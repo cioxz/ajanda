@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Renk, Takvim ve Not Ajandası</title>
+  <title>Takvim ve Çizimli Not Ajandası</title>
   <style>
     :root {
       --bg: #0f172a;
       --card-bg: #1e293b;
       --text: #f8fafc;
       --accent: #38bdf8;
+      --danger: #ef4444;
     }
 
     * {
@@ -42,6 +43,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
 
+    /* Header Structure */
     .header {
       display: flex;
       justify-content: space-between;
@@ -65,15 +67,21 @@
       font-size: 1.2rem;
     }
 
-    .header button {
+    .header-btn {
       background: #334155;
       color: #fff;
       border: none;
       padding: 8px 12px;
       border-radius: 8px;
       cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
+    /* Calendar Grid */
     .weekdays, .days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -126,52 +134,89 @@
       cursor: default;
     }
 
-    /* General Notes Section */
-    .notes-section h3 {
-      font-size: 1rem;
-      color: var(--accent);
-      margin-bottom: 10px;
+    /* Notes Box & Cards */
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .notes-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .note-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .note-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .note-item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .general-note-input {
-      width: 100%;
-      height: 140px;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      color: #fff;
-      padding: 12px;
+    .note-item-title {
+      font-weight: bold;
+      color: var(--accent);
       font-size: 0.95rem;
-      resize: none;
-      outline: none;
-      line-height: 1.4;
     }
 
-    .general-note-input:focus {
-      border-color: var(--accent);
+    .note-item-text {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      white-space: pre-wrap;
     }
 
-    /* Modal Popup */
+    .note-item img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* Modals */
     .modal {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       backdrop-filter: blur(4px);
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      z-index: 20;
     }
 
     .modal-content {
       background: var(--card-bg);
       padding: 20px;
       border-radius: 16px;
-      width: 85%;
-      max-width: 320px;
+      width: 90%;
+      max-width: 360px;
       text-align: center;
     }
 
@@ -189,17 +234,21 @@
       cursor: pointer;
     }
 
-    .date-note-input {
+    .input-box {
       width: 100%;
-      height: 80px;
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 8px;
       color: #fff;
       padding: 10px;
       font-size: 0.9rem;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    textarea.input-box {
+      height: 80px;
       resize: none;
-      margin-bottom: 15px;
     }
 
     .save-btn {
@@ -211,6 +260,30 @@
       border-radius: 8px;
       width: 100%;
       cursor: pointer;
+      margin-top: 5px;
+    }
+
+    /* Canvas (Çizim Ekranı) */
+    canvas {
+      background: #ffffff;
+      border-radius: 12px;
+      touch-action: none;
+      cursor: crosshair;
+      margin-bottom: 10px;
+    }
+
+    .draw-tools {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .draw-color {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #ccc;
     }
   </style>
 </head>
@@ -220,12 +293,12 @@
   <!-- Calendar Card -->
   <div class="card">
     <div class="header">
-      <button onclick="prevMonth()">◄</button>
+      <button class="header-btn" onclick="prevMonth()">◄</button>
       <div class="header-center">
         <div class="today-info" id="todayTitle"></div>
         <h2 id="monthTitle"></h2>
       </div>
-      <button onclick="nextMonth()">►</button>
+      <button class="header-btn" onclick="nextMonth()">►</button>
     </div>
 
     <div class="weekdays">
@@ -235,30 +308,66 @@
     <div class="days" id="daysContainer"></div>
   </div>
 
-  <!-- General Notes Card -->
-  <div class="card notes-section">
-    <h3>📝 Genel Notlar</h3>
-    <textarea class="general-note-input" id="generalNotes" placeholder="Buraya genel hatırlatmalarınızı, yapılacaklar listelerinizi yazabilirsiniz..."></textarea>
+  <!-- Notes Box Card -->
+  <div class="card">
+    <div class="notes-header">
+      <h2>📌 Notlar & Çizimler</h2>
+      <div class="notes-actions">
+        <button class="header-btn" onclick="openDrawModal()">✏️ Çiz</button>
+        <button class="header-btn" onclick="openTextNoteModal()">➕ Not</button>
+      </div>
+    </div>
+
+    <div class="note-list" id="generalNotesList">
+      <!-- Dynamic Notes -->
+    </div>
   </div>
 </div>
 
-<!-- Date-Specific Color & Note Modal Popup -->
+<!-- Date-Specific Color & Note Modal -->
 <div class="modal" id="colorModal">
   <div class="modal-content">
     <h3 id="modalDate">Tarih Seç</h3>
     
     <div class="colors">
-      <div class="color-btn" style="background:#334155" onclick="selectColor('')"></div> <!-- Clear -->
-      <div class="color-btn" style="background:#ef4444" onclick="selectColor('#ef4444')"></div> <!-- Red -->
-      <div class="color-btn" style="background:#eab308" onclick="selectColor('#eab308')"></div> <!-- Yellow -->
-      <div class="color-btn" style="background:#3b82f6" onclick="selectColor('#3b82f6')"></div> <!-- Blue -->
-      <div class="color-btn" style="background:#a855f7" onclick="selectColor('#a855f7')"></div> <!-- Purple -->
-      <div class="color-btn" style="background:#22c55e" onclick="selectColor('#22c55e')"></div> <!-- Green -->
+      <div class="color-btn" style="background:#334155" onclick="selectColor('')"></div>
+      <div class="color-btn" style="background:#ef4444" onclick="selectColor('#ef4444')"></div>
+      <div class="color-btn" style="background:#eab308" onclick="selectColor('#eab308')"></div>
+      <div class="color-btn" style="background:#3b82f6" onclick="selectColor('#3b82f6')"></div>
+      <div class="color-btn" style="background:#a855f7" onclick="selectColor('#a855f7')"></div>
+      <div class="color-btn" style="background:#22c55e" onclick="selectColor('#22c55e')"></div>
     </div>
 
-    <textarea class="date-note-input" id="noteInput" placeholder="Bu tarihe özel not ekleyin..."></textarea>
-
+    <textarea class="input-box" id="noteInput" placeholder="Bu tarihe özel not ekleyin..."></textarea>
     <button class="save-btn" onclick="saveDayData()">Kaydet</button>
+  </div>
+</div>
+
+<!-- Text Note Modal -->
+<div class="modal" id="textNoteModal">
+  <div class="modal-content">
+    <h3>Yeni Not Ekle</h3>
+    <input type="text" class="input-box" id="newNoteTitle" placeholder="Başlık (Opsiyonel)">
+    <textarea class="input-box" id="newNoteText" placeholder="Notunuzu yazın..."></textarea>
+    <button class="save-btn" onclick="saveTextNote()">Notu Kaydet</button>
+    <button class="header-btn" style="width:100%; margin-top:8px; justify-content:center;" onclick="closeModal('textNoteModal')">İptal</button>
+  </div>
+</div>
+
+<!-- Draw Modal -->
+<div class="modal" id="drawModal">
+  <div class="modal-content">
+    <h3>Karalama / Çizim Yap</h3>
+    <div class="draw-tools">
+      <div class="draw-color" style="background:#000000" onclick="setPenColor('#000000')"></div>
+      <div class="draw-color" style="background:#ef4444" onclick="setPenColor('#ef4444')"></div>
+      <div class="draw-color" style="background:#3b82f6" onclick="setPenColor('#3b82f6')"></div>
+      <div class="draw-color" style="background:#22c55e" onclick="setPenColor('#22c55e')"></div>
+      <button class="header-btn" onclick="clearCanvas()">Temizle</button>
+    </div>
+    <canvas id="paintCanvas" width="300" height="250"></canvas>
+    <button class="save-btn" onclick="saveDrawing()">Çizimi Kaydet</button>
+    <button class="header-btn" style="width:100%; margin-top:8px; justify-content:center;" onclick="closeModal('drawModal')">İptal</button>
   </div>
 </div>
 
@@ -306,12 +415,9 @@
       }
 
       const dateKey = `${year}-${month + 1}-${day}`;
-      
       const savedData = JSON.parse(localStorage.getItem(dateKey) || '{}');
       
-      if (savedData.color) {
-        dayCell.style.backgroundColor = savedData.color;
-      }
+      if (savedData.color) dayCell.style.backgroundColor = savedData.color;
 
       if (savedData.note && savedData.note.trim() !== '') {
         const dot = document.createElement('div');
@@ -319,63 +425,173 @@
         dayCell.appendChild(dot);
       }
 
-      dayCell.onclick = () => openModal(dateKey, day, savedData);
+      dayCell.onclick = () => openModal('colorModal', dateKey, day, savedData);
       container.appendChild(dayCell);
     }
   }
 
-  function openModal(dateKey, day, savedData) {
+  /* General Notes & Drawings Logic */
+  function loadGeneralNotes() {
+    const notesList = document.getElementById('generalNotesList');
+    notesList.innerHTML = '';
+    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+
+    if (notes.length === 0) {
+      notesList.innerHTML = '<div style="color:#64748b; font-size:0.85rem; text-align:center; padding:10px;">Henüz not veya çizim yok. "+" veya "✏️" butonuna basarak ekleyin!</div>';
+      return;
+    }
+
+    notes.forEach((note, index) => {
+      const item = document.createElement('div');
+      item.classList.add('note-item');
+
+      let contentHtml = '';
+      if (note.type === 'text') {
+        contentHtml = `
+          <div class="note-item-header">
+            <span class="note-item-title">${note.title || 'Not'}</span>
+            <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
+          </div>
+          <div class="note-item-text">${note.text}</div>
+        `;
+      } else if (note.type === 'draw') {
+        contentHtml = `
+          <div class="note-item-header">
+            <span class="note-item-title">🎨 Çizim Notu</span>
+            <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
+          </div>
+          <img src="${note.image}" alt="Çizim">
+        `;
+      }
+
+      item.innerHTML = contentHtml;
+      notesList.appendChild(item);
+    });
+  }
+
+  function openTextNoteModal() {
+    document.getElementById('newNoteTitle').value = '';
+    document.getElementById('newNoteText').value = '';
+    document.getElementById('textNoteModal').style.display = 'flex';
+  }
+
+  function saveTextNote() {
+    const title = document.getElementById('newNoteTitle').value;
+    const text = document.getElementById('newNoteText').value;
+
+    if (!text.trim()) return;
+
+    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+    notes.unshift({ type: 'text', title, text });
+    localStorage.setItem('user_general_notes', JSON.stringify(notes));
+
+    closeModal('textNoteModal');
+    loadGeneralNotes();
+  }
+
+  function deleteNote(index) {
+    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+    notes.splice(index, 1);
+    localStorage.setItem('user_general_notes', JSON.stringify(notes));
+    loadGeneralNotes();
+  }
+
+  /* Canvas / Drawing Logic */
+  const canvas = document.getElementById('paintCanvas');
+  const ctx = canvas.getContext('2d');
+  let painting = false;
+  let penColor = '#000000';
+
+  function setPenColor(color) {
+    penColor = color;
+  }
+
+  function clearCanvas() {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function openDrawModal() {
+    document.getElementById('drawModal').style.display = 'flex';
+    clearCanvas();
+  }
+
+  function startPosition(e) {
+    painting = true;
+    draw(e);
+  }
+
+  function endPosition() {
+    painting = false;
+    ctx.beginPath();
+  }
+
+  function draw(e) {
+    if (!painting) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = penColor;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  }
+
+  canvas.addEventListener('mousedown', startPosition);
+  canvas.addEventListener('mouseup', endPosition);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('touchstart', startPosition);
+  canvas.addEventListener('touchend', endPosition);
+  canvas.addEventListener('touchmove', draw);
+
+  function saveDrawing() {
+    const dataUrl = canvas.toDataURL();
+    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+    notes.unshift({ type: 'draw', image: dataUrl });
+    localStorage.setItem('user_general_notes', JSON.stringify(notes));
+
+    closeModal('drawModal');
+    loadGeneralNotes();
+  }
+
+  /* Date Modal Helpers */
+  function openModal(id, dateKey, day, savedData) {
     selectedDateKey = dateKey;
     selectedColor = savedData.color || '';
     document.getElementById('modalDate').innerText = `${day} ${monthNames[currentDate.getMonth()]}`;
     document.getElementById('noteInput').value = savedData.note || '';
-    document.getElementById('colorModal').style.display = 'flex';
+    document.getElementById(id).style.display = 'flex';
   }
 
-  function selectColor(color) {
-    selectedColor = color;
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
   }
 
-  function closeModal() {
-    document.getElementById('colorModal').style.display = 'none';
-  }
+  function selectColor(color) { selectedColor = color; }
 
   function saveDayData() {
     const noteText = document.getElementById('noteInput').value;
-
     if (selectedColor || noteText.trim() !== '') {
-      const dataToSave = {
-        color: selectedColor,
-        note: noteText
-      };
-      localStorage.setItem(selectedDateKey, JSON.stringify(dataToSave));
+      localStorage.setItem(selectedDateKey, JSON.stringify({ color: selectedColor, note: noteText }));
     } else {
       localStorage.removeItem(selectedDateKey);
     }
-
-    closeModal();
+    closeModal('colorModal');
     renderCalendar();
   }
 
-  function prevMonth() {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar();
-  }
-
-  function nextMonth() {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
-  }
-
-  // Auto-save for General Notes
-  const generalNotesInput = document.getElementById('generalNotes');
-  generalNotesInput.value = localStorage.getItem('general_notes') || '';
-  generalNotesInput.addEventListener('input', () => {
-    localStorage.setItem('general_notes', generalNotesInput.value);
-  });
+  function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
+  function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
   updateHeaderTodayInfo();
   renderCalendar();
+  loadGeneralNotes();
 </script>
 
 </body>
