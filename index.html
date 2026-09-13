@@ -386,13 +386,17 @@
       height: 100%;
       touch-action: none;
       cursor: crosshair;
-      display: none;
+      pointer-events: none;
       z-index: 5;
+    }
+
+    canvas#inlineCanvas.active-draw {
+      pointer-events: auto;
     }
 
     .ios-toolbar {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       align-items: center;
       padding-top: 10px;
       border-top: 1px solid var(--element-bg);
@@ -405,7 +409,7 @@
       font-size: 1.1rem;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 12px;
       transition: all 0.2s;
     }
@@ -418,7 +422,7 @@
 
     .pen-colors {
       display: none;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
 
@@ -429,6 +433,16 @@
       cursor: pointer;
       border: 2px solid #fff;
       box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .custom-color-picker {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: none;
     }
 
     .colors {
@@ -518,7 +532,7 @@
   </div>
 </div>
 
-<!-- Apple iOS Style Quick Note Modal (Metin & Entegre Çizim) -->
+<!-- Apple iOS Style Quick Note Modal -->
 <div class="modal" id="iosNoteModal">
   <div class="ios-modal-content">
     <div class="ios-header">
@@ -539,15 +553,23 @@
     <input type="file" id="imageUploader" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
 
     <div class="ios-toolbar">
-      <button class="ios-toolbar-btn active" id="btnWriteMode" onclick="setMode('write')" title="Yazma Modu"><b>Aa</b></button>
-      <button class="ios-toolbar-btn" id="btnDrawMode" onclick="setMode('draw')" title="Çizim Modu">✏️</button>
+      <div style="display: flex; gap: 4px;">
+        <button class="ios-toolbar-btn active" id="btnWriteMode" onclick="setMode('write')" title="Yazma Modu"><b>Aa</b></button>
+        <button class="ios-toolbar-btn" id="btnDrawMode" onclick="setMode('draw')" title="Çizim Modu">✏️</button>
+      </div>
       
       <div class="pen-colors" id="penColorsPalette">
-        <div class="pen-color-btn" style="background:#1f2937" onclick="setPenColor('#1f2937')"></div>
-        <div class="pen-color-btn" style="background:#ef4444" onclick="setPenColor('#ef4444')"></div>
-        <div class="pen-color-btn" style="background:#3b82f6" onclick="setPenColor('#3b82f6')"></div>
-        <div class="pen-color-btn" style="background:#22c55e" onclick="setPenColor('#22c55e')"></div>
-        <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()">Sil</button>
+        <div class="pen-color-btn" style="background:#1f2937" onclick="setPenColor('#1f2937')" title="Siyah"></div>
+        <div class="pen-color-btn" style="background:#ef4444" onclick="setPenColor('#ef4444')" title="Kırmızı"></div>
+        <div class="pen-color-btn" style="background:#3b82f6" onclick="setPenColor('#3b82f6')" title="Mavi"></div>
+        <div class="pen-color-btn" style="background:#22c55e" onclick="setPenColor('#22c55e')" title="Yeşil"></div>
+        
+        <!-- Renk Seçici (Color Picker) -->
+        <input type="color" class="custom-color-picker" id="customColorPicker" value="#eb3434" onchange="setPenColor(this.value)" title="Renk Seçici">
+        
+        <!-- Silgi Butonu -->
+        <button class="ios-toolbar-btn" id="btnEraser" style="padding: 4px 8px; font-size: 0.9rem;" onclick="setEraser()" title="Silgi">🧹</button>
+        <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()" title="Tümünü Temizle">Sil</button>
       </div>
 
       <button class="ios-toolbar-btn" title="Görsel Ekle" onclick="triggerImageUpload()">📎</button>
@@ -640,15 +662,29 @@
   const ctx = canvas.getContext('2d');
   let painting = false;
   let penColor = '#1f2937';
+  let isEraser = false;
   let hasDrawn = false;
+  let canvasInitialized = false;
 
   function initCanvasSize() {
     const wrapper = document.getElementById('editorWrapper');
-    canvas.width = wrapper.clientWidth;
-    canvas.height = wrapper.clientHeight;
+    if (!canvasInitialized) {
+      canvas.width = wrapper.clientWidth;
+      canvas.height = wrapper.clientHeight;
+      canvasInitialized = true;
+    }
   }
 
-  function setPenColor(color) { penColor = color; }
+  function setPenColor(color) { 
+    isEraser = false;
+    penColor = color; 
+    document.getElementById('btnEraser').classList.remove('active');
+  }
+
+  function setEraser() {
+    isEraser = true;
+    document.getElementById('btnEraser').classList.add('active');
+  }
 
   function clearInlineCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -661,16 +697,17 @@
     const btnDraw = document.getElementById('btnDrawMode');
     const colorsPalette = document.getElementById('penColorsPalette');
 
+    initCanvasSize();
+
     if (mode === 'draw') {
       btnDraw.classList.add('active');
       btnWrite.classList.remove('active');
-      canvas.style.display = 'block';
+      canvas.classList.add('active-draw');
       colorsPalette.style.display = 'flex';
-      initCanvasSize();
     } else {
       btnWrite.classList.add('active');
       btnDraw.classList.remove('active');
-      canvas.style.display = 'none';
+      canvas.classList.remove('active-draw');
       colorsPalette.style.display = 'none';
     }
   }
@@ -694,10 +731,16 @@
     const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
     const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = penColor;
+    if (isEraser) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 16;
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = penColor;
+    }
 
+    ctx.lineCap = 'round';
     ctx.lineTo(x, y);
     ctx.stroke();
     ctx.beginPath();
@@ -755,9 +798,10 @@
     document.getElementById('iosModalTimestamp').innerText = dateStr;
     document.getElementById('iosNoteInput').value = '';
     attachedImage = null;
+    canvasInitialized = false;
     clearInlineCanvas();
-    setMode('write');
     document.getElementById('iosNoteModal').style.display = 'flex';
+    setMode('write');
   }
 
   function saveIosNote() {
