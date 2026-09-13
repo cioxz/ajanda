@@ -15,7 +15,8 @@
       --text-muted: #6b7280;
       --accent: #4b5563;
       --accent-highlight: #3b82f6;
-      --ios-yellow: #f59e0b;
+      --holiday-bg: #fecdd3;
+      --holiday-text: #9f1239;
       --danger: #ef4444;
     }
 
@@ -51,7 +52,7 @@
       border: 1px solid var(--card-border);
     }
 
-    /* Header Structure */
+    /* Header */
     .header {
       display: flex;
       justify-content: space-between;
@@ -59,9 +60,7 @@
       margin-bottom: 20px;
     }
 
-    .header-center {
-      text-align: center;
-    }
+    .header-center { text-align: center; }
 
     .today-info {
       font-size: 0.8rem;
@@ -95,13 +94,8 @@
       transition: all 0.2s ease;
     }
 
-    .header-btn:hover {
-      background: var(--element-hover);
-    }
-
-    .header-btn:active {
-      transform: scale(0.95);
-    }
+    .header-btn:hover { background: var(--element-hover); }
+    .header-btn:active { transform: scale(0.95); }
 
     /* Calendar Grid */
     .weekdays, .days {
@@ -134,13 +128,8 @@
       transition: all 0.2s ease;
     }
 
-    .day:hover {
-      background: #e5e7eb;
-    }
-
-    .day:active {
-      transform: scale(0.93);
-    }
+    .day:hover { background: #e5e7eb; }
+    .day:active { transform: scale(0.93); }
 
     .note-dot {
       width: 5px;
@@ -148,11 +137,16 @@
       background-color: var(--accent-highlight);
       border-radius: 50%;
       position: absolute;
-      bottom: 5px;
+      bottom: 4px;
+    }
+
+    .day.holiday {
+      background-color: var(--holiday-bg) !important;
+      color: var(--holiday-text) !important;
+      font-weight: 700;
     }
 
     .day.current-today {
-      background: #ffffff;
       border: 2px solid var(--accent-highlight);
       color: var(--accent-highlight);
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
@@ -163,7 +157,7 @@
       cursor: default;
     }
 
-    /* Notes Box & Action Buttons */
+    /* Notes Box */
     .notes-header {
       display: flex;
       justify-content: space-between;
@@ -178,12 +172,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      letter-spacing: -0.3px;
-    }
-
-    .notes-actions {
-      display: flex;
-      gap: 8px;
     }
 
     .action-btn {
@@ -197,18 +185,12 @@
       font-weight: 600;
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 6px;
       transition: all 0.2s ease;
     }
 
-    .action-btn:hover {
-      background: #e5e7eb;
-    }
-
-    .action-btn:active {
-      transform: scale(0.95);
-    }
+    .action-btn:hover { background: #e5e7eb; }
+    .action-btn:active { transform: scale(0.95); }
 
     .note-list {
       display: flex;
@@ -225,7 +207,6 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      position: relative;
     }
 
     .note-item-header {
@@ -261,12 +242,9 @@
       cursor: pointer;
       font-size: 1rem;
       opacity: 0.7;
-      transition: opacity 0.2s;
     }
 
-    .delete-btn:hover {
-      opacity: 1;
-    }
+    .delete-btn:hover { opacity: 1; }
 
     /* Modals */
     .modal {
@@ -290,7 +268,6 @@
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
-    /* Apple Style Quick Note Modal */
     .ios-modal-content {
       background: #ffffff;
       color: var(--text);
@@ -320,26 +297,10 @@
       font-weight: bold;
       color: var(--text);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .ios-header-center {
-      text-align: center;
-    }
-
-    .ios-title {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: var(--text);
-    }
-
-    .ios-date-subtitle {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
+    .ios-title { font-weight: 700; font-size: 1.05rem; }
+    .ios-date-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
     .ios-save-btn {
       background: var(--accent-highlight);
@@ -352,7 +313,6 @@
       cursor: pointer;
     }
 
-    /* Note Container (Editor + Drawing overlay) */
     .ios-editor-wrapper {
       position: relative;
       width: 100%;
@@ -375,24 +335,19 @@
       background: transparent;
       padding: 12px;
       line-height: 1.6;
-      display: block;
     }
 
     canvas#inlineCanvas {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       touch-action: none;
       cursor: crosshair;
       pointer-events: none;
       z-index: 5;
     }
 
-    canvas#inlineCanvas.active-draw {
-      pointer-events: auto;
-    }
+    canvas#inlineCanvas.active-draw { pointer-events: auto; }
 
     .ios-toolbar {
       display: flex;
@@ -400,7 +355,6 @@
       align-items: center;
       padding-top: 10px;
       border-top: 1px solid var(--element-bg);
-      color: var(--text-muted);
     }
 
     .ios-toolbar-btn {
@@ -411,7 +365,6 @@
       cursor: pointer;
       padding: 8px 12px;
       border-radius: 12px;
-      transition: all 0.2s;
     }
 
     .ios-toolbar-btn.active {
@@ -438,7 +391,6 @@
     .custom-color-picker {
       width: 24px;
       height: 24px;
-      padding: 0;
       border: none;
       border-radius: 50%;
       cursor: pointer;
@@ -457,11 +409,6 @@
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
-      transition: transform 0.1s;
-    }
-
-    .color-btn:active {
-      transform: scale(0.9);
     }
 
     .input-box {
@@ -476,10 +423,7 @@
       margin-bottom: 12px;
     }
 
-    textarea.input-box {
-      height: 100px;
-      resize: none;
-    }
+    textarea.input-box { height: 100px; resize: none; }
 
     .save-btn {
       background: var(--accent-highlight);
@@ -490,14 +434,19 @@
       border-radius: 12px;
       width: 100%;
       cursor: pointer;
-      font-size: 0.9rem;
+    }
+
+    .holiday-info-label {
+      font-size: 0.8rem;
+      color: var(--holiday-text);
+      font-weight: 600;
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- Calendar Card -->
   <div class="card">
     <div class="header">
       <button class="header-btn" onclick="prevMonth()">◄</button>
@@ -515,7 +464,6 @@
     <div class="days" id="daysContainer"></div>
   </div>
 
-  <!-- Notes Box Card -->
   <div class="card">
     <div class="notes-header">
       <h2>Kayıtlı Notlar</h2>
@@ -526,13 +474,11 @@
       </div>
     </div>
 
-    <div class="note-list" id="generalNotesList">
-      <!-- Dynamic Notes -->
-    </div>
+    <div class="note-list" id="generalNotesList"></div>
   </div>
 </div>
 
-<!-- Apple iOS Style Quick Note Modal -->
+<!-- Modal: Hızlı Not -->
 <div class="modal" id="iosNoteModal">
   <div class="ios-modal-content">
     <div class="ios-header">
@@ -549,7 +495,6 @@
       <canvas id="inlineCanvas"></canvas>
     </div>
 
-    <!-- Gizli Görsel Yükleme Input'u -->
     <input type="file" id="imageUploader" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
 
     <div class="ios-toolbar">
@@ -564,12 +509,10 @@
         <div class="pen-color-btn" style="background:#3b82f6" onclick="setPenColor('#3b82f6')" title="Mavi"></div>
         <div class="pen-color-btn" style="background:#22c55e" onclick="setPenColor('#22c55e')" title="Yeşil"></div>
         
-        <!-- Renk Seçici (Color Picker) -->
         <input type="color" class="custom-color-picker" id="customColorPicker" value="#eb3434" onchange="setPenColor(this.value)" title="Renk Seçici">
         
-        <!-- Silgi Butonu -->
         <button class="ios-toolbar-btn" id="btnEraser" style="padding: 4px 8px; font-size: 0.9rem;" onclick="setEraser()" title="Silgi">🧹</button>
-        <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()" title="Tümünü Temizle">Sil</button>
+        <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()">Sil</button>
       </div>
 
       <button class="ios-toolbar-btn" title="Görsel Ekle" onclick="triggerImageUpload()">📎</button>
@@ -577,10 +520,11 @@
   </div>
 </div>
 
-<!-- Date-Specific Color & Note Modal -->
+<!-- Modal: Gün Detayı & Renk -->
 <div class="modal" id="colorModal">
   <div class="modal-content">
-    <h3 id="modalDate" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--text);">Tarih Seç</h3>
+    <h3 id="modalDate" style="margin-bottom: 4px; font-size: 1.1rem; color: var(--text);">Tarih Seç</h3>
+    <div id="holidayLabel" class="holiday-info-label"></div>
     
     <div class="colors">
       <div class="color-btn" style="background:#f3f4f6" onclick="selectColor('')"></div>
@@ -602,10 +546,62 @@
   let selectedDateKey = '';
   let selectedColor = '';
   let attachedImage = null;
-  let currentMode = 'write'; // 'write' or 'draw'
+  let currentMode = 'write';
 
-  const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+  const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylul", "Ekim", "Kasım", "Aralık"];
   const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+
+  // Sabit Milli Bayramlar (Ay-Gün formatı)
+  const fixedHolidays = {
+    "1-1": "Yılbaşı",
+    "4-23": "23 Nisan Ulusal Egemenlik ve Çocuk Bayramı",
+    "5-1": "1 Mayıs Emek ve Dayanışma Günü",
+    "5-19": "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı",
+    "7-15": "15 Temmuz Demokrasi ve Milli Birlik Günü",
+    "8-30": "30 Ağustos Zafer Bayramı",
+    "10-29": "29 Ekim Cumhuriyet Bayramı"
+  };
+
+  // Hicri-Miladi Dönüştürücü (Dini Bayramlar için)
+  function getHijriDate(date) {
+    const cf = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-num', {
+      day: 'numeric', month: 'numeric', year: 'numeric'
+    });
+    const parts = cf.formatToParts(date);
+    let hDay = 0, hMonth = 0;
+    for (let p of parts) {
+      if (p.type === 'day') hDay = parseInt(p.value);
+      if (p.type === 'month') hMonth = parseInt(p.value);
+    }
+    return { day: hDay, month: hMonth };
+  }
+
+  function getHolidayName(year, month, day) {
+    // 1) Sabit Bayram Kontrolü
+    const fixedKey = `${month}-${day}`;
+    if (fixedHolidays[fixedKey]) return fixedHolidays[fixedKey];
+
+    // 2) Dinî Bayram Kontrolü (Hicri Takvim)
+    const targetDate = new Date(year, month - 1, day);
+    const hijri = getHijriDate(targetDate);
+
+    // Ramazan Bayramı: Şevval ayı (10. ay) 1, 2, 3
+    if (hijri.month === 10) {
+      if (hijri.day === 1) return "Ramazan Bayramı 1. Gün";
+      if (hijri.day === 2) return "Ramazan Bayramı 2. Gün";
+      if (hijri.day === 3) return "Ramazan Bayramı 3. Gün";
+    }
+
+    // Kurban Bayramı: Zilhicce ayı (12. ay) 10, 11, 12, 13
+    if (hijri.month === 12) {
+      if (hijri.day === 10) return "Kurban Bayramı 1. Gün";
+      if (hijri.day === 11) return "Kurban Bayramı 2. Gün";
+      if (hijri.day === 12) return "Kurban Bayramı 3. Gün";
+      if (hijri.day === 13) return "Kurban Bayramı 4. Gün";
+    }
+
+    return null;
+  }
 
   function updateHeaderTodayInfo() {
     const dayName = dayNames[realToday.getDay()];
@@ -637,13 +633,19 @@
       dayCell.classList.add('day');
       dayCell.innerText = day;
 
+      const dateKey = `${year}-${month + 1}-${day}`;
+      const savedData = JSON.parse(localStorage.getItem(dateKey) || '{}');
+      const holidayName = getHolidayName(year, month + 1, day);
+
+      if (holidayName) {
+        dayCell.classList.add('holiday');
+        dayCell.title = holidayName;
+      }
+
       if (day === realToday.getDate() && month === realToday.getMonth() && year === realToday.getFullYear()) {
         dayCell.classList.add('current-today');
       }
 
-      const dateKey = `${year}-${month + 1}-${day}`;
-      const savedData = JSON.parse(localStorage.getItem(dateKey) || '{}');
-      
       if (savedData.color) dayCell.style.backgroundColor = savedData.color;
 
       if (savedData.note && savedData.note.trim() !== '') {
@@ -652,12 +654,12 @@
         dayCell.appendChild(dot);
       }
 
-      dayCell.onclick = () => openModal('colorModal', dateKey, day, savedData);
+      dayCell.onclick = () => openModal('colorModal', dateKey, day, savedData, holidayName);
       container.appendChild(dayCell);
     }
   }
 
-  /* Canvas / Drawing Setup inside Note Modal */
+  /* Canvas Drawing Logic */
   const canvas = document.getElementById('inlineCanvas');
   const ctx = canvas.getContext('2d');
   let painting = false;
@@ -754,14 +756,14 @@
   canvas.addEventListener('touchend', endPosition);
   canvas.addEventListener('touchmove', draw);
 
-  /* General Notes & iOS Quick Notes Logic */
+  /* General Notes Logic */
   function loadGeneralNotes() {
     const notesList = document.getElementById('generalNotesList');
     notesList.innerHTML = '';
     const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
 
     if (notes.length === 0) {
-      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0; font-weight:400;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
+      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
       return;
     }
 
@@ -776,15 +778,9 @@
         </div>
       `;
 
-      if (note.text) {
-        contentHtml += `<div class="note-item-text">${note.text}</div>`;
-      }
-      if (note.drawing) {
-        contentHtml += `<img src="${note.drawing}" alt="Not Çizimi">`;
-      }
-      if (note.image) {
-        contentHtml += `<img src="${note.image}" alt="Eklenti Görsel">`;
-      }
+      if (note.text) contentHtml += `<div class="note-item-text">${note.text}</div>`;
+      if (note.drawing) contentHtml += `<img src="${note.drawing}" alt="Çizim">`;
+      if (note.image) contentHtml += `<img src="${note.image}" alt="Görsel">`;
 
       item.innerHTML = contentHtml;
       notesList.appendChild(item);
@@ -807,11 +803,7 @@
   function saveIosNote() {
     const text = document.getElementById('iosNoteInput').value;
     const timeStr = document.getElementById('iosModalTimestamp').innerText;
-    let drawingData = null;
-
-    if (hasDrawn) {
-      drawingData = canvas.toDataURL();
-    }
+    let drawingData = hasDrawn ? canvas.toDataURL() : null;
 
     if (!text.trim() && !attachedImage && !drawingData) return;
 
@@ -852,11 +844,11 @@
     loadGeneralNotes();
   }
 
-  /* Date Modal Helpers */
-  function openModal(id, dateKey, day, savedData) {
+  function openModal(id, dateKey, day, savedData, holidayName) {
     selectedDateKey = dateKey;
     selectedColor = savedData.color || '';
     document.getElementById('modalDate').innerText = `${day} ${monthNames[currentDate.getMonth()]}`;
+    document.getElementById('holidayLabel').innerText = holidayName ? `🎉 ${holidayName}` : '';
     document.getElementById('noteInput').value = savedData.note || '';
     document.getElementById(id).style.display = 'flex';
   }
