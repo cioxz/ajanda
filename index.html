@@ -210,10 +210,6 @@
       transform: scale(0.95);
     }
 
-    .action-btn span {
-      font-size: 1rem;
-    }
-
     .note-list {
       display: flex;
       flex-direction: column;
@@ -356,24 +352,49 @@
       cursor: pointer;
     }
 
-    .ios-editor-area {
+    /* Note Container (Editor + Drawing overlay) */
+    .ios-editor-wrapper {
+      position: relative;
       width: 100%;
       height: 320px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fafafa;
+      border: 1px solid var(--element-bg);
+    }
+
+    .ios-editor-area {
+      width: 100%;
+      height: 100%;
       border: none;
       outline: none;
       font-size: 1rem;
       color: var(--text);
       resize: none;
       background: transparent;
-      padding: 10px 4px;
+      padding: 12px;
       line-height: 1.6;
+      display: block;
+    }
+
+    canvas#inlineCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+      display: none;
+      z-index: 5;
     }
 
     .ios-toolbar {
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding-top: 14px;
+      padding-top: 10px;
       border-top: 1px solid var(--element-bg);
       color: var(--text-muted);
     }
@@ -381,17 +402,33 @@
     .ios-toolbar-btn {
       background: none;
       border: none;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 10px;
-      transition: background 0.2s;
+      padding: 8px 14px;
+      border-radius: 12px;
+      transition: all 0.2s;
     }
 
-    .ios-toolbar-btn:hover {
+    .ios-toolbar-btn.active {
       background: var(--element-bg);
-      color: var(--text);
+      color: var(--accent-highlight);
+      font-weight: bold;
+    }
+
+    .pen-colors {
+      display: none;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pen-color-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
     .colors {
@@ -441,32 +478,6 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-
-    /* Canvas (Çizim Ekranı) */
-    canvas {
-      background: #ffffff;
-      border-radius: 16px;
-      touch-action: none;
-      cursor: crosshair;
-      margin-bottom: 12px;
-      border: 1px solid var(--element-bg);
-    }
-
-    .draw-tools {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .draw-color {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
   </style>
 </head>
 <body>
@@ -507,7 +518,7 @@
   </div>
 </div>
 
-<!-- Apple iOS Style Quick Note Modal -->
+<!-- Apple iOS Style Quick Note Modal (Metin & Entegre Çizim) -->
 <div class="modal" id="iosNoteModal">
   <div class="ios-modal-content">
     <div class="ios-header">
@@ -519,17 +530,27 @@
       <button class="ios-save-btn" onclick="saveIosNote()">Kaydet</button>
     </div>
 
-    <textarea class="ios-editor-area" id="iosNoteInput" placeholder="Not yazmaya başlayın..."></textarea>
+    <div class="ios-editor-wrapper" id="editorWrapper">
+      <textarea class="ios-editor-area" id="iosNoteInput" placeholder="Not yazmaya başlayın..."></textarea>
+      <canvas id="inlineCanvas"></canvas>
+    </div>
 
     <!-- Gizli Görsel Yükleme Input'u -->
     <input type="file" id="imageUploader" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
 
     <div class="ios-toolbar">
-      <button class="ios-toolbar-btn" title="Metin Biçimlendir" onclick="formatText()"><b>Aa</b></button>
-      <button class="ios-toolbar-btn" title="Yapılacak Listesi" onclick="insertCheckbox()">☑</button>
-      <button class="ios-toolbar-btn" title="Tablo Taslağı Ekle" onclick="insertTable()">▦</button>
+      <button class="ios-toolbar-btn active" id="btnWriteMode" onclick="setMode('write')" title="Yazma Modu"><b>Aa</b></button>
+      <button class="ios-toolbar-btn" id="btnDrawMode" onclick="setMode('draw')" title="Çizim Modu">✏️</button>
+      
+      <div class="pen-colors" id="penColorsPalette">
+        <div class="pen-color-btn" style="background:#1f2937" onclick="setPenColor('#1f2937')"></div>
+        <div class="pen-color-btn" style="background:#ef4444" onclick="setPenColor('#ef4444')"></div>
+        <div class="pen-color-btn" style="background:#3b82f6" onclick="setPenColor('#3b82f6')"></div>
+        <div class="pen-color-btn" style="background:#22c55e" onclick="setPenColor('#22c55e')"></div>
+        <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()">Sil</button>
+      </div>
+
       <button class="ios-toolbar-btn" title="Görsel Ekle" onclick="triggerImageUpload()">📎</button>
-      <button class="ios-toolbar-btn" title="Çizim Yap" onclick="openDrawFromNote()">✏️</button>
     </div>
   </div>
 </div>
@@ -553,29 +574,13 @@
   </div>
 </div>
 
-<!-- Draw Modal -->
-<div class="modal" id="drawModal">
-  <div class="modal-content">
-    <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--text);">Karalama / Çizim Yap</h3>
-    <div class="draw-tools">
-      <div class="draw-color" style="background:#1f2937" onclick="setPenColor('#1f2937')"></div>
-      <div class="draw-color" style="background:#ef4444" onclick="setPenColor('#ef4444')"></div>
-      <div class="draw-color" style="background:#3b82f6" onclick="setPenColor('#3b82f6')"></div>
-      <div class="draw-color" style="background:#22c55e" onclick="setPenColor('#22c55e')"></div>
-      <button class="header-btn" style="width: auto; padding: 0 10px; font-size: 0.75rem;" onclick="clearCanvas()">Temizle</button>
-    </div>
-    <canvas id="paintCanvas" width="320" height="260"></canvas>
-    <button class="save-btn" onclick="saveDrawing()">Çizimi Kaydet</button>
-    <button class="header-btn" style="width:100%; margin-top:8px; justify-content:center; border-radius: 12px;" onclick="closeModal('drawModal')">İptal</button>
-  </div>
-</div>
-
 <script>
   let currentDate = new Date();
   const realToday = new Date();
   let selectedDateKey = '';
   let selectedColor = '';
   let attachedImage = null;
+  let currentMode = 'write'; // 'write' or 'draw'
 
   const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
   const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
@@ -630,152 +635,50 @@
     }
   }
 
-  /* General Notes & iOS Quick Notes Logic */
-  function loadGeneralNotes() {
-    const notesList = document.getElementById('generalNotesList');
-    notesList.innerHTML = '';
-    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-
-    if (notes.length === 0) {
-      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0; font-weight:400;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
-      return;
-    }
-
-    notes.forEach((note, index) => {
-      const item = document.createElement('div');
-      item.classList.add('note-item');
-
-      let contentHtml = '';
-      if (note.type === 'text') {
-        contentHtml = `
-          <div class="note-item-header">
-            <span class="note-item-date">${note.timestamp || ''}</span>
-            <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
-          </div>
-          <div class="note-item-text">${note.text}</div>
-          ${note.image ? `<img src="${note.image}" alt="Eklenti Görsel">` : ''}
-        `;
-      } else if (note.type === 'draw') {
-        contentHtml = `
-          <div class="note-item-header">
-            <span class="note-item-date">🎨 Çizim Notu</span>
-            <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
-          </div>
-          <img src="${note.image}" alt="Çizim">
-        `;
-      }
-
-      item.innerHTML = contentHtml;
-      notesList.appendChild(item);
-    });
-  }
-
-  function openIosNoteModal() {
-    const now = new Date();
-    const dateStr = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    
-    document.getElementById('iosModalTimestamp').innerText = dateStr;
-    document.getElementById('iosNoteInput').value = '';
-    attachedImage = null;
-    document.getElementById('iosNoteModal').style.display = 'flex';
-  }
-
-  function saveIosNote() {
-    const text = document.getElementById('iosNoteInput').value;
-    const timeStr = document.getElementById('iosModalTimestamp').innerText;
-
-    if (!text.trim() && !attachedImage) return;
-
-    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-    notes.unshift({ type: 'text', text, image: attachedImage, timestamp: timeStr });
-    localStorage.setItem('user_general_notes', JSON.stringify(notes));
-
-    closeModal('iosNoteModal');
-    loadGeneralNotes();
-  }
-
-  /* Araç Çubuğu Buton Fonksiyonları */
-  function formatText() {
-    const textarea = document.getElementById('iosNoteInput');
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-
-    if (selectedText) {
-      textarea.value = textarea.value.substring(0, start) + selectedText.toUpperCase() + textarea.value.substring(end);
-    } else {
-      const currentVal = textarea.value;
-      textarea.value = currentVal ? currentVal + "\n📌 " : "📌 ";
-    }
-    textarea.focus();
-  }
-
-  function insertCheckbox() {
-    const textarea = document.getElementById('iosNoteInput');
-    const start = textarea.selectionStart;
-    const currentVal = textarea.value;
-    
-    const prefix = currentVal && !currentVal.endsWith('\n') ? '\n[ ] ' : '[ ] ';
-    textarea.value = currentVal.substring(0, start) + prefix + currentVal.substring(start);
-    textarea.focus();
-  }
-
-  function insertTable() {
-    const textarea = document.getElementById('iosNoteInput');
-    const tableTemplate = "\n| Başlık 1 | Başlık 2 |\n|----------|----------|\n| Veri 1   | Veri 2   |\n";
-    textarea.value += tableTemplate;
-    textarea.focus();
-  }
-
-  function triggerImageUpload() {
-    document.getElementById('imageUploader').click();
-  }
-
-  function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        attachedImage = event.target.result;
-        const textarea = document.getElementById('iosNoteInput');
-        textarea.value += "\n[📷 Görsel Eklendi]";
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  function openDrawFromNote() {
-    closeModal('iosNoteModal');
-    openDrawModal();
-  }
-
-  function deleteNote(index) {
-    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-    notes.splice(index, 1);
-    localStorage.setItem('user_general_notes', JSON.stringify(notes));
-    loadGeneralNotes();
-  }
-
-  /* Canvas / Drawing Logic */
-  const canvas = document.getElementById('paintCanvas');
+  /* Canvas / Drawing Setup inside Note Modal */
+  const canvas = document.getElementById('inlineCanvas');
   const ctx = canvas.getContext('2d');
   let painting = false;
   let penColor = '#1f2937';
+  let hasDrawn = false;
+
+  function initCanvasSize() {
+    const wrapper = document.getElementById('editorWrapper');
+    canvas.width = wrapper.clientWidth;
+    canvas.height = wrapper.clientHeight;
+  }
 
   function setPenColor(color) { penColor = color; }
 
-  function clearCanvas() {
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  function clearInlineCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawn = false;
   }
 
-  function openDrawModal() {
-    document.getElementById('drawModal').style.display = 'flex';
-    clearCanvas();
+  function setMode(mode) {
+    currentMode = mode;
+    const btnWrite = document.getElementById('btnWriteMode');
+    const btnDraw = document.getElementById('btnDrawMode');
+    const colorsPalette = document.getElementById('penColorsPalette');
+
+    if (mode === 'draw') {
+      btnDraw.classList.add('active');
+      btnWrite.classList.remove('active');
+      canvas.style.display = 'block';
+      colorsPalette.style.display = 'flex';
+      initCanvasSize();
+    } else {
+      btnWrite.classList.add('active');
+      btnDraw.classList.remove('active');
+      canvas.style.display = 'none';
+      colorsPalette.style.display = 'none';
+    }
   }
 
   function startPosition(e) {
+    if (currentMode !== 'draw') return;
     painting = true;
+    hasDrawn = true;
     draw(e);
   }
 
@@ -785,7 +688,7 @@
   }
 
   function draw(e) {
-    if (!painting) return;
+    if (!painting || currentMode !== 'draw') return;
     e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
@@ -808,13 +711,100 @@
   canvas.addEventListener('touchend', endPosition);
   canvas.addEventListener('touchmove', draw);
 
-  function saveDrawing() {
-    const dataUrl = canvas.toDataURL();
+  /* General Notes & iOS Quick Notes Logic */
+  function loadGeneralNotes() {
+    const notesList = document.getElementById('generalNotesList');
+    notesList.innerHTML = '';
     const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-    notes.unshift({ type: 'draw', image: dataUrl });
+
+    if (notes.length === 0) {
+      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0; font-weight:400;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
+      return;
+    }
+
+    notes.forEach((note, index) => {
+      const item = document.createElement('div');
+      item.classList.add('note-item');
+
+      let contentHtml = `
+        <div class="note-item-header">
+          <span class="note-item-date">${note.timestamp || ''}</span>
+          <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
+        </div>
+      `;
+
+      if (note.text) {
+        contentHtml += `<div class="note-item-text">${note.text}</div>`;
+      }
+      if (note.drawing) {
+        contentHtml += `<img src="${note.drawing}" alt="Not Çizimi">`;
+      }
+      if (note.image) {
+        contentHtml += `<img src="${note.image}" alt="Eklenti Görsel">`;
+      }
+
+      item.innerHTML = contentHtml;
+      notesList.appendChild(item);
+    });
+  }
+
+  function openIosNoteModal() {
+    const now = new Date();
+    const dateStr = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    document.getElementById('iosModalTimestamp').innerText = dateStr;
+    document.getElementById('iosNoteInput').value = '';
+    attachedImage = null;
+    clearInlineCanvas();
+    setMode('write');
+    document.getElementById('iosNoteModal').style.display = 'flex';
+  }
+
+  function saveIosNote() {
+    const text = document.getElementById('iosNoteInput').value;
+    const timeStr = document.getElementById('iosModalTimestamp').innerText;
+    let drawingData = null;
+
+    if (hasDrawn) {
+      drawingData = canvas.toDataURL();
+    }
+
+    if (!text.trim() && !attachedImage && !drawingData) return;
+
+    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+    notes.unshift({ 
+      text: text.trim(), 
+      drawing: drawingData, 
+      image: attachedImage, 
+      timestamp: timeStr 
+    });
     localStorage.setItem('user_general_notes', JSON.stringify(notes));
 
-    closeModal('drawModal');
+    closeModal('iosNoteModal');
+    loadGeneralNotes();
+  }
+
+  function triggerImageUpload() {
+    document.getElementById('imageUploader').click();
+  }
+
+  function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        attachedImage = event.target.result;
+        const textarea = document.getElementById('iosNoteInput');
+        textarea.value += "\n[📷 Görsel Eklendi]";
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function deleteNote(index) {
+    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+    notes.splice(index, 1);
+    localStorage.setItem('user_general_notes', JSON.stringify(notes));
     loadGeneralNotes();
   }
 
