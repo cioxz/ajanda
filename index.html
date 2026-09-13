@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Takvim ve iOS Hızlı Notlar</title>
+  <title>Takvim ve Hızlı Notlar</title>
   <style>
     :root {
-      --bg: #f2efe9;
-      --card-bg: #faf8f5;
-      --card-border: #e3dec3;
-      --element-bg: #e6e2da;
-      --text: #2c302e;
-      --text-muted: #736f68;
-      --accent: #8c7a6b;
-      --ios-yellow: #d4a359;
-      --danger: #d9534f;
+      --bg: #e5e7eb;
+      --card-bg: #ffffff;
+      --card-border: #f3f4f6;
+      --element-bg: #f3f4f6;
+      --element-hover: #e5e7eb;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --accent: #4b5563;
+      --accent-highlight: #3b82f6;
+      --ios-yellow: #f59e0b;
+      --danger: #ef4444;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -29,7 +31,8 @@
       color: var(--text);
       display: flex;
       justify-content: center;
-      padding: 15px;
+      padding: 20px 15px;
+      min-height: 100vh;
     }
 
     .app {
@@ -37,15 +40,15 @@
       max-width: 420px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 18px;
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-      border: 1px solid #e8e4dc;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      border: 1px solid var(--card-border);
     }
 
     /* Header Structure */
@@ -61,50 +64,58 @@
     }
 
     .today-info {
-      font-size: 0.85rem;
-      color: var(--accent);
+      font-size: 0.8rem;
+      color: var(--accent-highlight);
       font-weight: 600;
+      letter-spacing: 0.3px;
       margin-bottom: 2px;
       text-transform: capitalize;
     }
 
     .header h2 {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       color: var(--text);
+      font-weight: 700;
+      letter-spacing: -0.3px;
     }
 
     .header-btn {
       background: var(--element-bg);
       color: var(--text);
       border: none;
-      padding: 8px 12px;
-      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: bold;
       display: flex;
       align-items: center;
-      gap: 4px;
-      transition: background 0.2s;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .header-btn:hover {
+      background: var(--element-hover);
     }
 
     .header-btn:active {
-      background: #dad5cc;
+      transform: scale(0.95);
     }
 
     /* Calendar Grid */
     .weekdays, .days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
+      gap: 8px;
       text-align: center;
     }
 
     .weekdays div {
-      font-weight: bold;
+      font-weight: 600;
       color: var(--text-muted);
-      font-size: 0.85rem;
-      padding-bottom: 8px;
+      font-size: 0.8rem;
+      padding-bottom: 6px;
     }
 
     .day {
@@ -114,31 +125,37 @@
       align-items: center;
       justify-content: center;
       background: var(--element-bg);
-      border-radius: 10px;
+      border-radius: 14px;
       font-size: 0.9rem;
       font-weight: 600;
       color: var(--text);
       cursor: pointer;
       position: relative;
-      transition: transform 0.1s, background 0.2s;
+      transition: all 0.2s ease;
+    }
+
+    .day:hover {
+      background: #e5e7eb;
     }
 
     .day:active {
-      transform: scale(0.92);
+      transform: scale(0.93);
     }
 
     .note-dot {
-      width: 4px;
-      height: 4px;
-      background-color: var(--accent);
+      width: 5px;
+      height: 5px;
+      background-color: var(--accent-highlight);
       border-radius: 50%;
       position: absolute;
-      bottom: 4px;
+      bottom: 5px;
     }
 
     .day.current-today {
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 8px rgba(140, 122, 107, 0.3);
+      background: #ffffff;
+      border: 2px solid var(--accent-highlight);
+      color: var(--accent-highlight);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
     }
 
     .day.empty {
@@ -146,12 +163,22 @@
       cursor: default;
     }
 
-    /* Notes Box & Cards */
+    /* Notes Box & Action Buttons */
     .notes-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 18px;
+    }
+
+    .notes-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.3px;
     }
 
     .notes-actions {
@@ -159,22 +186,51 @@
       gap: 8px;
     }
 
+    .action-btn {
+      background: var(--element-bg);
+      color: var(--text);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      padding: 8px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-width: 58px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+
+    .action-btn span {
+      font-size: 1rem;
+    }
+
     .note-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 250px;
+      gap: 12px;
+      max-height: 260px;
       overflow-y: auto;
     }
 
     .note-item {
       background: var(--element-bg);
-      border: 1px solid #dad5cc;
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       position: relative;
     }
 
@@ -187,18 +243,20 @@
     .note-item-date {
       font-size: 0.75rem;
       color: var(--text-muted);
+      font-weight: 500;
     }
 
     .note-item-text {
       font-size: 0.9rem;
       color: var(--text);
       white-space: pre-wrap;
+      line-height: 1.4;
     }
 
     .note-item img {
       max-width: 100%;
-      border-radius: 8px;
-      margin-top: 5px;
+      border-radius: 10px;
+      margin-top: 4px;
     }
 
     .delete-btn {
@@ -208,15 +266,21 @@
       font-weight: bold;
       cursor: pointer;
       font-size: 1rem;
+      opacity: 0.7;
+      transition: opacity 0.2s;
     }
 
-    /* Modals Base */
+    .delete-btn:hover {
+      opacity: 1;
+    }
+
+    /* Modals */
     .modal {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(44, 48, 46, 0.4);
-      backdrop-filter: blur(4px);
+      background: rgba(17, 24, 39, 0.4);
+      backdrop-filter: blur(8px);
       align-items: center;
       justify-content: center;
       z-index: 20;
@@ -224,42 +288,41 @@
 
     .modal-content {
       background: var(--card-bg);
-      padding: 20px;
-      border-radius: 16px;
+      padding: 24px;
+      border-radius: 24px;
       width: 90%;
       max-width: 360px;
       text-align: center;
-      border: 1px solid #e8e4dc;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
     /* Apple Style Quick Note Modal */
     .ios-modal-content {
-      background: #faf8f5;
+      background: #ffffff;
       color: var(--text);
       width: 92%;
       max-width: 380px;
       border-radius: 24px;
-      padding: 16px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-      border: 1px solid #e8e4dc;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.15);
     }
 
     .ios-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .ios-close-btn {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       background: var(--element-bg);
       border-radius: 50%;
       border: none;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: bold;
       color: var(--text);
       cursor: pointer;
@@ -285,13 +348,13 @@
     }
 
     .ios-save-btn {
-      background: var(--ios-yellow);
+      background: var(--accent-highlight);
       color: #ffffff;
       border: none;
-      padding: 6px 16px;
+      padding: 7px 18px;
       border-radius: 20px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       cursor: pointer;
     }
 
@@ -300,7 +363,7 @@
       height: 180px;
       border: none;
       outline: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--text);
       resize: none;
       background: transparent;
@@ -313,7 +376,7 @@
       justify-content: space-around;
       align-items: center;
       padding-top: 12px;
-      border-top: 1px solid #e2ddd5;
+      border-top: 1px solid var(--element-bg);
       color: var(--text-muted);
       font-size: 1.1rem;
     }
@@ -329,60 +392,66 @@
     .colors {
       display: flex;
       justify-content: space-around;
-      margin: 15px 0;
+      margin: 18px 0;
     }
 
     .color-btn {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .color-btn:active {
+      transform: scale(0.9);
     }
 
     .input-box {
       width: 100%;
       background: var(--element-bg);
-      border: 1px solid #dad5cc;
-      border-radius: 8px;
+      border: 1px solid transparent;
+      border-radius: 12px;
       color: var(--text);
-      padding: 10px;
+      padding: 12px;
       font-size: 0.9rem;
       outline: none;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     textarea.input-box {
-      height: 80px;
+      height: 90px;
       resize: none;
     }
 
     .save-btn {
-      background: var(--accent);
+      background: var(--accent-highlight);
       color: #ffffff;
-      font-weight: bold;
+      font-weight: 600;
       border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
+      padding: 12px 16px;
+      border-radius: 12px;
       width: 100%;
       cursor: pointer;
-      margin-top: 5px;
+      font-size: 0.9rem;
     }
 
     /* Canvas (Çizim Ekranı) */
     canvas {
       background: #ffffff;
-      border-radius: 12px;
+      border-radius: 16px;
       touch-action: none;
       cursor: crosshair;
-      margin-bottom: 10px;
-      border: 1px solid #dad5cc;
+      margin-bottom: 12px;
+      border: 1px solid var(--element-bg);
     }
 
     .draw-tools {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
     .draw-color {
@@ -390,7 +459,8 @@
       height: 28px;
       border-radius: 50%;
       cursor: pointer;
-      border: 2px solid #ccc;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -420,8 +490,12 @@
     <div class="notes-header">
       <h2>📌 Notlar & Çizimler</h2>
       <div class="notes-actions">
-        <button class="header-btn" onclick="openDrawModal()">✏️ Çiz</button>
-        <button class="header-btn" onclick="openIosNoteModal()">➕ Not</button>
+        <button class="action-btn" onclick="openDrawModal()">
+          <span>✏️</span> Çiz
+        </button>
+        <button class="action-btn" onclick="openIosNoteModal()">
+          <span>➕</span> Not
+        </button>
       </div>
     </div>
 
@@ -458,15 +532,15 @@
 <!-- Date-Specific Color & Note Modal -->
 <div class="modal" id="colorModal">
   <div class="modal-content">
-    <h3 id="modalDate">Tarih Seç</h3>
+    <h3 id="modalDate" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--text);">Tarih Seç</h3>
     
     <div class="colors">
-      <div class="color-btn" style="background:#e6e2da" onclick="selectColor('')"></div>
-      <div class="color-btn" style="background:#f87171" onclick="selectColor('#f87171')"></div>
-      <div class="color-btn" style="background:#fbbf24" onclick="selectColor('#fbbf24')"></div>
-      <div class="color-btn" style="background:#60a5fa" onclick="selectColor('#60a5fa')"></div>
-      <div class="color-btn" style="background:#c084fc" onclick="selectColor('#c084fc')"></div>
-      <div class="color-btn" style="background:#4ade80" onclick="selectColor('#4ade80')"></div>
+      <div class="color-btn" style="background:#f3f4f6" onclick="selectColor('')"></div>
+      <div class="color-btn" style="background:#fca5a5" onclick="selectColor('#fca5a5')"></div>
+      <div class="color-btn" style="background:#fde047" onclick="selectColor('#fde047')"></div>
+      <div class="color-btn" style="background:#93c5fd" onclick="selectColor('#93c5fd')"></div>
+      <div class="color-btn" style="background:#d8b4fe" onclick="selectColor('#d8b4fe')"></div>
+      <div class="color-btn" style="background:#86efac" onclick="selectColor('#86efac')"></div>
     </div>
 
     <textarea class="input-box" id="noteInput" placeholder="Bu tarihe özel not ekleyin..."></textarea>
@@ -477,17 +551,17 @@
 <!-- Draw Modal -->
 <div class="modal" id="drawModal">
   <div class="modal-content">
-    <h3>Karalama / Çizim Yap</h3>
+    <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--text);">Karalama / Çizim Yap</h3>
     <div class="draw-tools">
-      <div class="draw-color" style="background:#000000" onclick="setPenColor('#000000')"></div>
+      <div class="draw-color" style="background:#1f2937" onclick="setPenColor('#1f2937')"></div>
       <div class="draw-color" style="background:#ef4444" onclick="setPenColor('#ef4444')"></div>
       <div class="draw-color" style="background:#3b82f6" onclick="setPenColor('#3b82f6')"></div>
       <div class="draw-color" style="background:#22c55e" onclick="setPenColor('#22c55e')"></div>
-      <button class="header-btn" onclick="clearCanvas()">Temizle</button>
+      <button class="header-btn" style="width: auto; padding: 0 10px; font-size: 0.75rem;" onclick="clearCanvas()">Temizle</button>
     </div>
-    <canvas id="paintCanvas" width="300" height="250"></canvas>
+    <canvas id="paintCanvas" width="300" height="240"></canvas>
     <button class="save-btn" onclick="saveDrawing()">Çizimi Kaydet</button>
-    <button class="header-btn" style="width:100%; margin-top:8px; justify-content:center;" onclick="closeModal('drawModal')">İptal</button>
+    <button class="header-btn" style="width:100%; margin-top:8px; justify-content:center; border-radius: 12px;" onclick="closeModal('drawModal')">İptal</button>
   </div>
 </div>
 
@@ -557,7 +631,7 @@
     const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
 
     if (notes.length === 0) {
-      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:10px;">Henüz not veya çizim yok. "+" veya "✏️" butonuna basarak ekleyin!</div>';
+      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0; font-weight:400;">Henüz not veya çizim yok.<br><b>"+"</b> veya <b>"✏️"</b> butonuna basarak ekleyin!</div>';
       return;
     }
 
@@ -623,7 +697,7 @@
   const canvas = document.getElementById('paintCanvas');
   const ctx = canvas.getContext('2d');
   let painting = false;
-  let penColor = '#000000';
+  let penColor = '#1f2937';
 
   function setPenColor(color) { penColor = color; }
 
