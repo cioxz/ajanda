@@ -259,6 +259,7 @@
     }
 
     .modal-content {
+      position: relative;
       background: var(--card-bg);
       padding: 24px;
       border-radius: 24px;
@@ -266,6 +267,30 @@
       max-width: 440px;
       text-align: center;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 28px;
+      height: 28px;
+      background: var(--element-bg);
+      border-radius: 50%;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: #e5e7eb;
+      color: var(--text);
     }
 
     .ios-modal-content {
@@ -389,13 +414,23 @@
     }
 
     .custom-color-picker {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border: none;
       border-radius: 50%;
       cursor: pointer;
       background: none;
       padding: 0;
+      overflow: hidden;
+    }
+
+    .custom-color-picker::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .custom-color-picker::-webkit-color-swatch {
+      border: none;
+      border-radius: 50%;
     }
 
     .colors {
@@ -509,8 +544,8 @@
 </div>
 
 <!-- Modal: Hızlı Not -->
-<div class="modal" id="iosNoteModal">
-  <div class="ios-modal-content">
+<div class="modal" id="iosNoteModal" onclick="handleOutsideClick(event, 'iosNoteModal')">
+  <div class="ios-modal-content" onclick="event.stopPropagation()">
     <div class="ios-header">
       <button class="ios-close-btn" onclick="closeModal('iosNoteModal')">✕</button>
       <div class="ios-header-center">
@@ -539,7 +574,7 @@
         <div class="pen-color-btn" style="background:#3b82f6" onclick="setPenColor('#3b82f6')" title="Mavi"></div>
         <div class="pen-color-btn" style="background:#22c55e" onclick="setPenColor('#22c55e')" title="Yeşil"></div>
         
-        <input type="color" class="custom-color-picker" id="customPenColorPicker" value="#eb3434" onchange="setPenColor(this.value)" title="Renk Seçici">
+        <input type="color" class="custom-color-picker" id="customPenColorPicker" value="#eb3434" onchange="setPenColor(this.value)" title="Renk Seçici" style="width:22px; height:22px;">
         
         <button class="ios-toolbar-btn" id="btnEraser" style="padding: 4px 8px; font-size: 0.9rem;" onclick="setEraser()" title="Silgi">🧹</button>
         <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()">Sil</button>
@@ -551,23 +586,19 @@
 </div>
 
 <!-- Modal: Gün Detayı & Renk -->
-<div class="modal" id="colorModal">
-  <div class="modal-content">
+<div class="modal" id="colorModal" onclick="handleOutsideClick(event, 'colorModal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeModal('colorModal')">✕</button>
+    
     <h3 id="modalDate" style="margin-bottom: 4px; font-size: 1.1rem; color: var(--text);">Tarih Seç</h3>
     <div id="holidayLabel" class="holiday-info-label"></div>
     
     <div class="colors">
-      <!-- Varsayılan (Renksiz) -->
       <div class="color-btn" style="background:#f3f4f6" onclick="selectColor('')" title="Sıfırla"></div>
-      <!-- Kırmızı / Pembe -->
       <div class="color-btn" style="background:#fca5a5" onclick="selectColor('#fca5a5')"></div>
-      <!-- Gri (#5f646b) -->
       <div class="color-btn" style="background:#5f646b" onclick="selectColor('#5f646b')"></div>
-      <!-- Mavi -->
       <div class="color-btn" style="background:#93c5fd" onclick="selectColor('#93c5fd')"></div>
-      <!-- Yeşil -->
       <div class="color-btn" style="background:#86efac" onclick="selectColor('#86efac')"></div>
-      <!-- Özel Renk Seçici -->
       <input type="color" class="custom-color-picker" id="dayColorPicker" onchange="selectColor(this.value)" title="Özel Renk Seç">
     </div>
 
@@ -590,10 +621,9 @@
   let attachedImage = null;
   let currentMode = 'write';
 
-  const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+  const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Kasım", "Aralık"];
   const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
 
-  // Sabit Milli Bayramlar (Ay-Gün)
   const fixedHolidays = {
     "1-1": "Yılbaşı",
     "4-23": "23 Nisan Ulusal Egemenlik ve Çocuk Bayramı",
@@ -604,7 +634,6 @@
     "10-29": "29 Ekim Cumhuriyet Bayramı"
   };
 
-  // Dinî Bayram Takvimi (Yıl-Ay-Gün)
   const religiousHolidays = {
     "2026-3-20": "Ramazan Bayramı 1. Gün",
     "2026-3-21": "Ramazan Bayramı 2. Gün",
@@ -687,7 +716,6 @@
         dayCell.classList.add('current-today');
       }
 
-      // Öncelik: Belirli tarihe özel renk > Tüm yıllara uygulanan renk
       const activeColor = savedData.color || recurrentColor;
       if (activeColor) dayCell.style.backgroundColor = activeColor;
 
@@ -906,6 +934,12 @@
 
   function closeModal(id) {
     document.getElementById(id).style.display = 'none';
+  }
+
+  function handleOutsideClick(event, modalId) {
+    if (event.target.id === modalId) {
+      closeModal(modalId);
+    }
   }
 
   function selectColor(color) { 
