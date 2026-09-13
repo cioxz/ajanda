@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Renk Ajandası</title>
+  <title>Renk ve Not Ajandası</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -85,6 +85,7 @@
     .day {
       aspect-ratio: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       background: #334155;
@@ -100,7 +101,16 @@
       transform: scale(0.92);
     }
 
-    /* Bugünün vurgulanması */
+    /* Nokta göstergesi (Not varsa beliren nokta) */
+    .note-dot {
+      width: 4px;
+      height: 4px;
+      background-color: #fff;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 4px;
+    }
+
     .day.current-today {
       border: 2px solid var(--accent);
       box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
@@ -111,7 +121,7 @@
       cursor: default;
     }
 
-    /* Renk Paleti Modal Popup */
+    /* Modal Popup */
     .modal {
       display: none;
       position: fixed;
@@ -135,25 +145,39 @@
     .colors {
       display: flex;
       justify-content: space-around;
-      margin: 20px 0;
+      margin: 15px 0;
     }
 
     .color-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
     }
 
-    .close-btn {
-      background: #475569;
+    .note-input {
+      width: 100%;
+      height: 80px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
       color: #fff;
+      padding: 10px;
+      font-size: 0.9rem;
+      resize: none;
+      margin-bottom: 15px;
+    }
+
+    .save-btn {
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: bold;
       border: none;
-      padding: 8px 16px;
+      padding: 10px 16px;
       border-radius: 8px;
       width: 100%;
-      margin-top: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -176,26 +200,31 @@
   <div class="days" id="daysContainer"></div>
 </div>
 
-<!-- Renk Seçim Ekranı -->
+<!-- Renk ve Not Modal Popup -->
 <div class="modal" id="colorModal">
   <div class="modal-content">
     <h3 id="modalDate">Tarih Seç</h3>
+    
     <div class="colors">
-      <div class="color-btn" style="background:#334155" onclick="setDayColor('')"></div> <!-- Temizle -->
-      <div class="color-btn" style="background:#ef4444" onclick="setDayColor('#ef4444')"></div> <!-- Kırmızı -->
-      <div class="color-btn" style="background:#eab308" onclick="setDayColor('#eab308')"></div> <!-- Sarı -->
-      <div class="color-btn" style="background:#3b82f6" onclick="setDayColor('#3b82f6')"></div> <!-- Mavi -->
-      <div class="color-btn" style="background:#a855f7" onclick="setDayColor('#a855f7')"></div> <!-- Mor -->
-      <div class="color-btn" style="background:#22c55e" onclick="setDayColor('#22c55e')"></div> <!-- Yeşil -->
+      <div class="color-btn" style="background:#334155" onclick="selectColor('')"></div> <!-- Temizle -->
+      <div class="color-btn" style="background:#ef4444" onclick="selectColor('#ef4444')"></div> <!-- Kırmızı -->
+      <div class="color-btn" style="background:#eab308" onclick="selectColor('#eab308')"></div> <!-- Sarı -->
+      <div class="color-btn" style="background:#3b82f6" onclick="selectColor('#3b82f6')"></div> <!-- Mavi -->
+      <div class="color-btn" style="background:#a855f7" onclick="selectColor('#a855f7')"></div> <!-- Mor -->
+      <div class="color-btn" style="background:#22c55e" onclick="selectColor('#22c55e')"></div> <!-- Yeşil -->
     </div>
-    <button class="close-btn" onclick="closeModal()">Kapat</button>
+
+    <textarea class="note-input" id="noteInput" placeholder="Bu güne bir not yazın..."></textarea>
+
+    <button class="save-btn" onclick="saveDayData()">Kaydet</button>
   </div>
 </div>
 
 <script>
   let currentDate = new Date();
-  const realToday = new Date(); // Gerçek bugünün tarihi
+  const realToday = new Date();
   let selectedDateKey = '';
+  let selectedColor = '';
 
   const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
   const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
@@ -219,53 +248,71 @@
     const container = document.getElementById('daysContainer');
     container.innerHTML = '';
 
-    // Boş günler
     for (let i = 0; i < firstDay; i++) {
       const emptyCell = document.createElement('div');
       emptyCell.classList.add('day', 'empty');
       container.appendChild(emptyCell);
     }
 
-    // Ayın günleri
     for (let day = 1; day <= daysInMonth; day++) {
       const dayCell = document.createElement('div');
       dayCell.classList.add('day');
       dayCell.innerText = day;
 
-      // Eğer gün gerçek bugün ise etrafını mavi halka yap
       if (day === realToday.getDate() && month === realToday.getMonth() && year === realToday.getFullYear()) {
         dayCell.classList.add('current-today');
       }
 
       const dateKey = `${year}-${month + 1}-${day}`;
       
-      // Kaydedilmiş rengi çek
-      const savedColor = localStorage.getItem(dateKey);
-      if (savedColor) {
-        dayCell.style.backgroundColor = savedColor;
+      // Kaydedilmiş renk ve notu al
+      const savedData = JSON.parse(localStorage.getItem(dateKey) || '{}');
+      
+      if (savedData.color) {
+        dayCell.style.backgroundColor = savedData.color;
       }
 
-      dayCell.onclick = () => openModal(dateKey, day);
+      // Not varsa günün altına küçük beyaz nokta ekle
+      if (savedData.note && savedData.note.trim() !== '') {
+        const dot = document.createElement('div');
+        dot.classList.add('note-dot');
+        dayCell.appendChild(dot);
+      }
+
+      dayCell.onclick = () => openModal(dateKey, day, savedData);
       container.appendChild(dayCell);
     }
   }
 
-  function openModal(dateKey, day) {
+  function openModal(dateKey, day, savedData) {
     selectedDateKey = dateKey;
+    selectedColor = savedData.color || '';
     document.getElementById('modalDate').innerText = `${day} ${monthNames[currentDate.getMonth()]}`;
+    document.getElementById('noteInput').value = savedData.note || '';
     document.getElementById('colorModal').style.display = 'flex';
+  }
+
+  function selectColor(color) {
+    selectedColor = color;
   }
 
   function closeModal() {
     document.getElementById('colorModal').style.display = 'none';
   }
 
-  function setDayColor(color) {
-    if (color) {
-      localStorage.setItem(selectedDateKey, color);
+  function saveDayData() {
+    const noteText = document.getElementById('noteInput').value;
+
+    if (selectedColor || noteText.trim() !== '') {
+      const dataToSave = {
+        color: selectedColor,
+        note: noteText
+      };
+      localStorage.setItem(selectedDateKey, JSON.stringify(dataToSave));
     } else {
       localStorage.removeItem(selectedDateKey);
     }
+
     closeModal();
     renderCalendar();
   }
