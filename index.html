@@ -226,7 +226,7 @@
       padding: 20px;
       border-radius: 16px;
       width: 90%;
-      max-width: 420px;
+      max-width: 520px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
 
@@ -262,12 +262,12 @@
 
     textarea {
       width: 100%;
-      height: 90px;
+      height: 120px;
       padding: 10px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
       resize: none;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       margin-bottom: 12px;
     }
 
@@ -299,7 +299,7 @@
     .editor-wrapper {
       position: relative;
       width: 100%;
-      height: 180px;
+      height: 280px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
       margin-bottom: 12px;
@@ -315,6 +315,7 @@
       top: 0; left: 0;
       z-index: 1;
       background: transparent;
+      font-size: 1rem;
     }
 
     canvas {
@@ -335,17 +336,18 @@
     }
 
     .tool-btn {
-      padding: 4px 10px;
+      padding: 6px 12px;
       border: 1px solid var(--border-color);
       background: #f8fafc;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
     .tool-btn.active {
       background: var(--primary);
       color: #fff;
+      border-color: var(--primary);
     }
   </style>
 </head>
@@ -393,7 +395,6 @@
         <div class="color-btn" style="background:#bbf7d0;" onclick="selectColor('#bbf7d0')"></div>
         <div class="color-btn" style="background:#bfdbfe;" onclick="selectColor('#bfdbfe')"></div>
         <div class="color-btn" style="background:#e9d5ff;" onclick="selectColor('#e9d5ff')"></div>
-        <div class="color-btn" style="background:#fff;" title="Sıfırla" onclick="selectColor('')">✕</div>
         <input type="color" id="dayColorPicker" style="border:none; width:28px; height:28px; cursor:pointer;" onchange="selectColor(this.value)">
       </div>
 
@@ -410,24 +411,17 @@
   <div class="modal-overlay" id="iosNoteModal" onclick="handleOutsideClick(event, 'iosNoteModal')">
     <div class="modal-content">
       <div class="modal-header">
-        <span style="font-size: 0.8rem; color: var(--text-muted);" id="iosModalTimestamp"></span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);" id="iosModalTimestamp"></span>
         <button class="delete-btn" onclick="closeModal('iosNoteModal')">✕</button>
       </div>
 
       <div class="toolbar">
         <button class="tool-btn active" id="btnWriteMode" onclick="setMode('write')">✏️ Yazı</button>
         <button class="tool-btn" id="btnDrawMode" onclick="setMode('draw')">🎨 Çizim</button>
-        <button class="tool-btn" id="btnEraser" onclick="setEraser()">🧹 Silgi</button>
+        <button class="tool-btn" id="btnEraser" onclick="setMode('eraser')">🧹 Silgi</button>
         <button class="tool-btn" onclick="triggerImageUpload()">📷 Görsel</button>
-        <input type="file" id="imageUploader" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
-      </div>
-
-      <div class="toolbar" id="penColorsPalette" style="display:none;">
-        <span class="color-btn" style="background:#1f2937;" onclick="setPenColor('#1f2937')"></span>
-        <span class="color-btn" style="background:#ef4444;" onclick="setPenColor('#ef4444')"></span>
-        <span class="color-btn" style="background:#3b82f6;" onclick="setPenColor('#3b82f6')"></span>
-        <span class="color-btn" style="background:#22c55e;" onclick="setPenColor('#22c55e')"></span>
         <button class="tool-btn" onclick="clearInlineCanvas()" style="margin-left:auto;">Temizle</button>
+        <input type="file" id="imageUploader" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
       </div>
 
       <div class="editor-wrapper" id="editorWrapper">
@@ -553,7 +547,6 @@
         const activeColor = savedData.color !== undefined ? savedData.color : recurrentColor;
         if (activeColor) dayCell.style.backgroundColor = activeColor;
 
-        // Not eklenmişse sağ üst köşeye 📝 ikonu yerleştirme
         if (savedData.note && savedData.note.trim() !== '') {
           const noteIcon = document.createElement('span');
           noteIcon.innerText = '📝';
@@ -570,8 +563,6 @@
     const canvas = document.getElementById('inlineCanvas');
     const ctx = canvas.getContext('2d');
     let painting = false;
-    let penColor = '#1f2937';
-    let isEraser = false;
     let hasDrawn = false;
     let canvasInitialized = false;
 
@@ -584,17 +575,6 @@
       }
     }
 
-    function setPenColor(color) { 
-      isEraser = false;
-      penColor = color; 
-      document.getElementById('btnEraser').classList.remove('active');
-    }
-
-    function setEraser() {
-      isEraser = true;
-      document.getElementById('btnEraser').classList.add('active');
-    }
-
     function clearInlineCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       hasDrawn = false;
@@ -604,25 +584,28 @@
       currentMode = mode;
       const btnWrite = document.getElementById('btnWriteMode');
       const btnDraw = document.getElementById('btnDrawMode');
-      const colorsPalette = document.getElementById('penColorsPalette');
+      const btnEraser = document.getElementById('btnEraser');
 
       initCanvasSize();
 
+      btnWrite.classList.remove('active');
+      btnDraw.classList.remove('active');
+      btnEraser.classList.remove('active');
+
       if (mode === 'draw') {
         btnDraw.classList.add('active');
-        btnWrite.classList.remove('active');
         canvas.classList.add('active-draw');
-        colorsPalette.style.display = 'flex';
+      } else if (mode === 'eraser') {
+        btnEraser.classList.add('active');
+        canvas.classList.add('active-draw');
       } else {
         btnWrite.classList.add('active');
-        btnDraw.classList.remove('active');
         canvas.classList.remove('active-draw');
-        colorsPalette.style.display = 'none';
       }
     }
 
     function startPosition(e) {
-      if (currentMode !== 'draw') return;
+      if (currentMode === 'write') return;
       painting = true;
       hasDrawn = true;
       draw(e);
@@ -634,19 +617,19 @@
     }
 
     function draw(e) {
-      if (!painting || currentMode !== 'draw') return;
+      if (!painting || currentMode === 'write') return;
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
       const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
       const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
-      if (isEraser) {
+      if (currentMode === 'eraser') {
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = 16;
+        ctx.lineWidth = 20;
       } else {
         ctx.globalCompositeOperation = 'source-over';
         ctx.lineWidth = 3;
-        ctx.strokeStyle = penColor;
+        ctx.strokeStyle = '#1f2937';
       }
 
       ctx.lineCap = 'round';
