@@ -2,1000 +2,834 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Takvim ve Hızlı Notlar</title>
-
-  <!-- Senin Attığın Görselin Birebir İkon Tanımlaması -->
-  <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/C3C6X9vK/calendar-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/C3C6X9vK/calendar-icon.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="https://i.ibb.co/C3C6X9vK/calendar-icon.png">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gelişmiş Takvim & Not Uygulaması</title>
   <style>
     :root {
-      --bg: #e5e7eb;
+      --bg-color: #f3f4f6;
       --card-bg: #ffffff;
-      --card-border: #f3f4f6;
-      --element-bg: #f3f4f6;
-      --element-hover: #e5e7eb;
-      --text: #1f2937;
+      --text-main: #1f2937;
       --text-muted: #6b7280;
-      --accent: #4b5563;
-      --accent-highlight: #3b82f6;
-      --holiday-bg: #fecdd3;
-      --holiday-text: #9f1239;
-      --danger: #ef4444;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border-color: #e5e7eb;
+      --holiday-bg: #fee2e2;
+      --holiday-text: #dc2626;
+      --today-border: #2563eb;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 20px;
       display: flex;
       justify-content: center;
-      padding: 20px 15px;
-      min-height: 100vh;
     }
 
-    .app {
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      max-width: 1100px;
       width: 100%;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    }
+
+    @media (max-width: 850px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: 24px;
-      padding: 22px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     /* Header */
-    .header {
+    .calendar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
-    .header-center { text-align: center; }
-
-    .today-info {
-      font-size: 0.8rem;
-      color: var(--accent-highlight);
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      margin-bottom: 2px;
-      text-transform: capitalize;
-    }
-
-    .header h2 {
+    .calendar-header h2 {
       font-size: 1.25rem;
-      color: var(--text);
       font-weight: 700;
-      letter-spacing: -0.3px;
     }
 
-    .header-btn {
-      background: var(--element-bg);
-      color: var(--text);
+    .today-title {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .nav-btn {
+      background: #f1f5f9;
       border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
+      font-weight: 600;
     }
 
-    .header-btn:hover { background: var(--element-hover); }
-    .header-btn:active { transform: scale(0.95); }
+    .nav-btn:hover {
+      background: #e2e8f0;
+    }
 
     /* Calendar Grid */
-    .weekdays, .days {
+    .weekdays-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
       text-align: center;
-    }
-
-    .weekdays div {
       font-weight: 600;
       color: var(--text-muted);
-      font-size: 0.8rem;
-      padding-bottom: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
     }
 
     .day {
+      position: relative;
       aspect-ratio: 1;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: var(--element-bg);
-      border-radius: 14px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text);
+      font-weight: 500;
       cursor: pointer;
-      position: relative;
-      transition: all 0.2s ease;
+      user-select: none;
+      background: #fff;
+      transition: transform 0.1s ease;
     }
 
-    .day:hover { background: #e5e7eb; }
-    .day:active { transform: scale(0.93); }
-
-    .note-dot {
-      width: 5px;
-      height: 5px;
-      background-color: var(--accent-highlight);
-      border-radius: 50%;
-      position: absolute;
-      bottom: 4px;
-    }
-
-    .day.holiday {
-      background-color: var(--holiday-bg) !important;
-      color: var(--holiday-text) !important;
-      font-weight: 700;
-    }
-
-    .day.current-today {
-      border: 2px solid var(--accent-highlight);
-      color: var(--accent-highlight);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    .day:hover {
+      transform: scale(1.03);
     }
 
     .day.empty {
+      border: none;
       background: transparent;
       cursor: default;
     }
 
-    /* Notes Box */
-    .notes-header {
+    .day.current-today {
+      border: 2px solid var(--today-border);
+      font-weight: 700;
+    }
+
+    .day.holiday {
+      background-color: var(--holiday-bg);
+      color: var(--holiday-text);
+    }
+
+    .note-icon {
+      position: absolute;
+      top: 3px;
+      right: 4px;
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    /* General Notes Sidebar */
+    .sidebar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
-    .notes-header h2 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .action-btn {
-      background: var(--element-bg);
-      color: var(--text);
-      border: 1px solid rgba(0, 0, 0, 0.03);
-      padding: 8px 16px;
-      border-radius: 14px;
+    .add-note-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.85rem;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
     }
 
-    .action-btn:hover { background: #e5e7eb; }
-    .action-btn:active { transform: scale(0.95); }
+    .add-note-btn:hover {
+      background: var(--primary-hover);
+    }
 
-    .note-list {
+    .notes-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 280px;
+      max-height: 520px;
       overflow-y: auto;
     }
 
     .note-item {
-      background: var(--element-bg);
-      border-radius: 16px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
     }
 
     .note-item-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-bottom: 6px;
     }
 
-    .note-item-date {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 500;
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     .note-item-text {
-      font-size: 0.95rem;
-      color: var(--text);
+      font-size: 0.9rem;
       white-space: pre-wrap;
-      line-height: 1.5;
     }
 
     .note-item img {
       max-width: 100%;
-      border-radius: 10px;
-      margin-top: 4px;
+      border-radius: 6px;
+      margin-top: 6px;
     }
-
-    .delete-btn {
-      background: transparent;
-      border: none;
-      color: var(--danger);
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1rem;
-      opacity: 0.7;
-    }
-
-    .delete-btn:hover { opacity: 1; }
 
     /* Modals */
-    .modal {
-      display: none;
+    .modal-overlay {
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(17, 24, 39, 0.4);
-      backdrop-filter: blur(8px);
-      align-items: center;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
       justify-content: center;
-      z-index: 20;
+      align-items: center;
+      z-index: 1000;
     }
 
     .modal-content {
-      position: relative;
-      background: var(--card-bg);
-      padding: 24px;
-      border-radius: 24px;
-      width: 92%;
-      max-width: 440px;
-      text-align: center;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-close-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 28px;
-      height: 28px;
-      background: var(--element-bg);
-      border-radius: 50%;
-      border: none;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-    }
-
-    .modal-close-btn:hover {
-      background: #e5e7eb;
-      color: var(--text);
-    }
-
-    .ios-modal-content {
-      background: #ffffff;
-      color: var(--text);
-      width: 95%;
-      max-width: 460px;
-      border-radius: 24px;
+      background: #fff;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
 
-    .ios-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .ios-close-btn {
-      width: 32px;
-      height: 32px;
-      background: var(--element-bg);
-      border-radius: 50%;
-      border: none;
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .ios-title { font-weight: 700; font-size: 1.05rem; }
-    .ios-date-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-
-    .ios-save-btn {
-      background: var(--accent-highlight);
-      color: #ffffff;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
-    .ios-editor-wrapper {
-      position: relative;
-      width: 100%;
-      height: 320px;
-      margin-bottom: 10px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #fafafa;
-      border: 1px solid var(--element-bg);
-    }
-
-    .ios-editor-area {
-      width: 100%;
-      height: 100%;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      color: var(--text);
-      resize: none;
-      background: transparent;
-      padding: 12px;
-      line-height: 1.6;
-    }
-
-    canvas#inlineCanvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      touch-action: none;
-      cursor: crosshair;
-      pointer-events: none;
-      z-index: 5;
-    }
-
-    canvas#inlineCanvas.active-draw { pointer-events: auto; }
-
-    .ios-toolbar {
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 10px;
-      border-top: 1px solid var(--element-bg);
-    }
-
-    .ios-toolbar-btn {
-      background: none;
-      border: none;
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 12px;
-    }
-
-    .ios-toolbar-btn.active {
-      background: var(--element-bg);
-      color: var(--accent-highlight);
-      font-weight: bold;
-    }
-
-    .pen-colors {
-      display: none;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .pen-color-btn {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-    }
-
-    .custom-color-picker {
-      width: 34px;
-      height: 34px;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      background: none;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .custom-color-picker::-webkit-color-swatch-wrapper {
-      padding: 0;
-    }
-
-    .custom-color-picker::-webkit-color-swatch {
-      border: none;
-      border-radius: 50%;
-    }
-
-    .colors {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      margin: 18px 0;
-    }
-
-    .color-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-    }
-
-    .color-btn:active { transform: scale(0.9); }
-    .color-btn.selected { border-color: var(--accent-highlight); transform: scale(1.1); }
-
-    .input-box {
-      width: 100%;
-      background: var(--element-bg);
-      border: 1px solid transparent;
-      border-radius: 12px;
-      color: var(--text);
-      padding: 12px;
-      font-size: 0.9rem;
-      outline: none;
       margin-bottom: 12px;
     }
 
-    textarea.input-box { height: 100px; resize: none; }
+    .holiday-label {
+      color: var(--holiday-text);
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
 
-    .modal-btn-group {
+    .color-palette {
       display: flex;
-      flex-direction: column;
       gap: 8px;
+      margin: 12px 0;
+      align-items: center;
     }
 
-    .save-btn {
-      background: var(--accent-highlight);
-      color: #ffffff;
-      font-weight: 600;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 12px;
-      width: 100%;
+    .color-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid #fff;
       cursor: pointer;
-      transition: opacity 0.2s;
+      box-shadow: 0 0 0 1px var(--border-color);
     }
 
-    .save-btn:hover { opacity: 0.9; }
-
-    .apply-all-years-btn {
-      background: var(--element-bg);
-      color: var(--text);
-      font-weight: 600;
-      border: 1px solid #d1d5db;
-      padding: 10px 16px;
-      border-radius: 12px;
+    textarea {
       width: 100%;
+      height: 90px;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      resize: none;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn-save {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--text-main);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* iOS Style Note Drawing Wrapper */
+    .editor-wrapper {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .editor-wrapper textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      margin: 0;
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+      background: transparent;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    canvas.active-draw {
+      pointer-events: auto;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .tool-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 0.85rem;
-      transition: background 0.2s;
     }
 
-    .apply-all-years-btn:hover { background: #e5e7eb; }
-
-    .holiday-info-label {
-      font-size: 0.8rem;
-      color: var(--holiday-text);
-      font-weight: 600;
-      margin-bottom: 8px;
+    .tool-btn.active {
+      background: var(--primary);
+      color: #fff;
     }
   </style>
 </head>
 <body>
 
-<div class="app">
-  <div class="card">
-    <div class="header">
-      <button class="header-btn" onclick="prevMonth()">◄</button>
-      <div class="header-center">
-        <div class="today-info" id="todayTitle"></div>
+  <div class="app-container">
+    <!-- Takvim Kartı -->
+    <div class="card">
+      <div class="today-title" id="todayTitle"></div>
+      <div class="calendar-header">
+        <button class="nav-btn" onclick="prevMonth()">‹ Önceki</button>
         <h2 id="monthTitle"></h2>
+        <button class="nav-btn" onclick="nextMonth()">Sonraki ›</button>
       </div>
-      <button class="header-btn" onclick="nextMonth()">►</button>
+
+      <div class="weekdays-grid">
+        <div>Pzr</div><div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div>
+      </div>
+
+      <div class="days-grid" id="daysContainer"></div>
     </div>
 
-    <div class="weekdays">
-      <div>Pz</div><div>Pt</div><div>Sa</div><div>Çr</div><div>Pş</div><div>Cu</div><div>Ct</div>
+    <!-- Genel Notlar Yan Paneli -->
+    <div class="card">
+      <div class="sidebar-header">
+        <h3>Notlarım</h3>
+        <button class="add-note-btn" onclick="openIosNoteModal()">+ Not</button>
+      </div>
+      <div class="notes-list" id="generalNotesList"></div>
     </div>
-
-    <div class="days" id="daysContainer"></div>
   </div>
 
-  <div class="card">
-    <div class="notes-header">
-      <h2>Kayıtlı Notlar</h2>
-      <div class="notes-actions">
-        <button class="action-btn" onclick="openIosNoteModal()">
-          <span>➕</span> Not
-        </button>
+  <!-- Gün Düzenleme Modalı -->
+  <div class="modal-overlay" id="colorModal" onclick="handleOutsideClick(event, 'colorModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalDate"></h3>
+        <button class="delete-btn" onclick="closeModal('colorModal')">✕</button>
+      </div>
+      <div class="holiday-label" id="holidayLabel"></div>
+
+      <div class="color-palette">
+        <div class="color-btn" style="background:#fecaca;" onclick="selectColor('#fecaca')"></div>
+        <div class="color-btn" style="background:#fef08a;" onclick="selectColor('#fef08a')"></div>
+        <div class="color-btn" style="background:#bbf7d0;" onclick="selectColor('#bbf7d0')"></div>
+        <div class="color-btn" style="background:#bfdbfe;" onclick="selectColor('#bfdbfe')"></div>
+        <div class="color-btn" style="background:#e9d5ff;" onclick="selectColor('#e9d5ff')"></div>
+        <div class="color-btn" style="background:#fff;" title="Sıfırla" onclick="selectColor('')">✕</div>
+        <input type="color" id="dayColorPicker" style="border:none; width:28px; height:28px; cursor:pointer;" onchange="selectColor(this.value)">
+      </div>
+
+      <textarea id="noteInput" placeholder="Bu güne özel not yazın..."></textarea>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="saveForEveryYear()">Her Yıl</button>
+        <button class="btn-save" onclick="saveDayData()">Kaydet</button>
       </div>
     </div>
-
-    <div class="note-list" id="generalNotesList"></div>
   </div>
-</div>
 
-<!-- Modal: Hızlı Not -->
-<div class="modal" id="iosNoteModal" onclick="handleOutsideClick(event, 'iosNoteModal')">
-  <div class="ios-modal-content" onclick="event.stopPropagation()">
-    <div class="ios-header">
-      <button class="ios-close-btn" onclick="closeModal('iosNoteModal')">✕</button>
-      <div class="ios-header-center">
-        <div class="ios-title">Yeni Not</div>
-        <div class="ios-date-subtitle" id="iosModalTimestamp"></div>
+  <!-- iOS Stil Çizimli Not Modalı -->
+  <div class="modal-overlay" id="iosNoteModal" onclick="handleOutsideClick(event, 'iosNoteModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span style="font-size: 0.8rem; color: var(--text-muted);" id="iosModalTimestamp"></span>
+        <button class="delete-btn" onclick="closeModal('iosNoteModal')">✕</button>
       </div>
-      <button class="ios-save-btn" onclick="saveIosNote()">Kaydet</button>
-    </div>
 
-    <div class="ios-editor-wrapper" id="editorWrapper">
-      <textarea class="ios-editor-area" id="iosNoteInput" placeholder="Not yazmaya başlayın..."></textarea>
-      <canvas id="inlineCanvas"></canvas>
-    </div>
-
-    <input type="file" id="imageUploader" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-
-    <div class="ios-toolbar">
-      <div style="display: flex; gap: 4px;">
-        <button class="ios-toolbar-btn active" id="btnWriteMode" onclick="setMode('write')" title="Yazma Modu"><b>Aa</b></button>
-        <button class="ios-toolbar-btn" id="btnDrawMode" onclick="setMode('draw')" title="Çizim Modu">✏️</button>
+      <div class="toolbar">
+        <button class="tool-btn active" id="btnWriteMode" onclick="setMode('write')">✏️ Yazı</button>
+        <button class="tool-btn" id="btnDrawMode" onclick="setMode('draw')">🎨 Çizim</button>
+        <button class="tool-btn" id="btnEraser" onclick="setEraser()">🧹 Silgi</button>
+        <button class="tool-btn" onclick="triggerImageUpload()">📷 Görsel</button>
+        <input type="file" id="imageUploader" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
       </div>
-      
-      <div class="pen-colors" id="penColorsPalette">
-        <div class="pen-color-btn" style="background:#1f2937" onclick="setPenColor('#1f2937')" title="Siyah"></div>
-        <div class="pen-color-btn" style="background:#ef4444" onclick="setPenColor('#ef4444')" title="Kırmızı"></div>
-        <div class="pen-color-btn" style="background:#3b82f6" onclick="setPenColor('#3b82f6')" title="Mavi"></div>
-        <div class="pen-color-btn" style="background:#22c55e" onclick="setPenColor('#22c55e')" title="Yeşil"></div>
+
+      <div class="toolbar" id="penColorsPalette" style="display:none;">
+        <span class="color-btn" style="background:#1f2937;" onclick="setPenColor('#1f2937')"></span>
+        <span class="color-btn" style="background:#ef4444;" onclick="setPenColor('#ef4444')"></span>
+        <span class="color-btn" style="background:#3b82f6;" onclick="setPenColor('#3b82f6')"></span>
+        <span class="color-btn" style="background:#22c55e;" onclick="setPenColor('#22c55e')"></span>
+        <button class="tool-btn" onclick="clearInlineCanvas()" style="margin-left:auto;">Temizle</button>
+      </div>
+
+      <div class="editor-wrapper" id="editorWrapper">
+        <textarea id="iosNoteInput" placeholder="Notunuzu yazın..."></textarea>
+        <canvas id="inlineCanvas"></canvas>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('iosNoteModal')">İptal</button>
+        <button class="btn-save" onclick="saveIosNote()">Ekle</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentDate = new Date();
+    const realToday = new Date();
+    let selectedDateKey = '';
+    let selectedColor = '';
+    let selectedDay = 1;
+    let selectedMonth = 1;
+    let attachedImage = null;
+    let currentMode = 'write';
+
+    const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+    const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+
+    const fixedHolidays = {
+      "1-1": "Yılbaşı",
+      "4-23": "23 Nisan Ulusal Egemenlik ve Çocuk Bayramı",
+      "5-1": "1 Mayıs Emek ve Dayanışma Günü",
+      "5-19": "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı",
+      "7-15": "15 Temmuz Demokrasi ve Milli Birlik Günü",
+      "8-30": "30 Ağustos Zafer Bayramı",
+      "10-29": "29 Ekim Cumhuriyet Bayramı"
+    };
+
+    const religiousHolidays = {
+      "2026-3-20": "Ramazan Bayramı 1. Gün",
+      "2026-3-21": "Ramazan Bayramı 2. Gün",
+      "2026-3-22": "Ramazan Bayramı 3. Gün",
+      "2026-5-27": "Kurban Bayramı 1. Gün",
+      "2026-5-28": "Kurban Bayramı 2. Gün",
+      "2026-5-29": "Kurban Bayramı 3. Gün",
+      "2026-5-30": "Kurban Bayramı 4. Gün",
+
+      "2027-3-10": "Ramazan Bayramı 1. Gün",
+      "2027-3-11": "Ramazan Bayramı 2. Gün",
+      "2027-3-12": "Ramazan Bayramı 3. Gün",
+      "2027-5-17": "Kurban Bayramı 1. Gün",
+      "2027-5-18": "Kurban Bayramı 2. Gün",
+      "2027-5-19": "Kurban Bayramı 3. Gün",
+      "2027-5-20": "Kurban Bayramı 4. Gün",
+
+      "2028-2-27": "Ramazan Bayramı 1. Gün",
+      "2028-2-28": "Ramazan Bayramı 2. Gün",
+      "2028-2-29": "Ramazan Bayramı 3. Gün",
+      "2028-5-5": "Kurban Bayramı 1. Gün",
+      "2028-5-6": "Kurban Bayramı 2. Gün",
+      "2028-5-7": "Kurban Bayramı 3. Gün",
+      "2028-5-8": "Kurban Bayramı 4. Gün"
+    };
+
+    function getHolidayName(year, month, day) {
+      const fullKey = `${year}-${month}-${day}`;
+      if (religiousHolidays[fullKey]) return religiousHolidays[fullKey];
+
+      const fixedKey = `${month}-${day}`;
+      if (fixedHolidays[fixedKey]) return fixedHolidays[fixedKey];
+
+      return null;
+    }
+
+    function updateHeaderTodayInfo() {
+      const dayName = dayNames[realToday.getDay()];
+      const monthName = monthNames[realToday.getMonth()];
+      const dateNum = realToday.getDate();
+      document.getElementById('todayTitle').innerText = `Bugün: ${dateNum} ${monthName} ${dayName}`;
+    }
+
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      document.getElementById('monthTitle').innerText = `${monthNames[month]} ${year}`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const container = document.getElementById('daysContainer');
+      container.innerHTML = '';
+
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('day', 'empty');
+        container.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.classList.add('day');
+
+        const dayNumber = document.createElement('span');
+        dayNumber.innerText = day;
+        dayCell.appendChild(dayNumber);
+
+        const dateKey = `${year}-${month + 1}-${day}`;
+        const recurrentKey = `recurrent_color_${month + 1}-${day}`;
         
-        <input type="color" class="custom-color-picker" id="customPenColorPicker" value="#eb3434" onchange="setPenColor(this.value)" title="Renk Seçici" style="width:22px; height:22px;">
-        
-        <button class="ios-toolbar-btn" id="btnEraser" style="padding: 4px 8px; font-size: 0.9rem;" onclick="setEraser()" title="Silgi">🧹</button>
-        <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()">Sil</button>
-      </div>
+        const savedData = JSON.parse(localStorage.getItem(dateKey) || '{}');
+        const recurrentColor = localStorage.getItem(recurrentKey);
+        const holidayName = getHolidayName(year, month + 1, day);
 
-      <button class="ios-toolbar-btn" title="Görsel Ekle" onclick="triggerImageUpload()">📎</button>
-    </div>
-  </div>
-</div>
+        if (holidayName) {
+          dayCell.classList.add('holiday');
+          dayCell.title = holidayName;
+        }
 
-<!-- Modal: Gün Detayı & Renk -->
-<div class="modal" id="colorModal" onclick="handleOutsideClick(event, 'colorModal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <button class="modal-close-btn" onclick="closeModal('colorModal')">✕</button>
-    
-    <h3 id="modalDate" style="margin-bottom: 4px; font-size: 1.1rem; color: var(--text);">Tarih Seç</h3>
-    <div id="holidayLabel" class="holiday-info-label"></div>
-    
-    <div class="colors">
-      <div class="color-btn" style="background:#f3f4f6" onclick="selectColor('')" title="Sıfırla"></div>
-      <div class="color-btn" style="background:#fca5a5" onclick="selectColor('#fca5a5')"></div>
-      <div class="color-btn" style="background:#5f646b" onclick="selectColor('#5f646b')"></div>
-      <div class="color-btn" style="background:#93c5fd" onclick="selectColor('#93c5fd')"></div>
-      <div class="color-btn" style="background:#86efac" onclick="selectColor('#86efac')"></div>
-      <input type="color" class="custom-color-picker" id="dayColorPicker" onchange="selectColor(this.value)" title="Özel Renk Seç">
-    </div>
+        if (day === realToday.getDate() && month === realToday.getMonth() && year === realToday.getFullYear()) {
+          dayCell.classList.add('current-today');
+        }
 
-    <textarea class="input-box" id="noteInput" placeholder="Bu tarihe özel not ekleyin..."></textarea>
-    
-    <div class="modal-btn-group">
-      <button class="save-btn" onclick="saveDayData()">Sadece Bu Yıl İçin Kaydet</button>
-      <button class="apply-all-years-btn" onclick="saveForEveryYear()">🔄 Tüm Yıllara Bu Rengi Uygula</button>
-    </div>
-  </div>
-</div>
+        const activeColor = savedData.color !== undefined ? savedData.color : recurrentColor;
+        if (activeColor) dayCell.style.backgroundColor = activeColor;
 
-<script>
-  let currentDate = new Date();
-  const realToday = new Date();
-  let selectedDateKey = '';
-  let selectedColor = '';
-  let selectedDay = 1;
-  let selectedMonth = 1;
-  let attachedImage = null;
-  let currentMode = 'write';
+        // Not eklenmişse sağ üst köşeye 📝 ikonu yerleştirme
+        if (savedData.note && savedData.note.trim() !== '') {
+          const noteIcon = document.createElement('span');
+          noteIcon.innerText = '📝';
+          noteIcon.classList.add('note-icon');
+          dayCell.appendChild(noteIcon);
+        }
 
-  const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
-  const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
-
-  const fixedHolidays = {
-    "1-1": "Yılbaşı",
-    "4-23": "23 Nisan Ulusal Egemenlik ve Çocuk Bayramı",
-    "5-1": "1 Mayıs Emek ve Dayanışma Günü",
-    "5-19": "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı",
-    "7-15": "15 Temmuz Demokrasi ve Milli Birlik Günü",
-    "8-30": "30 Ağustos Zafer Bayramı",
-    "10-29": "29 Ekim Cumhuriyet Bayramı"
-  };
-
-  const religiousHolidays = {
-    "2026-3-20": "Ramazan Bayramı 1. Gün",
-    "2026-3-21": "Ramazan Bayramı 2. Gün",
-    "2026-3-22": "Ramazan Bayramı 3. Gün",
-    "2026-5-27": "Kurban Bayramı 1. Gün",
-    "2026-5-28": "Kurban Bayramı 2. Gün",
-    "2026-5-29": "Kurban Bayramı 3. Gün",
-    "2026-5-30": "Kurban Bayramı 4. Gün",
-
-    "2027-3-10": "Ramazan Bayramı 1. Gün",
-    "2027-3-11": "Ramazan Bayramı 2. Gün",
-    "2027-3-12": "Ramazan Bayramı 3. Gün",
-    "2027-5-17": "Kurban Bayramı 1. Gün",
-    "2027-5-18": "Kurban Bayramı 2. Gün",
-    "2027-5-19": "Kurban Bayramı 3. Gün",
-    "2027-5-20": "Kurban Bayramı 4. Gün",
-
-    "2028-2-27": "Ramazan Bayramı 1. Gün",
-    "2028-2-28": "Ramazan Bayramı 2. Gün",
-    "2028-2-29": "Ramazan Bayramı 3. Gün",
-    "2028-5-5": "Kurban Bayramı 1. Gün",
-    "2028-5-6": "Kurban Bayramı 2. Gün",
-    "2028-5-7": "Kurban Bayramı 3. Gün",
-    "2028-5-8": "Kurban Bayramı 4. Gün"
-  };
-
-  function getHolidayName(year, month, day) {
-    const fullKey = `${year}-${month}-${day}`;
-    if (religiousHolidays[fullKey]) return religiousHolidays[fullKey];
-
-    const fixedKey = `${month}-${day}`;
-    if (fixedHolidays[fixedKey]) return fixedHolidays[fixedKey];
-
-    return null;
-  }
-
-  function updateHeaderTodayInfo() {
-    const dayName = dayNames[realToday.getDay()];
-    const monthName = monthNames[realToday.getMonth()];
-    const dateNum = realToday.getDate();
-    document.getElementById('todayTitle').innerText = `Bugün: ${dateNum} ${monthName} ${dayName}`;
-  }
-
-  function renderCalendar() {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-
-    document.getElementById('monthTitle').innerText = `${monthNames[month]} ${year}`;
-
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    const container = document.getElementById('daysContainer');
-    container.innerHTML = '';
-
-    for (let i = 0; i < firstDay; i++) {
-      const emptyCell = document.createElement('div');
-      emptyCell.classList.add('day', 'empty');
-      container.appendChild(emptyCell);
+        dayCell.onclick = () => openModal('colorModal', dateKey, day, month + 1, savedData, holidayName, activeColor);
+        container.appendChild(dayCell);
+      }
     }
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayCell = document.createElement('div');
-      dayCell.classList.add('day');
-      dayCell.innerText = day;
+    /* Canvas Drawing Logic */
+    const canvas = document.getElementById('inlineCanvas');
+    const ctx = canvas.getContext('2d');
+    let painting = false;
+    let penColor = '#1f2937';
+    let isEraser = false;
+    let hasDrawn = false;
+    let canvasInitialized = false;
 
-      const dateKey = `${year}-${month + 1}-${day}`;
-      const recurrentKey = `recurrent_color_${month + 1}-${day}`;
+    function initCanvasSize() {
+      const wrapper = document.getElementById('editorWrapper');
+      if (!canvasInitialized && wrapper) {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        canvasInitialized = true;
+      }
+    }
+
+    function setPenColor(color) { 
+      isEraser = false;
+      penColor = color; 
+      document.getElementById('btnEraser').classList.remove('active');
+    }
+
+    function setEraser() {
+      isEraser = true;
+      document.getElementById('btnEraser').classList.add('active');
+    }
+
+    function clearInlineCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hasDrawn = false;
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      const btnWrite = document.getElementById('btnWriteMode');
+      const btnDraw = document.getElementById('btnDrawMode');
+      const colorsPalette = document.getElementById('penColorsPalette');
+
+      initCanvasSize();
+
+      if (mode === 'draw') {
+        btnDraw.classList.add('active');
+        btnWrite.classList.remove('active');
+        canvas.classList.add('active-draw');
+        colorsPalette.style.display = 'flex';
+      } else {
+        btnWrite.classList.add('active');
+        btnDraw.classList.remove('active');
+        canvas.classList.remove('active-draw');
+        colorsPalette.style.display = 'none';
+      }
+    }
+
+    function startPosition(e) {
+      if (currentMode !== 'draw') return;
+      painting = true;
+      hasDrawn = true;
+      draw(e);
+    }
+
+    function endPosition() {
+      painting = false;
+      ctx.beginPath();
+    }
+
+    function draw(e) {
+      if (!painting || currentMode !== 'draw') return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+      if (isEraser) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = 16;
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = penColor;
+      }
+
+      ctx.lineCap = 'round';
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+
+    canvas.addEventListener('mousedown', startPosition);
+    canvas.addEventListener('mouseup', endPosition);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', startPosition);
+    canvas.addEventListener('touchend', endPosition);
+    canvas.addEventListener('touchmove', draw);
+
+    /* General Notes Logic */
+    function loadGeneralNotes() {
+      const notesList = document.getElementById('generalNotesList');
+      notesList.innerHTML = '';
+      const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+
+      if (notes.length === 0) {
+        notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
+        return;
+      }
+
+      notes.forEach((note, index) => {
+        const item = document.createElement('div');
+        item.classList.add('note-item');
+
+        let contentHtml = `
+          <div class="note-item-header">
+            <span class="note-item-date">${note.timestamp || ''}</span>
+            <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
+          </div>
+        `;
+
+        if (note.text) contentHtml += `<div class="note-item-text">${note.text}</div>`;
+        if (note.drawing) contentHtml += `<img src="${note.drawing}" alt="Çizim">`;
+        if (note.image) contentHtml += `<img src="${note.image}" alt="Görsel">`;
+
+        item.innerHTML = contentHtml;
+        notesList.appendChild(item);
+      });
+    }
+
+    function openIosNoteModal() {
+      const now = new Date();
+      const dateStr = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
       
-      const savedData = JSON.parse(localStorage.getItem(dateKey) || '{}');
-      const recurrentColor = localStorage.getItem(recurrentKey);
-      const holidayName = getHolidayName(year, month + 1, day);
+      document.getElementById('iosModalTimestamp').innerText = dateStr;
+      document.getElementById('iosNoteInput').value = '';
+      attachedImage = null;
+      canvasInitialized = false;
+      clearInlineCanvas();
+      document.getElementById('iosNoteModal').style.display = 'flex';
+      setMode('write');
+    }
 
-      if (holidayName) {
-        dayCell.classList.add('holiday');
-        dayCell.title = holidayName;
+    function saveIosNote() {
+      const text = document.getElementById('iosNoteInput').value;
+      const timeStr = document.getElementById('iosModalTimestamp').innerText;
+      let drawingData = hasDrawn ? canvas.toDataURL() : null;
+
+      if (!text.trim() && !attachedImage && !drawingData) return;
+
+      const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+      notes.unshift({ 
+        text: text.trim(), 
+        drawing: drawingData, 
+        image: attachedImage, 
+        timestamp: timeStr 
+      });
+      localStorage.setItem('user_general_notes', JSON.stringify(notes));
+
+      closeModal('iosNoteModal');
+      loadGeneralNotes();
+    }
+
+    function triggerImageUpload() {
+      document.getElementById('imageUploader').click();
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          attachedImage = event.target.result;
+          const textarea = document.getElementById('iosNoteInput');
+          textarea.value += "\n[📷 Görsel Eklendi]";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function deleteNote(index) {
+      const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
+      notes.splice(index, 1);
+      localStorage.setItem('user_general_notes', JSON.stringify(notes));
+      loadGeneralNotes();
+    }
+
+    function openModal(id, dateKey, day, month, savedData, holidayName, activeColor) {
+      selectedDateKey = dateKey;
+      selectedDay = day;
+      selectedMonth = month;
+      selectedColor = activeColor || '';
+
+      document.getElementById('modalDate').innerText = `${day} ${monthNames[currentDate.getMonth()]}`;
+      document.getElementById('holidayLabel').innerText = holidayName ? `🎉 ${holidayName}` : '';
+      document.getElementById('noteInput').value = savedData.note || '';
+      
+      if (selectedColor && selectedColor.startsWith('#')) {
+        document.getElementById('dayColorPicker').value = selectedColor;
+      } else {
+        document.getElementById('dayColorPicker').value = '#ffffff';
       }
 
-      if (day === realToday.getDate() && month === realToday.getMonth() && year === realToday.getFullYear()) {
-        dayCell.classList.add('current-today');
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function handleOutsideClick(event, modalId) {
+      if (event.target.id === modalId) {
+        closeModal(modalId);
+      }
+    }
+
+    function selectColor(color) { 
+      selectedColor = color; 
+      if (color && color.startsWith('#')) {
+        document.getElementById('dayColorPicker').value = color;
+      }
+    }
+
+    function saveDayData() {
+      const noteText = document.getElementById('noteInput').value.trim();
+      
+      if (selectedColor !== '' || noteText !== '') {
+        localStorage.setItem(selectedDateKey, JSON.stringify({ color: selectedColor, note: noteText }));
+      } else {
+        localStorage.removeItem(selectedDateKey);
+      }
+      
+      closeModal('colorModal');
+      renderCalendar();
+    }
+
+    function saveForEveryYear() {
+      const noteText = document.getElementById('noteInput').value.trim();
+      const recurrentKey = `recurrent_color_${selectedMonth}-${selectedDay}`;
+
+      if (selectedColor !== '') {
+        localStorage.setItem(recurrentKey, selectedColor);
+      } else {
+        localStorage.removeItem(recurrentKey);
       }
 
-      const activeColor = savedData.color || recurrentColor;
-      if (activeColor) dayCell.style.backgroundColor = activeColor;
-
-      if (savedData.note && savedData.note.trim() !== '') {
-        const dot = document.createElement('div');
-        dot.classList.add('note-dot');
-        dayCell.appendChild(dot);
+      if (noteText !== '' || selectedColor !== '') {
+        const savedData = JSON.parse(localStorage.getItem(selectedDateKey) || '{}');
+        savedData.note = noteText;
+        savedData.color = selectedColor;
+        localStorage.setItem(selectedDateKey, JSON.stringify(savedData));
+      } else {
+        localStorage.removeItem(selectedDateKey);
       }
 
-      dayCell.onclick = () => openModal('colorModal', dateKey, day, month + 1, savedData, holidayName, activeColor);
-      container.appendChild(dayCell);
-    }
-  }
-
-  /* Canvas Drawing Logic */
-  const canvas = document.getElementById('inlineCanvas');
-  const ctx = canvas.getContext('2d');
-  let painting = false;
-  let penColor = '#1f2937';
-  let isEraser = false;
-  let hasDrawn = false;
-  let canvasInitialized = false;
-
-  function initCanvasSize() {
-    const wrapper = document.getElementById('editorWrapper');
-    if (!canvasInitialized) {
-      canvas.width = wrapper.clientWidth;
-      canvas.height = wrapper.clientHeight;
-      canvasInitialized = true;
-    }
-  }
-
-  function setPenColor(color) { 
-    isEraser = false;
-    penColor = color; 
-    document.getElementById('btnEraser').classList.remove('active');
-  }
-
-  function setEraser() {
-    isEraser = true;
-    document.getElementById('btnEraser').classList.add('active');
-  }
-
-  function clearInlineCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    hasDrawn = false;
-  }
-
-  function setMode(mode) {
-    currentMode = mode;
-    const btnWrite = document.getElementById('btnWriteMode');
-    const btnDraw = document.getElementById('btnDrawMode');
-    const colorsPalette = document.getElementById('penColorsPalette');
-
-    initCanvasSize();
-
-    if (mode === 'draw') {
-      btnDraw.classList.add('active');
-      btnWrite.classList.remove('active');
-      canvas.classList.add('active-draw');
-      colorsPalette.style.display = 'flex';
-    } else {
-      btnWrite.classList.add('active');
-      btnDraw.classList.remove('active');
-      canvas.classList.remove('active-draw');
-      colorsPalette.style.display = 'none';
-    }
-  }
-
-  function startPosition(e) {
-    if (currentMode !== 'draw') return;
-    painting = true;
-    hasDrawn = true;
-    draw(e);
-  }
-
-  function endPosition() {
-    painting = false;
-    ctx.beginPath();
-  }
-
-  function draw(e) {
-    if (!painting || currentMode !== 'draw') return;
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-
-    if (isEraser) {
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.lineWidth = 16;
-    } else {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = penColor;
+      closeModal('colorModal');
+      renderCalendar();
     }
 
-    ctx.lineCap = 'round';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  }
+    function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
+    function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
-  canvas.addEventListener('mousedown', startPosition);
-  canvas.addEventListener('mouseup', endPosition);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('touchstart', startPosition);
-  canvas.addEventListener('touchend', endPosition);
-  canvas.addEventListener('touchmove', draw);
-
-  /* General Notes Logic */
-  function loadGeneralNotes() {
-    const notesList = document.getElementById('generalNotesList');
-    notesList.innerHTML = '';
-    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-
-    if (notes.length === 0) {
-      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
-      return;
-    }
-
-    notes.forEach((note, index) => {
-      const item = document.createElement('div');
-      item.classList.add('note-item');
-
-      let contentHtml = `
-        <div class="note-item-header">
-          <span class="note-item-date">${note.timestamp || ''}</span>
-          <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
-        </div>
-      `;
-
-      if (note.text) contentHtml += `<div class="note-item-text">${note.text}</div>`;
-      if (note.drawing) contentHtml += `<img src="${note.drawing}" alt="Çizim">`;
-      if (note.image) contentHtml += `<img src="${note.image}" alt="Görsel">`;
-
-      item.innerHTML = contentHtml;
-      notesList.appendChild(item);
-    });
-  }
-
-  function openIosNoteModal() {
-    const now = new Date();
-    const dateStr = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    
-    document.getElementById('iosModalTimestamp').innerText = dateStr;
-    document.getElementById('iosNoteInput').value = '';
-    attachedImage = null;
-    canvasInitialized = false;
-    clearInlineCanvas();
-    document.getElementById('iosNoteModal').style.display = 'flex';
-    setMode('write');
-  }
-
-  function saveIosNote() {
-    const text = document.getElementById('iosNoteInput').value;
-    const timeStr = document.getElementById('iosModalTimestamp').innerText;
-    let drawingData = hasDrawn ? canvas.toDataURL() : null;
-
-    if (!text.trim() && !attachedImage && !drawingData) return;
-
-    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-    notes.unshift({ 
-      text: text.trim(), 
-      drawing: drawingData, 
-      image: attachedImage, 
-      timestamp: timeStr 
-    });
-    localStorage.setItem('user_general_notes', JSON.stringify(notes));
-
-    closeModal('iosNoteModal');
-    loadGeneralNotes();
-  }
-
-  function triggerImageUpload() {
-    document.getElementById('imageUploader').click();
-  }
-
-  function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        attachedImage = event.target.result;
-        const textarea = document.getElementById('iosNoteInput');
-        textarea.value += "\n[📷 Görsel Eklendi]";
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  function deleteNote(index) {
-    const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-    notes.splice(index, 1);
-    localStorage.setItem('user_general_notes', JSON.stringify(notes));
-    loadGeneralNotes();
-  }
-
-  function openModal(id, dateKey, day, month, savedData, holidayName, activeColor) {
-    selectedDateKey = dateKey;
-    selectedDay = day;
-    selectedMonth = month;
-    selectedColor = activeColor || '';
-
-    document.getElementById('modalDate').innerText = `${day} ${monthNames[currentDate.getMonth()]}`;
-    document.getElementById('holidayLabel').innerText = holidayName ? `🎉 ${holidayName}` : '';
-    document.getElementById('noteInput').value = savedData.note || '';
-    
-    if (selectedColor && selectedColor.startsWith('#')) {
-      document.getElementById('dayColorPicker').value = selectedColor;
-    }
-
-    document.getElementById(id).style.display = 'flex';
-  }
-
-  function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-  }
-
-  function handleOutsideClick(event, modalId) {
-    if (event.target.id === modalId) {
-      closeModal(modalId);
-    }
-  }
-
-  function selectColor(color) { 
-    selectedColor = color; 
-    if (color.startsWith('#')) {
-      document.getElementById('dayColorPicker').value = color;
-    }
-  }
-
-  function saveDayData() {
-    const noteText = document.getElementById('noteInput').value;
-    
-    if (selectedColor || noteText.trim() !== '') {
-      localStorage.setItem(selectedDateKey, JSON.stringify({ color: selectedColor, note: noteText }));
-    } else {
-      localStorage.removeItem(selectedDateKey);
-    }
-    
-    closeModal('colorModal');
+    // Uygulamayı Başlat
+    updateHeaderTodayInfo();
     renderCalendar();
-  }
-
-  function saveForEveryYear() {
-    const noteText = document.getElementById('noteInput').value;
-    const recurrentKey = `recurrent_color_${selectedMonth}-${selectedDay}`;
-
-    if (selectedColor) {
-      localStorage.setItem(recurrentKey, selectedColor);
-    } else {
-      localStorage.removeItem(recurrentKey);
-    }
-
-    if (noteText.trim() !== '') {
-      const savedData = JSON.parse(localStorage.getItem(selectedDateKey) || '{}');
-      savedData.note = noteText;
-      savedData.color = selectedColor;
-      localStorage.setItem(selectedDateKey, JSON.stringify(savedData));
-    }
-
-    closeModal('colorModal');
-    renderCalendar();
-  }
-
-  function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
-  function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
-
-  updateHeaderTodayInfo();
-  renderCalendar();
-  loadGeneralNotes();
-</script>
-
+    loadGeneralNotes();
+  </script>
 </body>
 </html>
