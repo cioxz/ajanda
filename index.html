@@ -6,12 +6,15 @@
   <title>Takvim ve iOS Hızlı Notlar</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --accent: #38bdf8;
-      --ios-yellow: #eab308;
-      --danger: #ef4444;
+      --bg: #f2efe9;
+      --card-bg: #faf8f5;
+      --card-border: #e3dec3;
+      --element-bg: #e6e2da;
+      --text: #2c302e;
+      --text-muted: #736f68;
+      --accent: #8c7a6b;
+      --ios-yellow: #d4a359;
+      --danger: #d9534f;
     }
 
     * {
@@ -41,7 +44,8 @@
       background: var(--card-bg);
       border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      border: 1px solid #e8e4dc;
     }
 
     /* Header Structure */
@@ -66,11 +70,12 @@
 
     .header h2 {
       font-size: 1.2rem;
+      color: var(--text);
     }
 
     .header-btn {
-      background: #334155;
-      color: #fff;
+      background: var(--element-bg);
+      color: var(--text);
       border: none;
       padding: 8px 12px;
       border-radius: 8px;
@@ -80,6 +85,11 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      transition: background 0.2s;
+    }
+
+    .header-btn:active {
+      background: #dad5cc;
     }
 
     /* Calendar Grid */
@@ -92,7 +102,7 @@
 
     .weekdays div {
       font-weight: bold;
-      color: #94a3b8;
+      color: var(--text-muted);
       font-size: 0.85rem;
       padding-bottom: 8px;
     }
@@ -103,13 +113,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #334155;
+      background: var(--element-bg);
       border-radius: 10px;
       font-size: 0.9rem;
       font-weight: 600;
+      color: var(--text);
       cursor: pointer;
       position: relative;
-      transition: transform 0.1s;
+      transition: transform 0.1s, background 0.2s;
     }
 
     .day:active {
@@ -119,7 +130,7 @@
     .note-dot {
       width: 4px;
       height: 4px;
-      background-color: #fff;
+      background-color: var(--accent);
       border-radius: 50%;
       position: absolute;
       bottom: 4px;
@@ -127,7 +138,7 @@
 
     .day.current-today {
       border: 2px solid var(--accent);
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 8px rgba(140, 122, 107, 0.3);
     }
 
     .day.empty {
@@ -157,8 +168,8 @@
     }
 
     .note-item {
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: var(--element-bg);
+      border: 1px solid #dad5cc;
       border-radius: 12px;
       padding: 12px;
       display: flex;
@@ -175,12 +186,12 @@
 
     .note-item-date {
       font-size: 0.75rem;
-      color: #94a3b8;
+      color: var(--text-muted);
     }
 
     .note-item-text {
       font-size: 0.9rem;
-      color: #f8fafc;
+      color: var(--text);
       white-space: pre-wrap;
     }
 
@@ -204,7 +215,7 @@
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(44, 48, 46, 0.4);
       backdrop-filter: blur(4px);
       align-items: center;
       justify-content: center;
@@ -218,19 +229,21 @@
       width: 90%;
       max-width: 360px;
       text-align: center;
+      border: 1px solid #e8e4dc;
     }
 
     /* Apple Style Quick Note Modal */
     .ios-modal-content {
-      background: #ffffff;
-      color: #000000;
+      background: #faf8f5;
+      color: var(--text);
       width: 92%;
       max-width: 380px;
       border-radius: 24px;
       padding: 16px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+      border: 1px solid #e8e4dc;
     }
 
     .ios-header {
@@ -243,12 +256,12 @@
     .ios-close-btn {
       width: 30px;
       height: 30px;
-      background: #e2e8f0;
+      background: var(--element-bg);
       border-radius: 50%;
       border: none;
       font-size: 1rem;
       font-weight: bold;
-      color: #475569;
+      color: var(--text);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -262,12 +275,12 @@
     .ios-title {
       font-weight: 700;
       font-size: 1rem;
-      color: #000;
+      color: var(--text);
     }
 
     .ios-date-subtitle {
       font-size: 0.75rem;
-      color: #94a3b8;
+      color: var(--text-muted);
       margin-top: 2px;
     }
 
@@ -288,7 +301,7 @@
       border: none;
       outline: none;
       font-size: 1rem;
-      color: #1e293b;
+      color: var(--text);
       resize: none;
       background: transparent;
       padding: 8px 4px;
@@ -300,8 +313,8 @@
       justify-content: space-around;
       align-items: center;
       padding-top: 12px;
-      border-top: 1px solid #e2e8f0;
-      color: #64748b;
+      border-top: 1px solid #e2ddd5;
+      color: var(--text-muted);
       font-size: 1.1rem;
     }
 
@@ -309,7 +322,7 @@
       background: none;
       border: none;
       font-size: 1.1rem;
-      color: #475569;
+      color: var(--text-muted);
       cursor: pointer;
     }
 
@@ -329,10 +342,10 @@
 
     .input-box {
       width: 100%;
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: var(--element-bg);
+      border: 1px solid #dad5cc;
       border-radius: 8px;
-      color: #fff;
+      color: var(--text);
       padding: 10px;
       font-size: 0.9rem;
       outline: none;
@@ -346,7 +359,7 @@
 
     .save-btn {
       background: var(--accent);
-      color: #0f172a;
+      color: #ffffff;
       font-weight: bold;
       border: none;
       padding: 10px 16px;
@@ -363,6 +376,7 @@
       touch-action: none;
       cursor: crosshair;
       margin-bottom: 10px;
+      border: 1px solid #dad5cc;
     }
 
     .draw-tools {
@@ -447,12 +461,12 @@
     <h3 id="modalDate">Tarih Seç</h3>
     
     <div class="colors">
-      <div class="color-btn" style="background:#334155" onclick="selectColor('')"></div>
-      <div class="color-btn" style="background:#ef4444" onclick="selectColor('#ef4444')"></div>
-      <div class="color-btn" style="background:#eab308" onclick="selectColor('#eab308')"></div>
-      <div class="color-btn" style="background:#3b82f6" onclick="selectColor('#3b82f6')"></div>
-      <div class="color-btn" style="background:#a855f7" onclick="selectColor('#a855f7')"></div>
-      <div class="color-btn" style="background:#22c55e" onclick="selectColor('#22c55e')"></div>
+      <div class="color-btn" style="background:#e6e2da" onclick="selectColor('')"></div>
+      <div class="color-btn" style="background:#f87171" onclick="selectColor('#f87171')"></div>
+      <div class="color-btn" style="background:#fbbf24" onclick="selectColor('#fbbf24')"></div>
+      <div class="color-btn" style="background:#60a5fa" onclick="selectColor('#60a5fa')"></div>
+      <div class="color-btn" style="background:#c084fc" onclick="selectColor('#c084fc')"></div>
+      <div class="color-btn" style="background:#4ade80" onclick="selectColor('#4ade80')"></div>
     </div>
 
     <textarea class="input-box" id="noteInput" placeholder="Bu tarihe özel not ekleyin..."></textarea>
@@ -543,7 +557,7 @@
     const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
 
     if (notes.length === 0) {
-      notesList.innerHTML = '<div style="color:#64748b; font-size:0.85rem; text-align:center; padding:10px;">Henüz not veya çizim yok. "+" veya "✏️" butonuna basarak ekleyin!</div>';
+      notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:10px;">Henüz not veya çizim yok. "+" veya "✏️" butonuna basarak ekleyin!</div>';
       return;
     }
 
