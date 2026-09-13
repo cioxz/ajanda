@@ -381,8 +381,8 @@
   </div>
 
   <!-- Gün Düzenleme Modalı -->
-  <div class="modal-overlay" id="colorModal" onclick="handleOutsideClick(event, 'colorModal')">
-    <div class="modal-content">
+  <div class="modal-overlay" id="colorModal" onmousedown="handleMouseDown(event, 'colorModal')" onclick="handleOverlayClick(event, 'colorModal')">
+    <div class="modal-content" onmousedown="event.stopPropagation()">
       <div class="modal-header">
         <h3 id="modalDate"></h3>
         <button class="delete-btn" onclick="closeModal('colorModal')">✕</button>
@@ -390,6 +390,7 @@
       <div class="holiday-label" id="holidayLabel"></div>
 
       <div class="color-palette">
+        <div class="color-btn" style="background:#ffffff;" title="Beyaz (Sıfırla)" onclick="selectColor('')"></div>
         <div class="color-btn" style="background:#fecaca;" onclick="selectColor('#fecaca')"></div>
         <div class="color-btn" style="background:#fef08a;" onclick="selectColor('#fef08a')"></div>
         <div class="color-btn" style="background:#bbf7d0;" onclick="selectColor('#bbf7d0')"></div>
@@ -408,8 +409,8 @@
   </div>
 
   <!-- iOS Stil Çizimli Not Modalı -->
-  <div class="modal-overlay" id="iosNoteModal" onclick="handleOutsideClick(event, 'iosNoteModal')">
-    <div class="modal-content">
+  <div class="modal-overlay" id="iosNoteModal" onmousedown="handleMouseDown(event, 'iosNoteModal')" onclick="handleOverlayClick(event, 'iosNoteModal')">
+    <div class="modal-content" onmousedown="event.stopPropagation()">
       <div class="modal-header">
         <span style="font-size: 0.85rem; color: var(--text-muted);" id="iosModalTimestamp"></span>
         <button class="delete-btn" onclick="closeModal('iosNoteModal')">✕</button>
@@ -445,6 +446,7 @@
     let selectedMonth = 1;
     let attachedImage = null;
     let currentMode = 'write';
+    let mousedownTarget = null;
 
     const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
     const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
@@ -757,10 +759,15 @@
       document.getElementById(id).style.display = 'none';
     }
 
-    function handleOutsideClick(event, modalId) {
-      if (event.target.id === modalId) {
+    function handleMouseDown(event, modalId) {
+      mousedownTarget = event.target;
+    }
+
+    function handleOverlayClick(event, modalId) {
+      if (event.target === event.currentTarget && mousedownTarget === event.currentTarget) {
         closeModal(modalId);
       }
+      mousedownTarget = null;
     }
 
     function selectColor(color) { 
