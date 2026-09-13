@@ -389,17 +389,19 @@
     }
 
     .custom-color-picker {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       border: none;
       border-radius: 50%;
       cursor: pointer;
       background: none;
+      padding: 0;
     }
 
     .colors {
       display: flex;
       justify-content: space-around;
+      align-items: center;
       margin: 18px 0;
     }
 
@@ -409,7 +411,11 @@
       border-radius: 50%;
       border: 2px solid transparent;
       cursor: pointer;
+      transition: transform 0.1s ease;
     }
+
+    .color-btn:active { transform: scale(0.9); }
+    .color-btn.selected { border-color: var(--accent-highlight); transform: scale(1.1); }
 
     .input-box {
       width: 100%;
@@ -425,6 +431,12 @@
 
     textarea.input-box { height: 100px; resize: none; }
 
+    .modal-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .save-btn {
       background: var(--accent-highlight);
       color: #ffffff;
@@ -434,7 +446,25 @@
       border-radius: 12px;
       width: 100%;
       cursor: pointer;
+      transition: opacity 0.2s;
     }
+
+    .save-btn:hover { opacity: 0.9; }
+
+    .apply-all-years-btn {
+      background: var(--element-bg);
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid #d1d5db;
+      padding: 10px 16px;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .apply-all-years-btn:hover { background: #e5e7eb; }
 
     .holiday-info-label {
       font-size: 0.8rem;
@@ -509,7 +539,7 @@
         <div class="pen-color-btn" style="background:#3b82f6" onclick="setPenColor('#3b82f6')" title="Mavi"></div>
         <div class="pen-color-btn" style="background:#22c55e" onclick="setPenColor('#22c55e')" title="Yeşil"></div>
         
-        <input type="color" class="custom-color-picker" id="customColorPicker" value="#eb3434" onchange="setPenColor(this.value)" title="Renk Seçici">
+        <input type="color" class="custom-color-picker" id="customPenColorPicker" value="#eb3434" onchange="setPenColor(this.value)" title="Renk Seçici">
         
         <button class="ios-toolbar-btn" id="btnEraser" style="padding: 4px 8px; font-size: 0.9rem;" onclick="setEraser()" title="Silgi">🧹</button>
         <button class="header-btn" style="width: auto; height:24px; padding: 0 6px; font-size: 0.65rem;" onclick="clearInlineCanvas()">Sil</button>
@@ -527,16 +557,26 @@
     <div id="holidayLabel" class="holiday-info-label"></div>
     
     <div class="colors">
-      <div class="color-btn" style="background:#f3f4f6" onclick="selectColor('')"></div>
+      <!-- Varsayılan (Renksiz) -->
+      <div class="color-btn" style="background:#f3f4f6" onclick="selectColor('')" title="Sıfırla"></div>
+      <!-- Kırmızı / Pembe -->
       <div class="color-btn" style="background:#fca5a5" onclick="selectColor('#fca5a5')"></div>
-      <div class="color-btn" style="background:#fde047" onclick="selectColor('#fde047')"></div>
+      <!-- Gri (#5f646b) -->
+      <div class="color-btn" style="background:#5f646b" onclick="selectColor('#5f646b')"></div>
+      <!-- Mavi -->
       <div class="color-btn" style="background:#93c5fd" onclick="selectColor('#93c5fd')"></div>
-      <div class="color-btn" style="background:#d8b4fe" onclick="selectColor('#d8b4fe')"></div>
+      <!-- Yeşil -->
       <div class="color-btn" style="background:#86efac" onclick="selectColor('#86efac')"></div>
+      <!-- Özel Renk Seçici -->
+      <input type="color" class="custom-color-picker" id="dayColorPicker" onchange="selectColor(this.value)" title="Özel Renk Seç">
     </div>
 
     <textarea class="input-box" id="noteInput" placeholder="Bu tarihe özel not ekleyin..."></textarea>
-    <button class="save-btn" onclick="saveDayData()">Kaydet</button>
+    
+    <div class="modal-btn-group">
+      <button class="save-btn" onclick="saveDayData()">Sadece Bu Yıl İçin Kaydet</button>
+      <button class="apply-all-years-btn" onclick="saveForEveryYear()">🔄 Tüm Yıllara Bu Rengi Uygula</button>
+    </div>
   </div>
 </div>
 
@@ -545,6 +585,8 @@
   const realToday = new Date();
   let selectedDateKey = '';
   let selectedColor = '';
+  let selectedDay = 1;
+  let selectedMonth = 1;
   let attachedImage = null;
   let currentMode = 'write';
 
@@ -562,9 +604,8 @@
     "10-29": "29 Ekim Cumhuriyet Bayramı"
   };
 
-  // Tam Kesinleşmiş Dinî Bayram Takvimi (Yıl-Ay-Gün)
+  // Dinî Bayram Takvimi (Yıl-Ay-Gün)
   const religiousHolidays = {
-    // 2026
     "2026-3-20": "Ramazan Bayramı 1. Gün",
     "2026-3-21": "Ramazan Bayramı 2. Gün",
     "2026-3-22": "Ramazan Bayramı 3. Gün",
@@ -573,7 +614,6 @@
     "2026-5-29": "Kurban Bayramı 3. Gün",
     "2026-5-30": "Kurban Bayramı 4. Gün",
 
-    // 2027
     "2027-3-10": "Ramazan Bayramı 1. Gün",
     "2027-3-11": "Ramazan Bayramı 2. Gün",
     "2027-3-12": "Ramazan Bayramı 3. Gün",
@@ -582,7 +622,6 @@
     "2027-5-19": "Kurban Bayramı 3. Gün",
     "2027-5-20": "Kurban Bayramı 4. Gün",
 
-    // 2028
     "2028-2-27": "Ramazan Bayramı 1. Gün",
     "2028-2-28": "Ramazan Bayramı 2. Gün",
     "2028-2-29": "Ramazan Bayramı 3. Gün",
@@ -593,11 +632,9 @@
   };
 
   function getHolidayName(year, month, day) {
-    // 1) Dinî Bayram Kontrolü
     const fullKey = `${year}-${month}-${day}`;
     if (religiousHolidays[fullKey]) return religiousHolidays[fullKey];
 
-    // 2) Sabit Milli Bayram Kontrolü
     const fixedKey = `${month}-${day}`;
     if (fixedHolidays[fixedKey]) return fixedHolidays[fixedKey];
 
@@ -635,7 +672,10 @@
       dayCell.innerText = day;
 
       const dateKey = `${year}-${month + 1}-${day}`;
+      const recurrentKey = `recurrent_color_${month + 1}-${day}`;
+      
       const savedData = JSON.parse(localStorage.getItem(dateKey) || '{}');
+      const recurrentColor = localStorage.getItem(recurrentKey);
       const holidayName = getHolidayName(year, month + 1, day);
 
       if (holidayName) {
@@ -647,7 +687,9 @@
         dayCell.classList.add('current-today');
       }
 
-      if (savedData.color) dayCell.style.backgroundColor = savedData.color;
+      // Öncelik: Belirli tarihe özel renk > Tüm yıllara uygulanan renk
+      const activeColor = savedData.color || recurrentColor;
+      if (activeColor) dayCell.style.backgroundColor = activeColor;
 
       if (savedData.note && savedData.note.trim() !== '') {
         const dot = document.createElement('div');
@@ -655,7 +697,7 @@
         dayCell.appendChild(dot);
       }
 
-      dayCell.onclick = () => openModal('colorModal', dateKey, day, savedData, holidayName);
+      dayCell.onclick = () => openModal('colorModal', dateKey, day, month + 1, savedData, holidayName, activeColor);
       container.appendChild(dayCell);
     }
   }
@@ -845,12 +887,20 @@
     loadGeneralNotes();
   }
 
-  function openModal(id, dateKey, day, savedData, holidayName) {
+  function openModal(id, dateKey, day, month, savedData, holidayName, activeColor) {
     selectedDateKey = dateKey;
-    selectedColor = savedData.color || '';
+    selectedDay = day;
+    selectedMonth = month;
+    selectedColor = activeColor || '';
+
     document.getElementById('modalDate').innerText = `${day} ${monthNames[currentDate.getMonth()]}`;
     document.getElementById('holidayLabel').innerText = holidayName ? `🎉 ${holidayName}` : '';
     document.getElementById('noteInput').value = savedData.note || '';
+    
+    if (selectedColor && selectedColor.startsWith('#')) {
+      document.getElementById('dayColorPicker').value = selectedColor;
+    }
+
     document.getElementById(id).style.display = 'flex';
   }
 
@@ -858,15 +908,43 @@
     document.getElementById(id).style.display = 'none';
   }
 
-  function selectColor(color) { selectedColor = color; }
+  function selectColor(color) { 
+    selectedColor = color; 
+    if (color.startsWith('#')) {
+      document.getElementById('dayColorPicker').value = color;
+    }
+  }
 
   function saveDayData() {
     const noteText = document.getElementById('noteInput').value;
+    
     if (selectedColor || noteText.trim() !== '') {
       localStorage.setItem(selectedDateKey, JSON.stringify({ color: selectedColor, note: noteText }));
     } else {
       localStorage.removeItem(selectedDateKey);
     }
+    
+    closeModal('colorModal');
+    renderCalendar();
+  }
+
+  function saveForEveryYear() {
+    const noteText = document.getElementById('noteInput').value;
+    const recurrentKey = `recurrent_color_${selectedMonth}-${selectedDay}`;
+
+    if (selectedColor) {
+      localStorage.setItem(recurrentKey, selectedColor);
+    } else {
+      localStorage.removeItem(recurrentKey);
+    }
+
+    if (noteText.trim() !== '') {
+      const savedData = JSON.parse(localStorage.getItem(selectedDateKey) || '{}');
+      savedData.note = noteText;
+      savedData.color = selectedColor;
+      localStorage.setItem(selectedDateKey, JSON.stringify(savedData));
+    }
+
     closeModal('colorModal');
     renderCalendar();
   }
