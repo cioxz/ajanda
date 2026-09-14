@@ -635,7 +635,7 @@
       border-color: var(--primary);
     }
 
-    /* Sağ Tıklama Menüleri (Stüdyo için) */
+    /* Sağ Tıklama Menüleri */
     .context-menu {
       display: none;
       position: absolute;
@@ -645,10 +645,10 @@
       border-radius: 6px;
       padding: 8px;
       z-index: 3000;
-      min-width: 160px;
+      min-width: 180px;
       color: #fff;
     }
-    .context-menu button {
+    .context-menu button, .context-menu .menu-item-row {
       display: block;
       width: 100%;
       background: none;
@@ -661,6 +661,7 @@
       font-size: 13px;
     }
     .context-menu button:hover { background: #007acc; }
+    .context-menu hr { border: 0; border-top: 1px solid #444; margin: 4px 0; }
 
     .studio-panel {
       display: none;
@@ -957,10 +958,11 @@
           <div class="ai-assistant-box">
             <button class="ai-send-btn" onclick="addVideoClip('rect', document.getElementById('capcutColorPicker').value)">➕ Kare Klip Ekle</button>
             <button class="ai-send-btn" onclick="addVideoClip('circle', document.getElementById('capcutColorPicker').value)">➕ Daire Klip Ekle</button>
-            <button class="ai-send-btn" onclick="addVideoClip('text', document.getElementById('capcutColorPicker').value)">➕ Metin Klipi Ekle</button>
+            <button class="ai-send-btn" onclick="addVideoClip('line', document.getElementById('capcutColorPicker').value)">➕ Çizgi Klip Ekle</button>
+            <button class="ai-send-btn" onclick="addVideoClip('text', document.getElementById('capcutColorPicker').value, 'Yeni Metin')">➕ Metin Klipi Ekle</button>
             <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
             <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">İpuçları:</div>
-            <div style="font-size:0.75rem; color:var(--text-muted);">• Tuvalde klip üstüne tıklayıp sürükleyerek **taşıyabilirsin**.<br>• Klip üstüne **sağ tıklayarak** büyütebilir veya silebilirsin.</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">• Tuvalde klip üstüne tıklayıp sürükleyerek **taşıyabilirsin**.<br>• Klip üstüne **sağ tıklayarak** rengini, metnini, hızını/süresini ve boyutunu ayarlayabilirsin.</div>
             <button class="btn-secondary" onclick="clearVideoClips()" style="margin-top:4px;">Tümünü Sıfırla</button>
           </div>
         </div>
@@ -1023,8 +1025,7 @@
               <label style="font-size: 0.85rem; font-weight: 600;">Boyut: <input type="range" id="animBrushSize" min="1" max="50" value="4" style="vertical-align:middle;"></label>
             </div>
           </div>
-          <!-- Gizli Dosya Seçici -->
-          <input type="file" id="imageLoader" name="imageLoader" accept="image/*" style="display: none;" />
+          <input type="file" id="imageLoader" accept="image/*" style="display: none;" />
 
           <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#ffffff; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
             <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('imageLoader').click()">
@@ -1127,10 +1128,17 @@
     <button onclick="setTool('magnifier')">Büyüteç</button>
   </div>
 
-  <!-- CapCut Sağ Tık Düzenleme Menüsü -->
+  <!-- CapCut Sağ Tık Düzenleme Menüsü (Geliştirilmiş) -->
   <div id="capcut-context-menu" class="context-menu">
+    <div style="padding: 4px 12px; font-size:11px; color:#aaa; font-weight:bold;">Klip Özelleştirme</div>
+    <hr>
+    <button onclick="ccMenuChangeColor()">🎨 Renk Değiştir</button>
+    <button onclick="ccMenuEditText()">✏️ Metni Düzenle</button>
+    <button onclick="ccMenuChangeDuration()">⏱️ Süreyi/Bitiş Kare Ayarla</button>
+    <hr>
     <button onclick="ccMenuZoomIn()">🔍 Büyüt (Zoom +)</button>
     <button onclick="ccMenuZoomOut()">🔍 Küçült (Zoom -)</button>
+    <hr>
     <button onclick="ccMenuDelete()" style="color:#ef4444;">🗑️ Klibi Sil</button>
   </div>
 
@@ -1583,10 +1591,11 @@
       statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
     }
 
-    // CapCut-Stili Video Stüdyosu Mantığı (Sürükleme ve Sağ Tık Düzenleme Özellikli)
+    // CapCut Video Stüdyosu
     let capcutClips = [
-      { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 150, startY: 175, sizeScale: 1 },
-      { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 400, startY: 150, sizeScale: 1 }
+      { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 150, startY: 175, sizeScale: 1, textContent: 'Klip #1' },
+      { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 400, startY: 150, sizeScale: 1, textContent: 'Klip #2' },
+      { id: 3, type: 'line', color: '#10b981', startFrame: 10, endFrame: 70, startX: 250, startY: 250, sizeScale: 1, textContent: 'Çizgi' }
     ];
     let capcutCurrentFrame = 0;
     const capcutMaxFrames = 100;
@@ -1606,17 +1615,18 @@
       renderCapCutFrame(capcutCurrentFrame);
     }
 
-    function addVideoClip(type, color) {
+    function addVideoClip(type, color, customText = '') {
       const newId = capcutClips.length + 1;
       capcutClips.push({
         id: newId,
         type: type,
         color: color,
         startFrame: 0,
-        endFrame: 90,
+        endFrame: 70,
         startX: 200 + Math.random() * 100,
         startY: 150 + Math.random() * 50,
-        sizeScale: 1
+        sizeScale: 1,
+        textContent: customText || (type === 'text' ? 'Örnek Metin' : `Klip #${newId}`)
       });
       renderCapCutTimelineClips();
       renderCapCutFrame(capcutCurrentFrame);
@@ -1631,7 +1641,6 @@
     function renderCapCutTimelineClips() {
       const container = document.getElementById('capcutClipsContainer');
       container.innerHTML = '';
-      const trackWidth = document.getElementById('capcutTrackBox').clientWidth || 500;
 
       capcutClips.forEach(clip => {
         const div = document.createElement('div');
@@ -1641,13 +1650,13 @@
         div.style.left = `${leftPct}%`;
         div.style.width = `${widthPct}%`;
         div.style.backgroundColor = clip.color;
-        div.innerText = `Klip #${clip.id} (${clip.type})`;
+        div.innerText = `${clip.type === 'text' ? clip.textContent : '#' + clip.id + ' ' + clip.type}`;
         container.appendChild(div);
       });
     }
 
     function getClipBoundingBox(clip) {
-      const baseSize = 50 * (clip.sizeScale || 1);
+      const baseSize = 60 * (clip.sizeScale || 1);
       return {
         left: clip.startX - baseSize / 2,
         top: clip.startY - baseSize / 2,
@@ -1667,23 +1676,31 @@
           const scale = clip.sizeScale || 1;
 
           ccCtx.fillStyle = clip.color;
-          ccCtx.strokeStyle = "#fff";
-          ccCtx.lineWidth = 2;
+          ccCtx.strokeStyle = clip.color;
+          ccCtx.lineWidth = 3 * scale;
 
           if (clip.type === 'rect') {
             const size = 50 * scale;
             ccCtx.fillRect(curX - size/2, curY - size/2, size, size);
+            ccCtx.strokeStyle = "#fff";
             ccCtx.strokeRect(curX - size/2, curY - size/2, size, size);
           } else if (clip.type === 'circle') {
             const radius = 25 * scale;
             ccCtx.beginPath();
             ccCtx.arc(curX, curY, radius, 0, Math.PI * 2);
             ccCtx.fill();
+            ccCtx.strokeStyle = "#fff";
+            ccCtx.stroke();
+          } else if (clip.type === 'line') {
+            const len = 70 * scale;
+            ccCtx.beginPath();
+            ccCtx.moveTo(curX - len/2, curY);
+            ccCtx.lineTo(curX + len/2, curY);
             ccCtx.stroke();
           } else if (clip.type === 'text') {
-            ccCtx.font = `bold ${Math.round(20 * scale)}px sans-serif`;
+            ccCtx.font = `bold ${Math.round(22 * scale)}px sans-serif`;
             ccCtx.fillStyle = clip.color;
-            ccCtx.fillText(`Animasyon #${clip.id}`, curX - 40, curY);
+            ccCtx.fillText(clip.textContent || 'Metin', curX - 40, curY);
           } else if (clip.type === 'image' && clip.imgElement) {
             const imgSize = 60 * scale;
             ccCtx.drawImage(clip.imgElement, curX - imgSize/2, curY - imgSize/2, imgSize, imgSize);
@@ -1701,7 +1718,6 @@
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      // Hangi klip tıklandı kontrol et
       for (let i = capcutClips.length - 1; i >= 0; i--) {
         const clip = capcutClips[i];
         if (capcutCurrentFrame >= clip.startFrame && capcutCurrentFrame <= clip.endFrame) {
@@ -1724,9 +1740,7 @@
           }
         }
       }
-      if (e.button === 2) {
-        e.preventDefault();
-      }
+      if (e.button === 2) e.preventDefault();
     });
 
     ccCanvas.addEventListener('mousemove', (e) => {
@@ -1740,13 +1754,46 @@
       renderCapCutFrame(capcutCurrentFrame);
     });
 
-    window.addEventListener('mouseup', () => {
-      ccDraggingClip = null;
-    });
+    window.addEventListener('mouseup', () => { ccDraggingClip = null; });
+    ccCanvas.addEventListener('contextmenu', (e) => { e.preventDefault(); });
 
-    ccCanvas.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-    });
+    // Sağ Tık Menü Fonksiyonları
+    function ccMenuChangeColor() {
+      if (ccSelectedClipForMenu) {
+        const newColor = prompt("Yeni renk HEX kodu girin (örn: #ff0000, #3b82f6):", ccSelectedClipForMenu.color);
+        if (newColor) {
+          ccSelectedClipForMenu.color = newColor;
+          renderCapCutTimelineClips();
+          renderCapCutFrame(capcutCurrentFrame);
+        }
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
+
+    function ccMenuEditText() {
+      if (ccSelectedClipForMenu) {
+        const newText = prompt("Yeni metin veya başlık girin:", ccSelectedClipForMenu.textContent || '');
+        if (newText !== null) {
+          ccSelectedClipForMenu.textContent = newText;
+          if (ccSelectedClipForMenu.type !== 'text') ccSelectedClipForMenu.type = 'text'; // Metne dönüştür
+          renderCapCutTimelineClips();
+          renderCapCutFrame(capcutCurrentFrame);
+        }
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
+
+    function ccMenuChangeDuration() {
+      if (ccSelectedClipForMenu) {
+        const newEnd = prompt(`Bitiş karesini girin (Başlangıç: ${ccSelectedClipForMenu.startFrame}, Max: ${capcutMaxFrames}):`, ccSelectedClipForMenu.endFrame);
+        if (newEnd !== null && !isNaN(newEnd)) {
+          ccSelectedClipForMenu.endFrame = Math.min(capcutMaxFrames, Math.max(ccSelectedClipForMenu.startFrame + 5, parseInt(newEnd)));
+          renderCapCutTimelineClips();
+          renderCapCutFrame(capcutCurrentFrame);
+        }
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
 
     function ccMenuZoomIn() {
       if (ccSelectedClipForMenu) {
@@ -1801,7 +1848,6 @@
       renderCapCutFrame(capcutCurrentFrame);
     }
 
-    // CapCut Fotoğraf Yükleme Desteği
     const capcutImageLoader = document.getElementById('capcutImageLoader');
     capcutImageLoader.addEventListener('change', (e) => {
       const reader = new FileReader();
@@ -1825,9 +1871,7 @@
         }
         img.src = event.target.result;
       }
-      if (e.target.files[0]) {
-        reader.readAsDataURL(e.target.files[0]);
-      }
+      if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
     });
 
     let animDrawing = false;
@@ -1920,7 +1964,6 @@
       document.getElementById('drawBtn').classList.add('active');
     }
 
-    // Fotoğraf Yükleme İşlevselliği
     const imageLoader = document.getElementById('imageLoader');
     imageLoader.addEventListener('change', (e) => {
       const reader = new FileReader();
@@ -1932,9 +1975,7 @@
         }
         img.src = event.target.result;
       }
-      if (e.target.files[0]) {
-        reader.readAsDataURL(e.target.files[0]);
-      }
+      if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
     });
 
     animCanvasEl.addEventListener('mousedown', (e) => {
