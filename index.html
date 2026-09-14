@@ -6,16 +6,16 @@
   <title>Gelişmiş Takvim & Animasyon Stüdyosu</title>
   <style>
     :root {
-      --bg-color: #f3f4f6;
+      --bg-color: #f8fafc;
       --card-bg: #ffffff;
-      --text-main: #1f2937;
-      --text-muted: #6b7280;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --border-color: #e5e7eb;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --border-color: #e2e8f0;
       --holiday-bg: #fee2e2;
       --holiday-text: #dc2626;
-      --today-border: #2563eb;
+      --today-border: #4f46e5;
     }
 
     * {
@@ -28,35 +28,14 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding: 20px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 20px;
+      min-height: 100vh;
     }
 
-    .app-container {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-      max-width: 1200px;
-      width: 100%;
-    }
-
-    @media (max-width: 850px) {
-      .app-container {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Üst Bar & Animasyon Açma Butonu */
     .top-action-bar {
       max-width: 1200px;
       width: 100%;
@@ -65,78 +44,104 @@
     }
 
     .open-anim-btn {
-      background: var(--primary);
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
       color: #fff;
       border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
+      padding: 12px 20px;
+      border-radius: 12px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-      transition: background 0.2s;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .open-anim-btn:hover {
-      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
     }
 
-    /* Header */
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border-color);
+    }
+
+    .today-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
     .calendar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .calendar-header h2 {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 700;
-    }
-
-    .today-title {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
     }
 
     .nav-btn {
       background: #f1f5f9;
       border: none;
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 8px 14px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
+      color: var(--text-main);
+      transition: background 0.2s;
     }
 
     .nav-btn:hover {
       background: #e2e8f0;
     }
 
-    /* Calendar Grid */
     .weekdays-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       text-align: center;
       font-weight: 600;
       color: var(--text-muted);
-      font-size: 0.85rem;
-      margin-bottom: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
     }
 
     .days-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
+      gap: 8px;
     }
 
     .day {
       position: relative;
       aspect-ratio: 1;
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -144,11 +149,13 @@
       cursor: pointer;
       user-select: none;
       background: #fff;
-      transition: transform 0.1s ease;
+      transition: all 0.15s ease;
     }
 
     .day:hover {
-      transform: scale(1.03);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     .day.empty {
@@ -160,22 +167,24 @@
     .day.current-today {
       border: 2px solid var(--today-border);
       font-weight: 700;
+      color: var(--primary);
     }
 
     .day.holiday {
       background-color: var(--holiday-bg);
       color: var(--holiday-text);
+      border-color: #fca5a5;
     }
 
     .note-icon {
       position: absolute;
-      top: 3px;
-      right: 4px;
-      font-size: 11px;
+      top: 4px;
+      right: 6px;
+      font-size: 10px;
       pointer-events: none;
     }
 
-    /* General Notes Sidebar */
+    /* Sidebar / Notes */
     .sidebar-header {
       display: flex;
       justify-content: space-between;
@@ -183,14 +192,20 @@
       margin-bottom: 16px;
     }
 
+    .sidebar-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
     .add-note-btn {
       background: var(--primary);
       color: #fff;
       border: none;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
+      font-size: 0.85rem;
     }
 
     .add-note-btn:hover {
@@ -201,15 +216,16 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 520px;
+      max-height: 480px;
       overflow-y: auto;
+      padding-right: 4px;
     }
 
     .note-item {
       background: #f8fafc;
       border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 14px;
     }
 
     .note-item-header {
@@ -226,24 +242,27 @@
       color: #ef4444;
       cursor: pointer;
       font-weight: bold;
+      font-size: 0.9rem;
     }
 
     .note-item-text {
       font-size: 0.9rem;
       white-space: pre-wrap;
+      line-height: 1.4;
     }
 
     .note-item img {
       max-width: 100%;
-      border-radius: 6px;
-      margin-top: 6px;
+      border-radius: 8px;
+      margin-top: 8px;
     }
 
     /* Modals */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
       align-items: center;
@@ -252,11 +271,11 @@
 
     .modal-content {
       background: #fff;
-      padding: 20px;
-      border-radius: 16px;
+      padding: 24px;
+      border-radius: 20px;
       width: 90%;
-      max-width: 520px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      max-width: 500px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
     .modal-header {
@@ -266,43 +285,58 @@
       margin-bottom: 12px;
     }
 
+    .modal-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
     .holiday-label {
       color: var(--holiday-text);
       font-size: 0.85rem;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       font-weight: 600;
     }
 
     .color-palette {
       display: flex;
-      gap: 8px;
-      margin: 12px 0;
+      gap: 10px;
+      margin: 14px 0;
       align-items: center;
     }
 
     .color-btn {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 2px solid #fff;
       cursor: pointer;
       box-shadow: 0 0 0 1px var(--border-color);
+      transition: transform 0.1s;
+    }
+
+    .color-btn:hover {
+      transform: scale(1.1);
     }
 
     textarea {
       width: 100%;
-      height: 120px;
-      padding: 10px;
+      height: 110px;
+      padding: 12px;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 10px;
       resize: none;
       font-size: 0.95rem;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
     }
 
     .modal-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       justify-content: flex-end;
     }
 
@@ -310,29 +344,40 @@
       background: var(--primary);
       color: #fff;
       border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
+      padding: 9px 18px;
+      border-radius: 10px;
       cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-save:hover {
+      background: var(--primary-hover);
     }
 
     .btn-secondary {
-      background: #e2e8f0;
+      background: #f1f5f9;
       color: var(--text-main);
       border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
+      padding: 9px 18px;
+      border-radius: 10px;
       cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
     }
 
     /* Not Çizim Alanı */
     .editor-wrapper {
       position: relative;
       width: 100%;
-      height: 280px;
+      height: 260px;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin-bottom: 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
       overflow: hidden;
+      background: #fff;
     }
 
     .editor-wrapper textarea {
@@ -344,33 +389,37 @@
       top: 0; left: 0;
       z-index: 1;
       background: transparent;
-      font-size: 1rem;
+      font-size: 0.95rem;
+      padding: 12px;
     }
 
-    canvas {
+    .editor-wrapper canvas {
       position: absolute;
       top: 0; left: 0;
       z-index: 2;
       pointer-events: none;
     }
 
-    canvas.active-draw {
+    .editor-wrapper canvas.active-draw {
       pointer-events: auto;
     }
 
     .toolbar {
       display: flex;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
     }
 
     .tool-btn {
       padding: 6px 12px;
       border: 1px solid var(--border-color);
       background: #f8fafc;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-main);
     }
 
     .tool-btn.active {
@@ -401,8 +450,8 @@
     .anim-addon-container {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding: 20px;
+      gap: 16px;
+      padding: 24px;
       flex: 1;
       height: calc(100vh - 70px);
     }
@@ -412,7 +461,7 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
     .anim-tools {
@@ -421,17 +470,19 @@
     }
 
     .anim-tool-btn {
-      background: #f1f5f9;
+      background: #f8fafc;
       border: 1px solid var(--border-color);
       color: var(--text-main);
       padding: 8px 16px;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: 500;
+      font-size: 0.9rem;
+      transition: background 0.2s;
     }
 
     .anim-tool-btn:hover {
-      background: #e2e8f0;
+      background: #f1f5f9;
     }
 
     .anim-tool-btn.active {
@@ -446,7 +497,7 @@
       flex: 1;
       background: #f8fafc;
       border: 2px dashed var(--border-color);
-      border-radius: 12px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -465,8 +516,8 @@
     .anim-timeline-container {
       background: #f8fafc;
       border: 1px solid var(--border-color);
-      padding: 12px;
-      border-radius: 10px;
+      padding: 16px;
+      border-radius: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -476,30 +527,28 @@
       position: relative;
       height: 24px;
       background: #e2e8f0;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
     }
 
     .anim-playhead {
       position: absolute;
       top: 0;
-      width: 6px;
+      width: 8px;
       height: 100%;
       background: var(--primary);
-      border-radius: 3px;
+      border-radius: 4px;
       pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Üst Bar ve Animasyon Butonu -->
   <div class="top-action-bar">
     <button class="open-anim-btn" onclick="openAnimStudio()">🎬 Animasyon Stüdyosu</button>
   </div>
 
   <div class="app-container">
-    <!-- Takvim Kartı -->
     <div class="card">
       <div class="today-title" id="todayTitle"></div>
       <div class="calendar-header">
@@ -515,7 +564,6 @@
       <div class="days-grid" id="daysContainer"></div>
     </div>
 
-    <!-- Genel Notlar Yan Paneli -->
     <div class="card">
       <div class="sidebar-header">
         <h3>Notlarım</h3>
@@ -525,11 +573,11 @@
     </div>
   </div>
 
-  <!-- Tam Ekran Animasyon Stüdyosu Arayüzü -->
+  <!-- Tam Ekran Animasyon Stüdyosu Modalı -->
   <div class="anim-fullscreen-overlay" id="animStudioModal">
     <div class="anim-fullscreen-header">
       <h3 style="display:flex; align-items:center; gap:8px;">🎬 Animasyon Stüdyosu</h3>
-      <button class="delete-btn" onclick="closeAnimStudio()" style="font-size: 1.2rem; padding: 4px 8px;">✕ Kapat</button>
+      <button class="delete-btn" onclick="closeAnimStudio()">✕ Kapat</button>
     </div>
 
     <div class="anim-addon-container">
@@ -542,8 +590,8 @@
         <div>
           <button class="anim-tool-btn" onclick="rewindAnimation()">⏮ Başa Sar</button>
           <button class="anim-tool-btn" onclick="togglePlayAnimation()">▶ Oynat</button>
-          <span id="frameCounter" style="margin-left: 10px; font-weight: bold; font-size: 0.9rem;">F12 / 48</span>
-          <button class="anim-tool-btn" style="margin-left: 10px;" onclick="addKeyframe()">+ Keyframe</button>
+          <span id="frameCounter" style="margin-left: 12px; font-weight: bold; font-size: 0.9rem;">F12 / 48</span>
+          <button class="anim-tool-btn" style="margin-left: 12px;" onclick="addKeyframe()">+ Keyframe</button>
         </div>
       </div>
 
@@ -561,7 +609,7 @@
         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
           <span>0</span><span>8</span><span>16</span><span>24</span><span>32</span><span>40</span><span>48</span>
         </div>
-        <div class="anim-timeline-container-inner anim-timeline-scrubber" id="timelineScrubber" onclick="scrubTimeline(event)">
+        <div class="anim-timeline-scrubber" id="timelineScrubber" onclick="scrubTimeline(event)">
           <div class="anim-playhead" id="playhead" style="left: 25%;"></div>
         </div>
       </div>
@@ -569,8 +617,8 @@
   </div>
 
   <!-- Gün Düzenleme Modalı -->
-  <div class="modal-overlay" id="colorModal" onmousedown="handleMouseDown(event, 'colorModal')" onclick="handleOverlayClick(event, 'colorModal')">
-    <div class="modal-content" onmousedown="event.stopPropagation()">
+  <div class="modal-overlay" id="colorModal" onclick="handleOverlayClick(event, 'colorModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">
         <h3 id="modalDate"></h3>
         <button class="delete-btn" onclick="closeModal('colorModal')">✕</button>
@@ -578,13 +626,13 @@
       <div class="holiday-label" id="holidayLabel"></div>
 
       <div class="color-palette">
-        <div class="color-btn" style="background:#ffffff;" title="Beyaz (Sıfırla)" onclick="selectColor('')"></div>
+        <div class="color-btn" style="background:#ffffff;" title="Sıfırla" onclick="selectColor('')"></div>
         <div class="color-btn" style="background:#fecaca;" onclick="selectColor('#fecaca')"></div>
         <div class="color-btn" style="background:#fef08a;" onclick="selectColor('#fef08a')"></div>
         <div class="color-btn" style="background:#bbf7d0;" onclick="selectColor('#bbf7d0')"></div>
         <div class="color-btn" style="background:#bfdbfe;" onclick="selectColor('#bfdbfe')"></div>
         <div class="color-btn" style="background:#e9d5ff;" onclick="selectColor('#e9d5ff')"></div>
-        <input type="color" id="dayColorPicker" style="border:none; width:28px; height:28px; cursor:pointer;" onchange="selectColor(this.value)">
+        <input type="color" id="dayColorPicker" style="border:none; width:30px; height:30px; cursor:pointer; background:none;" onchange="selectColor(this.value)">
       </div>
 
       <textarea id="noteInput" placeholder="Bu güne özel not yazın..."></textarea>
@@ -597,8 +645,8 @@
   </div>
 
   <!-- iOS Stil Çizimli Not Modalı -->
-  <div class="modal-overlay" id="iosNoteModal" onmousedown="handleMouseDown(event, 'iosNoteModal')" onclick="handleOverlayClick(event, 'iosNoteModal')">
-    <div class="modal-content" onmousedown="event.stopPropagation()">
+  <div class="modal-overlay" id="iosNoteModal" onclick="handleOverlayClick(event, 'iosNoteModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">
         <span style="font-size: 0.85rem; color: var(--text-muted);" id="iosModalTimestamp"></span>
         <button class="delete-btn" onclick="closeModal('iosNoteModal')">✕</button>
@@ -626,7 +674,6 @@
   </div>
 
   <script>
-    // --- Takvim & Not Mantığı ---
     let currentDate = new Date();
     const realToday = new Date();
     let selectedDateKey = '';
@@ -635,7 +682,6 @@
     let selectedMonth = 1;
     let attachedImage = null;
     let currentMode = 'write';
-    let mousedownTarget = null;
 
     const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
     const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
@@ -647,7 +693,7 @@
       "5-19": "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı",
       "7-15": "15 Temmuz Demokrasi ve Milli Birlik Günü",
       "8-30": "30 Ağustos Zafer Bayramı",
-      "10-29": "29 Cumhuriyet Bayramı"
+      "10-29": "29 Ekim Cumhuriyet Bayramı"
     };
 
     const religiousHolidays = {
@@ -657,23 +703,7 @@
       "2026-5-27": "Kurban Bayramı 1. Gün",
       "2026-5-28": "Kurban Bayramı 2. Gün",
       "2026-5-29": "Kurban Bayramı 3. Gün",
-      "2026-5-30": "Kurban Bayramı 4. Gün",
-
-      "2027-3-10": "Ramazan Bayramı 1. Gün",
-      "2027-3-11": "Ramazan Bayramı 2. Gün",
-      "2027-3-12": "Ramazan Bayramı 3. Gün",
-      "2027-5-17": "Kurban Bayramı 1. Gün",
-      "2027-5-18": "Kurban Bayramı 2. Gün",
-      "2027-5-19": "Kurban Bayramı 3. Gün",
-      "2027-5-20": "Kurban Bayramı 4. Gün",
-
-      "2028-2-27": "Ramazan Bayramı 1. Gün",
-      "2028-2-28": "Ramazan Bayramı 2. Gün",
-      "2028-2-29": "Ramazan Bayramı 3. Gün",
-      "2028-5-5": "Kurban Bayramı 1. Gün",
-      "2028-5-6": "Kurban Bayramı 2. Gün",
-      "2028-5-7": "Kurban Bayramı 3. Gün",
-      "2028-5-8": "Kurban Bayramı 4. Gün"
+      "2026-5-30": "Kurban Bayramı 4. Gün"
     };
 
     function getHolidayName(year, month, day) {
@@ -748,7 +778,6 @@
       }
     }
 
-    // --- Not Çizim Canvas Mantığı ---
     const canvas = document.getElementById('inlineCanvas');
     const ctx = canvas.getContext('2d');
     let painting = false;
@@ -818,7 +847,7 @@
       } else {
         ctx.globalCompositeOperation = 'source-over';
         ctx.lineWidth = 3;
-        ctx.strokeStyle = '#1f2937';
+        ctx.strokeStyle = '#0f172a';
       }
 
       ctx.lineCap = 'round';
@@ -835,14 +864,13 @@
     canvas.addEventListener('touchend', endPosition);
     canvas.addEventListener('touchmove', draw);
 
-    // --- Notlar Sidebar Mantığı ---
     function loadGeneralNotes() {
       const notesList = document.getElementById('generalNotesList');
       notesList.innerHTML = '';
       const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
 
       if (notes.length === 0) {
-        notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:18px 0;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
+        notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:24px 0;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
         return;
       }
 
@@ -852,7 +880,7 @@
 
         let contentHtml = `
           <div class="note-item-header">
-            <span class="note-item-date">${note.timestamp || ''}</span>
+            <span>${note.timestamp || ''}</span>
             <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
           </div>
         `;
@@ -887,12 +915,7 @@
       if (!text.trim() && !attachedImage && !drawingData) return;
 
       const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-      notes.unshift({ 
-        text: text.trim(), 
-        drawing: drawingData, 
-        image: attachedImage, 
-        timestamp: timeStr 
-      });
+      notes.unshift({ text: text.trim(), drawing: drawingData, image: attachedImage, timestamp: timeStr });
       localStorage.setItem('user_general_notes', JSON.stringify(notes));
 
       closeModal('iosNoteModal');
@@ -946,15 +969,10 @@
       document.getElementById(id).style.display = 'none';
     }
 
-    function handleMouseDown(event, modalId) {
-      mousedownTarget = event.target;
-    }
-
     function handleOverlayClick(event, modalId) {
-      if (event.target === event.currentTarget && mousedownTarget === event.currentTarget) {
+      if (event.target === event.currentTarget) {
         closeModal(modalId);
       }
-      mousedownTarget = null;
     }
 
     function selectColor(color) { 
@@ -966,13 +984,11 @@
 
     function saveDayData() {
       const noteText = document.getElementById('noteInput').value.trim();
-      
       if (selectedColor !== '' || noteText !== '') {
         localStorage.setItem(selectedDateKey, JSON.stringify({ color: selectedColor, note: noteText }));
       } else {
         localStorage.removeItem(selectedDateKey);
       }
-      
       closeModal('colorModal');
       renderCalendar();
     }
@@ -1003,8 +1019,7 @@
     function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
     function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
-
-    // --- Animasyon Stüdyosu Mantığı ---
+    // Animasyon Stüdyosu Mantığı
     let animCanvas = null;
     let animCtx = null;
     let currentFrame = 12;
@@ -1128,7 +1143,6 @@
       event.currentTarget.classList.add('active');
     }
 
-    // Uygulamayı Başlat
     updateHeaderTodayInfo();
     renderCalendar();
     loadGeneralNotes();
