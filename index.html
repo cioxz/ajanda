@@ -649,28 +649,6 @@
       border-color: var(--primary);
     }
 
-    .anim-workspace {
-      position: relative;
-      width: 100%;
-      flex: 1;
-      background: #f8fafc;
-      border: 2px dashed var(--border-color);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .anim-workspace canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: auto;
-    }
-
     .studio-panel {
       display: none;
       width: 100%;
@@ -708,7 +686,7 @@
       border: 1px solid #334155;
     }
 
-    /* Minecraft Blueprint / Daire Şeması Stilleri */
+    /* Görseldeki Stil Uyarlandı: Minecraft Blueprint Stili */
     .blueprint-container {
       display: flex;
       flex-direction: column;
@@ -717,12 +695,71 @@
       overflow-y: auto;
     }
 
+    .blueprint-card-box {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .bp-input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bp-label-header {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bp-input-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+      transition: border-color 0.2s;
+    }
+
+    .bp-input-box:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .bp-input-box input {
+      border: none;
+      outline: none;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      width: 100px;
+      background: transparent;
+    }
+
+    .bp-input-box span {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
     .blueprint-grid-wrapper {
       flex: 1;
       background: #f8fafc;
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 16px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -734,24 +771,35 @@
     .blueprint-grid {
       display: grid;
       gap: 1px;
-      background: var(--border-color);
-      padding: 2px;
-      border-radius: 6px;
-      background-color: #cbd5e1;
+      background-color: #000000;
+      border: 1px solid #000000;
+      padding: 1px;
+      border-radius: 2px;
     }
 
     .bp-cell {
-      width: 14px;
-      height: 14px;
+      width: 18px;
+      height: 18px;
       background: #ffffff;
     }
 
     .bp-cell.active {
-      background: #8b5cf6; /* Mor Minecraft Daire Çizgisi */
+      background: #3b82f6; /* Görseldeki mavi tonu */
+    }
+
+    .bp-cell.axis {
+      background: #94a3b8; /* Gri eksen / haç çizgisi tonu */
     }
 
     .bp-cell.center {
-      background: #64748b; /* Merkez İşaretçi */
+      background: #1e293b; /* Tam merkezdeki koyu blok */
+    }
+
+    .bp-stats-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-main);
+      text-align: center;
     }
 
     .anim-timeline-container {
@@ -898,15 +946,29 @@
           </div>
         </div>
 
-        <!-- Blueprint / Daire Kontrolleri (Sadece Boy ve Kalınlık) -->
+        <!-- Blueprint / Daire Kontrolleri (Görsele Benzer Input Formatı) -->
         <div id="sidebarBlueprint" class="studio-sidebar-content" style="display: none;">
-          <div class="sidebar-section-title">📐 Daire Parametreleri</div>
-          <div class="ai-assistant-box">
-            <label style="font-size: 0.85rem; font-weight: 600;">Çap (Boy): <b id="bpSizeVal">15</b> blok</label>
-            <input type="range" id="bpSizeInput" min="3" max="51" step="2" value="15" oninput="updateBlueprintParams()" style="cursor: pointer; width: 100%;">
-            
-            <label style="font-size: 0.85rem; font-weight: 600; margin-top: 8px;">Çizgi Kalınlığı: <b id="bpThickVal">1</b> blok</label>
-            <input type="range" id="bpThickInput" min="1" max="5" value="1" oninput="updateBlueprintParams()" style="cursor: pointer; width: 100%;">
+          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">Generate the circle</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
+            Experiment with the diameter to create your Minecraft circle.
+          </div>
+
+          <div class="blueprint-card-box">
+            <div class="bp-input-row">
+              <div class="bp-label-header"><span>Diameter</span></div>
+              <div class="bp-input-box">
+                <input type="number" id="bpSizeInput" min="3" max="51" step="1" value="10" oninput="updateBlueprintParams()">
+                <span>blocks</span>
+              </div>
+            </div>
+
+            <div class="bp-input-row">
+              <div class="bp-label-header"><span>Thickness</span></div>
+              <div class="bp-input-box">
+                <input type="number" id="bpThickInput" min="1" max="10" step="1" value="1" oninput="updateBlueprintParams()">
+                <span>blocks</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -931,13 +993,13 @@
             <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
           </div>
 
-          <div class="anim-workspace" id="animWorkspace">
+          <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#f8fafc; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
             <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
               <div style="font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
               <span style="font-size: 1.1rem; font-weight: 600;">Gemini'ye çizdirin ya da serbest çizim yapın</span><br>
               <span style="font-size: 0.85rem;">Örn: "kedi çiz", "kule çiz"</span>
             </div>
-            <canvas id="animCanvas"></canvas>
+            <canvas id="animCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto;"></canvas>
           </div>
         </div>
 
@@ -953,13 +1015,12 @@
           </div>
         </div>
 
-        <!-- Blueprint / Daire Paneli -->
+        <!-- Blueprint / Daire Paneli (Görseldeki Gibi İstatistik ve Grid Yapısı) -->
         <div id="panelBlueprint" class="studio-panel">
-          <div class="anim-top-toolbar">
-            <span style="font-weight: 600; font-size: 0.9rem;" id="bpInfoTitle">Minecraft Piksel Daire Şeması</span>
-            <button class="anim-tool-btn" onclick="generateBlueprint()">Yenile</button>
+          <div class="blueprint-grid-wrapper">
+            <div class="bp-stats-text" id="bpStatsText">You will need <b>0</b> blocks to build this circle.</div>
+            <div id="blueprintGridContainer" style="display: flex; align-items: center; justify-content: center; overflow: auto; max-width: 100%; max-height: 100%;"></div>
           </div>
-          <div class="blueprint-grid-wrapper" id="blueprintGridContainer"></div>
         </div>
 
         <div class="anim-timeline-container">
@@ -1475,30 +1536,32 @@
       }
     }
 
-    // --- MINECRAFT DAİRE ŞEMASI (BOY VE KALINLIK) ---
+    // --- MİNECRAFT BLUEPRINT ŞEMA ÜRETİCİSİ (GÖRSEL STİLİ) ---
     function updateBlueprintParams() {
-      const size = document.getElementById('bpSizeInput').value;
-      const thick = document.getElementById('bpThickInput').value;
-      document.getElementById('bpSizeVal').innerText = size;
-      document.getElementById('bpThickVal').innerText = thick;
       generateBlueprint();
     }
 
     function generateBlueprint() {
-      const size = parseInt(document.getElementById('bpSizeInput').value) || 15;
-      const thickness = parseInt(document.getElementById('bpThickInput').value) || 1;
+      let sizeInput = parseInt(document.getElementById('bpSizeInput').value);
+      let thickInput = parseInt(document.getElementById('bpThickInput').value);
+
+      if (isNaN(sizeInput) || sizeInput < 3) sizeInput = 3;
+      if (isNaN(thickInput) || thickInput < 1) thickInput = 1;
+
       const container = document.getElementById('blueprintGridContainer');
+      const statsText = document.getElementById('bpStatsText');
       container.innerHTML = '';
 
       const grid = document.createElement('div');
       grid.classList.add('blueprint-grid');
-      grid.style.gridTemplateColumns = `repeat(${size}, 16px)`;
+      grid.style.gridTemplateColumns = `repeat(${sizeInput}, 20px)`;
 
-      const radius = size / 2;
-      const center = (size - 1) / 2;
+      const radius = sizeInput / 2;
+      const center = (sizeInput - 1) / 2;
+      let activeBlocksCount = 0;
 
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
+      for (let y = 0; y < sizeInput; y++) {
+        for (let x = 0; x < sizeInput; x++) {
           const cell = document.createElement('div');
           cell.classList.add('bp-cell');
 
@@ -1506,11 +1569,19 @@
           const dy = y - center;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Kalınlık ve boy hesaplaması
-          if (distance <= radius && distance >= (radius - thickness * 0.75)) {
-            cell.classList.add('active');
-          } else if (Math.abs(dx) <= 0.3 && Math.abs(dy) <= 0.3) {
+          const isCenter = Math.abs(dx) <= 0.3 && Math.abs(dy) <= 0.3;
+          const isAxis = (Math.abs(dx) <= 0.3 || Math.abs(dy) <= 0.3) && distance <= radius;
+          const isCircleEdge = distance <= radius && distance >= (radius - thickInput * 0.75);
+
+          if (isCenter) {
             cell.classList.add('center');
+            activeBlocksCount++;
+          } else if (isCircleEdge) {
+            cell.classList.add('active');
+            activeBlocksCount++;
+          } else if (isAxis) {
+            cell.classList.add('axis');
+            activeBlocksCount++;
           }
 
           grid.appendChild(cell);
@@ -1518,6 +1589,7 @@
       }
 
       container.appendChild(grid);
+      statsText.innerHTML = `You will need <b>${activeBlocksCount}</b> blocks to build this circle.`;
     }
 
     // --- RESİM / ÇİZİM STÜDYOSU & OPAKLIK DÜZELTMESİ ---
@@ -1566,7 +1638,6 @@
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      // Opaklık ve ayarların doğru uygulanması
       if (animMode === 'eraser') {
         ctxAnim.globalCompositeOperation = 'destination-out';
         ctxAnim.lineWidth = toolSettings.eraser.size;
@@ -1714,7 +1785,7 @@
         const data = await res.json();
         
         if (data.candidates && data.candidates[0].content) {
-          outputDiv.innerHTML = `<span style="color:green; font-weight:600;>Başarılı:</span> "${prompt}" tuvale yansıtıldı!`;
+          outputDiv.innerHTML = `<span style="color:green; font-weight:600;">Başarılı:</span> "${prompt}" tuvale yansıtıldı!`;
           drawGeminiShape(prompt.toLowerCase());
         } else if (data.error) {
           outputDiv.innerHTML = `<span style="color:red;">Hata: ${data.error.message}</span>`;
