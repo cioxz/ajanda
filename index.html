@@ -6,16 +6,16 @@
   <title>Gelişmiş Takvim & Çoklu Stüdyo Platformu</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --border-color: #334155;
-      --holiday-bg: #450a0a;
-      --holiday-text: #fca5a5;
-      --today-border: #6366f1;
+      --bg-color: #e8e4df;
+      --card-bg: #f4f2ee;
+      --text-main: #2c2b2a;
+      --text-muted: #8c857b;
+      --primary: #5c564f;
+      --primary-hover: #4a4743;
+      --border-color: #d5d0c7;
+      --holiday-bg: #fde8e8;
+      --holiday-text: #9b1c1c;
+      --today-border: #5c564f;
     }
 
     * {
@@ -34,6 +34,7 @@
       align-items: center;
       gap: 20px;
       min-height: 100vh;
+      user-select: none;
     }
 
     .top-action-bar {
@@ -45,7 +46,7 @@
     }
 
     .open-anim-btn {
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      background: #4a4743;
       color: #fff;
       border: none;
       padding: 12px 20px;
@@ -55,23 +56,28 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(74, 71, 67, 0.2);
+      transition: background 0.2s, transform 0.2s;
     }
 
     .open-anim-btn:hover {
+      background: #3d3a37;
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
     }
 
     .settings-btn {
-      background: var(--card-bg);
+      background: #d5d0c7;
       color: var(--text-main);
-      border: 1px solid var(--border-color);
+      border: 1px solid #b8b0a4;
       padding: 12px 16px;
       border-radius: 12px;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .settings-btn:hover {
+      background: #c4beb3;
     }
 
     .app-container {
@@ -92,14 +98,14 @@
       background: var(--card-bg);
       border-radius: 20px;
       padding: 24px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border-color);
     }
 
     .today-title {
       font-size: 0.85rem;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 8px;
@@ -118,7 +124,7 @@
     }
 
     .nav-btn {
-      background: var(--border-color);
+      background: #d5d0c7;
       border: none;
       padding: 8px 14px;
       border-radius: 10px;
@@ -129,7 +135,7 @@
     }
 
     .nav-btn:hover {
-      background: #475569;
+      background: #c4beb3;
     }
 
     .weekdays-grid {
@@ -159,14 +165,14 @@
       font-weight: 500;
       cursor: pointer;
       user-select: none;
-      background: #1e293b;
+      background: #ffffff;
       transition: all 0.15s ease;
     }
 
     .day:hover {
-      border-color: var(--primary);
+      border-color: #8c857b;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     .day.empty {
@@ -178,13 +184,22 @@
     .day.current-today {
       border: 2px solid var(--today-border);
       font-weight: 700;
-      color: var(--primary);
     }
 
     .day.holiday {
       background-color: var(--holiday-bg);
       color: var(--holiday-text);
-      border-color: #7f1d1d;
+      border-color: #fca5a5;
+    }
+
+    .day-number-outline {
+      color: #2c2b2a;
+      text-shadow: none;
+    }
+
+    .day[style*="background-color"] .day-number-outline {
+      color: #ffffff;
+      text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     }
 
     .note-icon {
@@ -216,6 +231,7 @@
       cursor: pointer;
       font-weight: 600;
       font-size: 0.85rem;
+      transition: background 0.2s;
     }
 
     .add-note-btn:hover {
@@ -232,7 +248,7 @@
     }
 
     .note-item {
-      background: #0f172a;
+      background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 14px;
@@ -259,6 +275,7 @@
       font-size: 0.9rem;
       white-space: pre-wrap;
       line-height: 1.4;
+      color: var(--text-main);
     }
 
     .note-item img {
@@ -270,7 +287,7 @@
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(44, 43, 42, 0.5);
       backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
@@ -286,7 +303,7 @@
       border-radius: 20px;
       width: 90%;
       max-width: 500px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
     .modal-header {
@@ -332,7 +349,7 @@
       width: 100%;
       height: 110px;
       padding: 12px;
-      background: #0f172a;
+      background: #ffffff;
       color: var(--text-main);
       border: 1px solid var(--border-color);
       border-radius: 10px;
@@ -360,6 +377,7 @@
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
+      transition: background 0.2s;
     }
 
     .btn-save:hover {
@@ -367,17 +385,18 @@
     }
 
     .btn-secondary {
-      background: var(--border-color);
+      background: #d5d0c7;
       color: var(--text-main);
       border: none;
       padding: 9px 18px;
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
+      transition: background 0.2s;
     }
 
     .btn-secondary:hover {
-      background: #475569;
+      background: #c4beb3;
     }
 
     .editor-wrapper {
@@ -388,7 +407,7 @@
       border-radius: 10px;
       margin-bottom: 14px;
       overflow: hidden;
-      background: #0f172a;
+      background: #ffffff;
     }
 
     .editor-wrapper textarea {
@@ -425,7 +444,7 @@
     .tool-btn {
       padding: 6px 12px;
       border: 1px solid var(--border-color);
-      background: #0f172a;
+      background: #ffffff;
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.85rem;
@@ -439,11 +458,11 @@
       border-color: var(--primary);
     }
 
-    /* Stüdyolar Modalı (Yenilenmiş UI) */
+    /* Stüdyolar Modalı */
     .anim-fullscreen-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: #0f172a;
+      background: #e8e4df;
       display: none;
       flex-direction: column;
       z-index: 2000;
@@ -455,7 +474,7 @@
       align-items: center;
       padding: 16px 24px;
       border-bottom: 1px solid var(--border-color);
-      background: #1e293b;
+      background: #f4f2ee;
     }
 
     .studio-tabs {
@@ -464,7 +483,7 @@
     }
 
     .studio-tab-btn {
-      background: #0f172a;
+      background: #ffffff;
       border: 1px solid var(--border-color);
       padding: 8px 16px;
       border-radius: 8px;
@@ -489,7 +508,7 @@
     }
 
     .anim-sidebar-left {
-      background: #1e293b;
+      background: #f4f2ee;
       border-right: 1px solid var(--border-color);
       padding: 20px;
       display: flex;
@@ -508,7 +527,7 @@
     }
 
     .ai-assistant-box {
-      background: #0f172a;
+      background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 12px;
@@ -522,7 +541,7 @@
       min-height: 100px;
       max-height: 200px;
       padding: 10px 12px;
-      background: #1e293b;
+      background: #f4f2ee;
       border: 1px solid var(--border-color);
       color: var(--text-main);
       border-radius: 8px;
@@ -532,7 +551,7 @@
     }
 
     .ai-send-btn {
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      background: #4a4743;
       color: #fff;
       border: none;
       padding: 10px;
@@ -541,6 +560,11 @@
       font-size: 0.9rem;
       cursor: pointer;
       text-align: center;
+      transition: background 0.2s;
+    }
+
+    .ai-send-btn:hover {
+      background: #3d3a37;
     }
 
     .ai-chips {
@@ -551,35 +575,13 @@
     }
 
     .ai-chip {
-      background: #334155;
-      border: none;
+      background: #e8e4df;
+      border: 1px solid var(--border-color);
       padding: 4px 8px;
       border-radius: 6px;
       font-size: 0.75rem;
       cursor: pointer;
       color: var(--text-main);
-    }
-
-    .layer-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    .layer-action-btn {
-      flex: 1;
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: var(--text-main);
-    }
-
-    .layer-action-btn.danger {
-      color: #ef4444;
-      border-color: #7f1d1d;
     }
 
     .anim-workspace-container {
@@ -588,7 +590,7 @@
       flex: 1;
       padding: 20px;
       gap: 16px;
-      background: #0f172a;
+      background: #e8e4df;
       overflow: hidden;
     }
 
@@ -598,7 +600,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      background: #1e293b;
+      background: #f4f2ee;
       padding: 12px 16px;
       border: 1px solid var(--border-color);
       border-radius: 12px;
@@ -610,7 +612,7 @@
     }
 
     .anim-tool-btn {
-      background: #0f172a;
+      background: #ffffff;
       border: 1px solid var(--border-color);
       color: var(--text-main);
       padding: 8px 14px;
@@ -640,7 +642,7 @@
     }
 
     .minecraft-box {
-      background: #1e293b;
+      background: #f4f2ee;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 16px;
@@ -652,8 +654,8 @@
     }
 
     .mc-output {
-      background: #090d16;
-      color: #38bdf8;
+      background: #ffffff;
+      color: #2563eb;
       padding: 14px;
       border-radius: 8px;
       font-family: monospace;
@@ -663,9 +665,8 @@
       border: 1px solid var(--border-color);
     }
 
-    /* Yeni Yenilenmiş Minecraft Blueprint / Daire Şeması UI Stili */
     .blueprint-card-box {
-      background: #0f172a;
+      background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 14px;
       padding: 16px;
@@ -684,7 +685,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #1e293b;
+      background: #f4f2ee;
       border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 10px 14px;
@@ -707,7 +708,7 @@
 
     .blueprint-grid-wrapper {
       flex: 1;
-      background: #1e293b;
+      background: #f4f2ee;
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 24px;
@@ -722,7 +723,7 @@
     .blueprint-grid {
       display: grid;
       gap: 1px;
-      background-color: #000;
+      background-color: #d5d0c7;
       border: 2px solid var(--border-color);
       padding: 1px;
       border-radius: 6px;
@@ -731,19 +732,19 @@
     .bp-cell {
       width: 18px;
       height: 18px;
-      background: #0f172a;
+      background: #ffffff;
     }
 
     .bp-cell.active {
-      background: #3b82f6; /* Klasik Minecraft Mavi Blok */
+      background: #3b82f6;
     }
 
     .bp-cell.axis {
-      background: #475569; /* Eksen çizgileri */
+      background: #94a3b8;
     }
 
     .bp-cell.center {
-      background: #94a3b8; /* Tam Merkez */
+      background: #64748b;
     }
 
     .bp-stats-text {
@@ -751,14 +752,14 @@
       font-weight: 500;
       color: var(--text-main);
       text-align: center;
-      background: #0f172a;
+      background: #ffffff;
       padding: 8px 16px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
     }
 
     .anim-timeline-container {
-      background: #1e293b;
+      background: #f4f2ee;
       border: 1px solid var(--border-color);
       padding: 12px 16px;
       border-radius: 12px;
@@ -770,9 +771,9 @@
 
     .custom-context-menu {
       position: absolute;
-      background: #1e293b;
+      background: #f4f2ee;
       border: 1px solid var(--border-color);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       border-radius: 12px;
       padding: 12px;
       display: none;
@@ -876,7 +877,7 @@
           </div>
         </div>
 
-        <!-- Yenilenmiş Daire / Blueprint Kontrolleri -->
+        <!-- Daire / Blueprint Kontrolleri -->
         <div id="sidebarBlueprint" class="studio-sidebar-content" style="display: none;">
           <div style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Circle Generator</div>
           <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
@@ -914,7 +915,7 @@
             </div>
             <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
           </div>
-          <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#0f172a; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+          <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#ffffff; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
             <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
               <div style="font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
               <span style="font-size: 1rem; font-weight: 600;">Serbest çizim yapın veya Gemini ile çizdirin</span>
@@ -955,7 +956,7 @@
     <div class="context-menu-title" id="contextMenuTitle">Ayarlar</div>
     <div class="context-menu-row" id="rowColor">
       <span>Renk:</span>
-      <input type="color" id="ctxColorPicker" value="#6366f1" onchange="updateToolSetting('color', this.value)" style="width:100%; height:30px; border:none; background:none; cursor:pointer;">
+      <input type="color" id="ctxColorPicker" value="#5c564f" onchange="updateToolSetting('color', this.value)" style="width:100%; height:30px; border:none; background:none; cursor:pointer;">
     </div>
     <div class="context-menu-row">
       <span>Kalınlık: <b id="ctxSizeVal">4</b>px</span>
@@ -973,7 +974,7 @@
       <div class="holiday-label" id="holidayLabel"></div>
 
       <div class="color-palette">
-        <div class="color-btn" style="background:#1e293b;" title="Sıfırla" onclick="selectColor('')"></div>
+        <div class="color-btn" style="background:#ffffff;" title="Sıfırla" onclick="selectColor('')"></div>
         <div class="color-btn" style="background:#7f1d1d;" onclick="selectColor('#7f1d1d')"></div>
         <div class="color-btn" style="background:#713f12;" onclick="selectColor('#713f12')"></div>
         <div class="color-btn" style="background:#14532d;" onclick="selectColor('#14532d')"></div>
@@ -1087,6 +1088,7 @@
 
         const dayNumber = document.createElement('span');
         dayNumber.innerText = day;
+        dayNumber.classList.add('day-number-outline');
         dayCell.appendChild(dayNumber);
 
         const dateKey = `${year}-${month + 1}-${day}`;
@@ -1182,7 +1184,7 @@
 
       ctx.globalCompositeOperation = 'source-over';
       ctx.lineWidth = 3;
-      ctx.strokeStyle = '#f8fafc';
+      ctx.strokeStyle = '#2c2b2a';
       ctx.lineCap = 'round';
       ctx.lineTo(x, y);
       ctx.stroke();
@@ -1344,7 +1346,6 @@
       }
     }
 
-    // --- DÜZELTİLMİŞ MINECRAFT DAİRE / ÇEMBER ALGORİTMASI ---
     function updateBlueprintParams() { generateBlueprint(); }
 
     function generateBlueprint() {
@@ -1399,12 +1400,11 @@
       statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
     }
 
-    // --- ÇİZİM STÜDYOSU ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
     const ctxAnim = animCanvasEl.getContext('2d');
-    const toolSettings = { pencil: { size: 4, color: '#6366f1' }, eraser: { size: 25 } };
+    const toolSettings = { pencil: { size: 4, color: '#5c564f' }, eraser: { size: 25 } };
     let activeContextTool = 'pencil';
 
     function initAnimCanvasSize() {
