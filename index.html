@@ -951,9 +951,9 @@
         <div id="sidebarAnim" class="studio-sidebar-content" style="display: none;">
           <div class="sidebar-section-title">🎬 Video Klip Öğeleri</div>
           <div class="ai-assistant-box">
-            <button class="ai-send-btn" onclick="addVideoClip('rect', '#3b82f6')">➕ Kare Klip Ekle</button>
-            <button class="ai-send-btn" onclick="addVideoClip('circle', '#ef4444')">➕ Daire Klip Ekle</button>
-            <button class="ai-send-btn" onclick="addVideoClip('text', '#10b981')">➕ Metin Kli̇pi̇ Ekle</button>
+            <button class="ai-send-btn" onclick="addVideoClip('rect', document.getElementById('capcutColorPicker').value)">➕ Kare Klip Ekle</button>
+            <button class="ai-send-btn" onclick="addVideoClip('circle', document.getElementById('capcutColorPicker').value)">➕ Daire Klip Ekle</button>
+            <button class="ai-send-btn" onclick="addVideoClip('text', document.getElementById('capcutColorPicker').value)">➕ Metin Klipi Ekle</button>
             <button class="btn-secondary" onclick="clearVideoClips()" style="margin-top:4px;">Tümünü Sıfırla</button>
           </div>
         </div>
@@ -1030,6 +1030,22 @@
 
         <!-- CapCut Video & Animasyon Stüdyosu Paneli -->
         <div id="panelAnim" class="studio-panel">
+          <div class="anim-top-toolbar">
+            <div class="anim-tools">
+              <button class="anim-tool-btn active">🎬 Video Araçları</button>
+              <button class="anim-tool-btn" oncontextmenu="openMenu(event, 'brush-menu'); return false;" onclick="toggleMenu(event, 'brush-menu')">Fırça ▾</button>
+              <button class="anim-tool-btn" oncontextmenu="openMenu(event, 'shape-menu'); return false;" onclick="toggleMenu(event, 'shape-menu')">Şekil ▾</button>
+              <button class="anim-tool-btn" oncontextmenu="openMenu(event, 'tools-menu'); return false;" onclick="toggleMenu(event, 'tools-menu')">Araçlar ▾</button>
+              <button class="anim-tool-btn" onclick="document.getElementById('capcutImageLoader').click()">🖼️ Fotoğraf Ekle</button>
+              <button class="anim-tool-btn" onclick="clearVideoClips()" style="color: #d9534f;">Tümünü Sıfırla</button>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <label style="font-size: 0.85rem; font-weight: 600;">Renk: <input type="color" id="capcutColorPicker" value="#3b82f6" style="border:none; width:28px; height:28px; vertical-align:middle; cursor:pointer; background:none;"></label>
+              <label style="font-size: 0.85rem; font-weight: 600;">Boyut: <input type="range" id="capcutBrushSize" min="1" max="50" value="25" style="vertical-align:middle;"></label>
+            </div>
+          </div>
+          <input type="file" id="capcutImageLoader" accept="image/*" style="display: none;" />
+
           <div class="capcut-studio-wrapper">
             <div class="capcut-preview-viewport">
               <canvas id="capcutCanvas" width="700" height="350" class="capcut-canvas"></canvas>
@@ -1642,6 +1658,8 @@
             ccCtx.font = "bold 20px sans-serif";
             ccCtx.fillStyle = clip.color;
             ccCtx.fillText(`Animasyon #${clip.id}`, curX, curY);
+          } else if (clip.type === 'image' && clip.imgElement) {
+            ccCtx.drawImage(clip.imgElement, curX - 30, curY - 30, 60, 60);
           }
         }
       });
@@ -1678,6 +1696,36 @@
       capcutCurrentFrame = Math.round(ratio * capcutMaxFrames);
       renderCapCutFrame(capcutCurrentFrame);
     }
+
+    // CapCut Fotoğraf Yükleme Desteği
+    const capcutImageLoader = document.getElementById('capcutImageLoader');
+    capcutImageLoader.addEventListener('change', (e) => {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const img = new Image();
+        img.onload = function () {
+          const newId = capcutClips.length + 1;
+          capcutClips.push({
+            id: newId,
+            type: 'image',
+            imgElement: img,
+            color: '#10b981',
+            startFrame: 0,
+            endFrame: 90,
+            startX: 100,
+            startY: 100,
+            endX: 500,
+            endY: 200
+          });
+          renderCapCutTimelineClips();
+          renderCapCutFrame(capcutCurrentFrame);
+        }
+        img.src = event.target.result;
+      }
+      if (e.target.files[0]) {
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
 
     let animDrawing = false;
     let currentTool = 'brush';
@@ -1761,6 +1809,13 @@
       currentTool = 'shape';
       currentShape = shape;
       closeAllMenus();
+      // CapCut panelindeyken şekil menüsünden seçilirse direkt klip olarak da eklenebilir
+      if (document.getElementById('panelAnim').classList.contains('active')) {
+        let col = document.getElementById('capcutColorPicker').value;
+        if (shape === 'rect' || shape === 'roundRect') addVideoClip('rect', col);
+        else if (shape === 'circle') addVideoClip('circle', col);
+        else addVideoClip('text', col);
+      }
     }
 
     function setAnimTool(tool) {
