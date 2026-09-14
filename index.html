@@ -479,7 +479,7 @@
 
     .anim-main-layout {
       display: grid;
-      grid-template-columns: 360px 1fr; /* Sol panel genişletildi */
+      grid-template-columns: 360px 1fr;
       flex: 1;
       height: calc(100vh - 70px);
       overflow: hidden;
@@ -517,13 +517,13 @@
 
     .ai-input {
       width: 100%;
-      min-height: 120px; /* Daha uzun ve geniş hale getirildi */
+      min-height: 120px;
       max-height: 250px;
       padding: 10px 12px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 0.9rem;
-      resize: vertical; /* Kullanıcı dikey olarak boyutlandırabilir */
+      resize: vertical;
       outline: none;
       line-height: 1.4;
     }
@@ -707,6 +707,65 @@
       border: 1px solid #334155;
     }
 
+    /* Blueprint / Daire Oluşturucu Stilleri */
+    .blueprint-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .blueprint-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: #f8fafc;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+
+    .blueprint-grid-wrapper {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+    }
+
+    .blueprint-grid {
+      display: grid;
+      gap: 2px;
+      background: var(--border-color);
+      padding: 2px;
+      border-radius: 6px;
+    }
+
+    .bp-cell {
+      width: 24px;
+      height: 24px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      border-radius: 2px;
+    }
+
+    .bp-cell.active {
+      background: #3b82f6; /* Mavi daire çizgisi */
+    }
+
+    .bp-cell.center {
+      background: #1e293b; /* Merkez nokta */
+    }
+
     .anim-timeline-container {
       background: #f8fafc;
       border: 1px solid var(--border-color);
@@ -758,6 +817,7 @@
         <div class="studio-tabs">
           <button class="studio-tab-btn active" id="tabArt" onclick="switchStudio('art')">Resim Stüdyosu</button>
           <button class="studio-tab-btn" id="tabMc" onclick="switchStudio('minecraft')">Minecraft Stüdyosu</button>
+          <button class="studio-tab-btn" id="tabBlueprint" onclick="switchStudio('blueprint')">📐 Çap/Daire Şeması</button>
         </div>
       </div>
       <button class="delete-btn" onclick="closeAnimStudio()">✕ Kapat</button>
@@ -804,6 +864,18 @@
           </div>
         </div>
 
+        <!-- Blueprint / Daire Kontrolleri -->
+        <div id="sidebarBlueprint" class="studio-sidebar-content" style="display: none;">
+          <div class="sidebar-section-title">📐 Daire / Çember Ayarları</div>
+          <div class="ai-assistant-box">
+            <label style="font-size: 0.85rem; font-weight: 600;">Boyut (Örn: 20x20):</label>
+            <input type="number" id="bpSizeInput" value="20" min="5" max="60" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
+            <label style="font-size: 0.85rem; font-weight: 600; margin-top: 8px;">Kalınlık:</label>
+            <input type="number" id="bpThicknessInput" value="1" min="1" max="5" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
+            <button class="ai-send-btn" style="margin-top: 8px;" onclick="generateBlueprint()">🔄 Şemayı Güncelle</button>
+          </div>
+        </div>
+
         <div>
           <div class="sidebar-section-title" style="margin-top: 16px;">Hızlı Durum</div>
           <div id="aiResponseOutput" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
@@ -843,6 +915,17 @@
           <div class="minecraft-box">
             <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Gemini Yanıtı / Kod Konsolu:</div>
             <div class="mc-output" id="mcOutputBox">Minecraft ile ilgili skript, komut veya sunucu yönetimi isteklerinizi sol taraftan yazabilirsiniz...</div>
+          </div>
+        </div>
+
+        <!-- Blueprint / Daire Paneli -->
+        <div id="panelBlueprint" class="studio-panel">
+          <div class="anim-top-toolbar">
+            <span style="font-weight: 600; font-size: 0.9rem;" id="bpInfoTitle">Minecraft 20x20 Daire Blueprint Şeması</span>
+            <button class="anim-tool-btn" onclick="generateBlueprint()">Yenile</button>
+          </div>
+          <div class="blueprint-grid-wrapper">
+            <div class="blueprint-grid" id="blueprintGrid"></div>
           </div>
         </div>
 
@@ -1294,19 +1377,25 @@
     function switchStudio(type) {
       const tabArt = document.getElementById('tabArt');
       const tabMc = document.getElementById('tabMc');
+      const tabBlueprint = document.getElementById('tabBlueprint');
       const panelArt = document.getElementById('panelArt');
       const panelMc = document.getElementById('panelMc');
+      const panelBlueprint = document.getElementById('panelBlueprint');
       const sidebarArt = document.getElementById('sidebarArt');
       const sidebarMc = document.getElementById('sidebarMc');
+      const sidebarBlueprint = document.getElementById('sidebarBlueprint');
       const mainTitle = document.getElementById('studioMainTitle');
       const activeStudioName = document.getElementById('activeStudioName');
 
       tabArt.classList.remove('active');
       tabMc.classList.remove('active');
+      tabBlueprint.classList.remove('active');
       panelArt.classList.remove('active');
       panelMc.classList.remove('active');
+      panelBlueprint.classList.remove('active');
       sidebarArt.style.display = 'none';
       sidebarMc.style.display = 'none';
+      sidebarBlueprint.style.display = 'none';
 
       if (type === 'art') {
         tabArt.classList.add('active');
@@ -1321,6 +1410,48 @@
         sidebarMc.style.display = 'flex';
         mainTitle.innerText = '⛏️ Minecraft Stüdyosu';
         activeStudioName.innerText = 'Minecraft Stüdyosu';
+      } else if (type === 'blueprint') {
+        tabBlueprint.classList.add('active');
+        panelBlueprint.classList.add('active');
+        sidebarBlueprint.style.display = 'flex';
+        mainTitle.innerText = '📐 Çap/Daire Şeması';
+        activeStudioName.innerText = 'Çap/Daire Blueprint Şeması';
+        generateBlueprint();
+      }
+    }
+
+    // --- BLUEPRINT / DAIRE OLUŞTURUCU MANTIĞI ---
+    function generateBlueprint() {
+      const sizeInput = parseInt(document.getElementById('bpSizeInput').value) || 20;
+      const thickness = parseInt(document.getElementById('bpThicknessInput').value) || 1;
+      const gridContainer = document.getElementById('blueprintGrid');
+      document.getElementById('bpInfoTitle').innerText = `Minecraft ${sizeInput}x${sizeInput} Daire Blueprint Şeması`;
+      
+      gridContainer.innerHTML = '';
+      gridContainer.style.gridTemplateColumns = `repeat(${sizeInput}, 24px)`;
+
+      const radius = sizeInput / 2;
+      const center = (sizeInput - 1) / 2;
+
+      for (let y = 0; y < sizeInput; y++) {
+        for (let x = 0; x < sizeInput; x++) {
+          const cell = document.createElement('div');
+          cell.classList.add('bp-cell');
+
+          const dx = x - center;
+          const dy = y - center;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          // Daire hesaplama mantığı
+          if (Math.abs(distance - radius) <= (thickness * 0.65)) {
+            cell.classList.add('active');
+          } else if (Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) {
+            cell.classList.add('center');
+            cell.title = "Merkez";
+          }
+
+          gridContainer.appendChild(cell);
+        }
       }
     }
 
@@ -1498,7 +1629,7 @@
       else if (prompt.includes('kule')) {
         ctxAnim.beginPath(); ctxAnim.rect(cx - 25, cy - 30, 50, 110); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.rect(cx - 32, cy - 50, 64, 20); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx, cy - 100); ctxAnim.lineTo(cx + 35, cy - 50); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctx kus = ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx, cy - 100); ctxAnim.lineTo(cx + 35, cy - 50); ctxAnim.closePath(); ctxAnim.stroke();
       }
       else {
         ctxAnim.beginPath(); ctxAnim.rect(cx - 40, cy - 40, 80, 80); ctxAnim.stroke();
