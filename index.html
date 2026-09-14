@@ -538,8 +538,8 @@
 
     .ai-input {
       width: 100%;
-      min-height: 100px;
-      max-height: 200px;
+      min-height: 90px;
+      max-height: 180px;
       padding: 10px 12px;
       background: #f4f2ee;
       border: 1px solid var(--border-color);
@@ -609,6 +609,7 @@
     .anim-tools {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .anim-tool-btn {
@@ -852,14 +853,14 @@
       <div class="anim-sidebar-left">
         <!-- Resim Stüdyosu Kontrolleri -->
         <div id="sidebarArt" class="studio-sidebar-content">
-          <div class="sidebar-section-title">✨ Gemini AI Çizim Asistanı</div>
+          <div class="sidebar-section-title">✨ Akıllı Çizim Asistanı</div>
           <div class="ai-assistant-box">
-            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz..."></textarea>
-            <button class="ai-send-btn" onclick="handleGeminiAICommand()">🤖 Gemini ile Çizdir</button>
+            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: insan pozu, ayakta duran insan çiz, yüz sketch..."></textarea>
+            <button class="ai-send-btn" onclick="handleSmartSketchCommand()">💡 Akıllı Çizim / Sketch Yap</button>
             <div class="ai-chips">
+              <button class="ai-chip" onclick="quickAICoip('insan çiz')">İnsan Figürü</button>
+              <button class="ai-chip" onclick="quickAICoip('portre çiz')">Yüz/Portre</button>
               <button class="ai-chip" onclick="quickAICoip('kedi çiz')">Kedi</button>
-              <button class="ai-chip" onclick="quickAICoip('uçak çiz')">Uçak</button>
-              <button class="ai-chip" onclick="quickAICoip('kule çiz')">Kule</button>
             </div>
           </div>
         </div>
@@ -911,6 +912,10 @@
           <div class="anim-top-toolbar">
             <div class="anim-tools">
               <button class="anim-tool-btn active" id="toolBtnPencil" onclick="setAnimTool('pencil')" oncontextmenu="openToolSettings(event, 'pencil')">✏️ Kalem</button>
+              <button class="anim-tool-btn" id="toolBtnFill" onclick="setAnimTool('fill')" oncontextmenu="openToolSettings(event, 'fill')">🪣 Boya Kovası</button>
+              <button class="anim-tool-btn" id="toolBtnRect" onclick="setAnimTool('rect')">▭ Dikdörtgen</button>
+              <button class="anim-tool-btn" id="toolBtnCircle" onclick="setAnimTool('circle')">⭕ Daire</button>
+              <button class="anim-tool-btn" id="toolBtnLine" onclick="setAnimTool('line')">╱ Çizgi</button>
               <button class="anim-tool-btn" id="toolBtnEraser" onclick="setAnimTool('eraser')" oncontextmenu="openToolSettings(event, 'eraser')">🧹 Silgi</button>
             </div>
             <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
@@ -918,7 +923,7 @@
           <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#ffffff; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
             <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
               <div style="font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
-              <span style="font-size: 1rem; font-weight: 600;">Serbest çizim yapın veya Gemini ile çizdirin</span>
+              <span style="font-size: 1rem; font-weight: 600;">Serbest çizim yapın, şekil seçin veya akıllı asistan kullanın</span>
             </div>
             <canvas id="animCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto;"></canvas>
           </div>
@@ -958,7 +963,7 @@
       <span>Renk:</span>
       <input type="color" id="ctxColorPicker" value="#5c564f" onchange="updateToolSetting('color', this.value)" style="width:100%; height:30px; border:none; background:none; cursor:pointer;">
     </div>
-    <div class="context-menu-row">
+    <div class="context-menu-row" id="rowSize">
       <span>Kalınlık: <b id="ctxSizeVal">4</b>px</span>
       <input type="range" id="ctxSizeRange" min="1" max="50" value="4" oninput="updateToolSetting('size', this.value)" style="width:100%;">
     </div>
@@ -1406,6 +1411,8 @@
     const ctxAnim = animCanvasEl.getContext('2d');
     const toolSettings = { pencil: { size: 4, color: '#5c564f' }, eraser: { size: 25 } };
     let activeContextTool = 'pencil';
+    let startX = 0, startY = 0;
+    let snapshot = null;
 
     function initAnimCanvasSize() {
       const workspace = document.getElementById('animWorkspace');
@@ -1423,11 +1430,23 @@
     window.addEventListener('resize', initAnimCanvasSize);
 
     animCanvasEl.addEventListener('mousedown', (e) => {
-      animDrawing = true;
       const rect = animCanvasEl.getBoundingClientRect();
-      ctxAnim.beginPath();
-      ctxAnim.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+      startX = e.clientX - rect.left;
+      startY = e.clientY - rect.top;
       document.getElementById('uploadPlaceholder').style.display = 'none';
+
+      if (animMode === 'fill') {
+        floodFill(Math.floor(startX), Math.floor(startY), hexToRgba(toolSettings.pencil.color));
+        return;
+      }
+
+      animDrawing = true;
+      snapshot = ctxAnim.getImageData(0, 0, animCanvasEl.width, animCanvasEl.height);
+
+      if (animMode === 'pencil' || animMode === 'eraser') {
+        ctxAnim.beginPath();
+        ctxAnim.moveTo(startX, startY);
+      }
     });
 
     animCanvasEl.addEventListener('mousemove', (e) => {
@@ -1436,26 +1455,59 @@
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      if (animMode === 'eraser') {
-        ctxAnim.globalCompositeOperation = 'destination-out';
-        ctxAnim.lineWidth = toolSettings.eraser.size;
-      } else {
+      if (animMode === 'pencil' || animMode === 'eraser') {
+        if (animMode === 'eraser') {
+          ctxAnim.globalCompositeOperation = 'destination-out';
+          ctxAnim.lineWidth = toolSettings.eraser.size;
+        } else {
+          ctxAnim.globalCompositeOperation = 'source-over';
+          ctxAnim.lineWidth = toolSettings.pencil.size;
+          ctxAnim.strokeStyle = toolSettings.pencil.color;
+        }
+        ctxAnim.lineCap = 'round';
+        ctxAnim.lineJoin = 'round';
+        ctxAnim.lineTo(x, y);
+        ctxAnim.stroke();
+      } else if (animMode === 'rect' || animMode === 'circle' || animMode === 'line') {
+        ctxAnim.putImageData(snapshot, 0, 0);
         ctxAnim.globalCompositeOperation = 'source-over';
         ctxAnim.lineWidth = toolSettings.pencil.size;
         ctxAnim.strokeStyle = toolSettings.pencil.color;
+        ctxAnim.beginPath();
+
+        if (animMode === 'rect') {
+          ctxAnim.strokeRect(startX, startY, x - startX, y - startY);
+        } else if (animMode === 'circle') {
+          let radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+          ctxAnim.arc(startX, startY, radius, 0, 2 * Math.PI);
+          ctxAnim.stroke();
+        } else if (animMode === 'line') {
+          ctxAnim.moveTo(startX, startY);
+          ctxAnim.lineTo(x, y);
+          ctxAnim.stroke();
+        }
       }
-      ctxAnim.lineCap = 'round';
-      ctxAnim.lineJoin = 'round';
-      ctxAnim.lineTo(x, y);
-      ctxAnim.stroke();
     });
 
-    window.addEventListener('mouseup', () => { if (animDrawing) { animDrawing = false; ctxAnim.beginPath(); } });
+    window.addEventListener('mouseup', () => {
+      if (animDrawing) {
+        animDrawing = false;
+        ctxAnim.beginPath();
+      }
+    });
 
     function setAnimTool(tool) {
       animMode = tool;
-      document.getElementById('toolBtnPencil').classList.toggle('active', tool === 'pencil');
-      document.getElementById('toolBtnEraser').classList.toggle('active', tool === 'eraser');
+      ['toolBtnPencil', 'toolBtnFill', 'toolBtnRect', 'toolBtnCircle', 'toolBtnLine', 'toolBtnEraser'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.classList.remove('active');
+      });
+      if(tool === 'pencil') document.getElementById('toolBtnPencil').classList.add('active');
+      if(tool === 'fill') document.getElementById('toolBtnFill').classList.add('active');
+      if(tool === 'rect') document.getElementById('toolBtnRect').classList.add('active');
+      if(tool === 'circle') document.getElementById('toolBtnCircle').classList.add('active');
+      if(tool === 'line') document.getElementById('toolBtnLine').classList.add('active');
+      if(tool === 'eraser') document.getElementById('toolBtnEraser').classList.add('active');
     }
 
     function clearAnimDrawing() {
@@ -1467,10 +1519,10 @@
       event.preventDefault();
       activeContextTool = toolType;
       const menu = document.getElementById('toolContextMenu');
-      document.getElementById('contextMenuTitle').innerText = toolType === 'pencil' ? '✏️ Kalem Ayarları' : '🧹 Silgi Ayarları';
-      document.getElementById('rowColor').style.display = toolType === 'pencil' ? 'flex' : 'none';
-      document.getElementById('ctxSizeRange').value = toolSettings[toolType].size;
-      document.getElementById('ctxSizeVal').innerText = toolSettings[toolType].size;
+      document.getElementById('contextMenuTitle').innerText = toolType === 'pencil' ? '✏️ Kalem Ayarları' : (toolType === 'fill' ? '🪣 Boya Kovası' : '🧹 Silgi Ayarları');
+      document.getElementById('rowColor').style.display = (toolType === 'pencil' || toolType === 'fill') ? 'flex' : 'none';
+      document.getElementById('ctxSizeRange').value = toolSettings[toolType === 'fill' ? 'pencil' : toolType].size;
+      document.getElementById('ctxSizeVal').innerText = toolSettings[toolType === 'fill' ? 'pencil' : toolType].size;
 
       menu.style.left = `${Math.min(event.pageX, window.innerWidth - 230)}px`;
       menu.style.top = `${Math.min(event.pageY, window.innerHeight - 200)}px`;
@@ -1484,37 +1536,109 @@
 
     function updateToolSetting(type, val) {
       if (type === 'size') {
-        toolSettings[activeContextTool].size = parseInt(val);
+        if(activeContextTool === 'eraser') toolSettings.eraser.size = parseInt(val);
+        else toolSettings.pencil.size = parseInt(val);
         document.getElementById('ctxSizeVal').innerText = val;
       } else if (type === 'color') {
         toolSettings.pencil.color = val;
       }
     }
 
-    async function handleGeminiAICommand() {
-      const prompt = document.getElementById('aiPromptInput').value.trim();
-      if (!prompt) return;
-      const apiKey = localStorage.getItem('gemini_api_key');
-      if (!apiKey) { alert("API anahtarı gerekli."); return; }
+    function hexToRgba(hex) {
+      let c = hex.replace('#','');
+      if(c.length===3) c = c.split('').map(x=>x+x).join('');
+      const num = parseInt(c,16);
+      return [num >> 16, (num >> 8) & 255, num & 255, 255];
+    }
 
+    function floodFill(startX, startY, fillColor) {
+      const imgData = ctxAnim.getImageData(0, 0, animCanvasEl.width, animCanvasEl.height);
+      const data = imgData.data;
+      const width = animCanvasEl.width;
+      const height = animCanvasEl.height;
+
+      const startIndex = (startY * width + startX) * 4;
+      const startR = data[startIndex];
+      const startG = data[startIndex+1];
+      const startB = data[startIndex+2];
+      const startA = data[startIndex+3];
+
+      if (startR === fillColor[0] && startG === fillColor[1] && startB === fillColor[2] && startA === fillColor[3]) return;
+
+      const queue = [[startX, startY]];
+      while(queue.length > 0) {
+        const [x, y] = queue.pop();
+        if(x < 0 || x >= width || y < 0 || y >= height) continue;
+        const idx = (y * width + x) * 4;
+
+        if(data[idx] === startR && data[idx+1] === startG && data[idx+2] === startB && data[idx+3] === startA) {
+          data[idx] = fillColor[0];
+          data[idx+1] = fillColor[1];
+          data[idx+2] = fillColor[2];
+          data[idx+3] = fillColor[3];
+
+          queue.push([x+1, y]);
+          queue.push([x-1, y]);
+          queue.push([x, y+1]);
+          queue.push([x, y-1]);
+        }
+      }
+      ctxAnim.putImageData(imgData, 0, 0);
+    }
+
+    function handleSmartSketchCommand() {
+      const prompt = document.getElementById('aiPromptInput').value.trim().toLowerCase();
       initAnimCanvasSize();
       document.getElementById('uploadPlaceholder').style.display = 'none';
       const cx = animCanvasEl.width / 2, cy = animCanvasEl.height / 2;
+      
       ctxAnim.globalCompositeOperation = 'source-over';
       ctxAnim.strokeStyle = toolSettings.pencil.color;
-      ctxAnim.lineWidth = 4;
-      ctxAnim.beginPath();
-      if (prompt.includes('kedi')) {
-        ctxAnim.arc(cx, cy, 50, 0, Math.PI * 2);
-        ctxAnim.moveTo(cx - 35, cy - 35); ctxAnim.lineTo(cx - 60, cy - 70);
-        ctxAnim.moveTo(cx + 35, cy - 35); ctxAnim.lineTo(cx + 60, cy - 70);
+      ctxAnim.lineWidth = 3;
+
+      if (prompt.includes('insan') || prompt.includes('kisi') || prompt.includes('figür')) {
+        // İnsan Stick/Sketch Çizimi
+        ctxAnim.beginPath();
+        // Kafa
+        ctxAnim.arc(cx, cy - 60, 20, 0, Math.PI * 2);
+        // Gövde
+        ctxAnim.moveTo(cx, cy - 40); ctxAnim.lineTo(cx, cy + 20);
+        // Kollar
+        ctxAnim.moveTo(cx, cy - 20); ctxAnim.lineTo(cx - 40, cy);
+        ctxAnim.moveTo(cx, cy - 20); ctxAnim.lineTo(cx + 40, cy);
+        // Bacaklar
+        ctxAnim.moveTo(cx, cy + 20); ctxAnim.lineTo(cx - 30, cy + 80);
+        ctxAnim.moveTo(cx, cy + 20); ctxAnim.lineTo(cx + 30, cy + 80);
+        ctxAnim.stroke();
+      } else if (prompt.includes('portre') || prompt.includes('yüz')) {
+        // Portre Çizimi
+        ctxAnim.beginPath();
+        ctxAnim.arc(cx, cy, 60, 0, Math.PI * 2); // Yüz ovali
+        // Gözler
+        ctxAnim.arc(cx - 20, cy - 10, 6, 0, Math.PI * 2);
+        ctxAnim.arc(cx + 20, cy - 10, 6, 0, Math.PI * 2);
+        // Burun
+        ctxAnim.moveTo(cx, cy - 5); ctxAnim.lineTo(cx, cy + 15);
+        // Ağız
+        ctxAnim.arc(cx, cy + 20, 15, 0, Math.PI);
+        ctxAnim.stroke();
+      } else if (prompt.includes('kedi')) {
+        // Kedi Çizimi
+        ctxAnim.beginPath();
+        ctxAnim.arc(cx, cy, 40, 0, Math.PI * 2);
+        ctxAnim.moveTo(cx - 30, cy - 25); ctxAnim.lineTo(cx - 50, cy - 60); ctxAnim.lineTo(cx - 10, cy - 35);
+        ctxAnim.moveTo(cx + 30, cy - 25); ctxAnim.lineTo(cx + 50, cy - 60); ctxAnim.lineTo(cx + 10, cy - 35);
+        ctxAnim.stroke();
       } else {
-        ctxAnim.rect(cx - 50, cy - 50, 100, 100);
+        // Genel akıllı şematik ev çizimi
+        ctxAnim.beginPath();
+        ctxAnim.rect(cx - 40, cy, 80, 80);
+        ctxAnim.moveTo(cx - 50, cy); ctxAnim.lineTo(cx, cy - 50); ctxAnim.lineTo(cx + 50, cy);
+        ctxAnim.stroke();
       }
-      ctxAnim.stroke();
     }
 
-    function quickAICoip(text) { document.getElementById('aiPromptInput').value = text; handleGeminiAICommand(); }
+    function quickAICoip(text) { document.getElementById('aiPromptInput').value = text; handleSmartSketchCommand(); }
 
     async function handleMinecraftAI() {
       const prompt = document.getElementById('mcPromptInput').value.trim();
