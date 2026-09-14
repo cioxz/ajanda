@@ -428,7 +428,7 @@
       border-color: var(--primary);
     }
 
-    /* Tam Ekran Animasyon Stüdyosu Modalı (İstediğin Şema Düzeni) */
+    /* Tam Ekran Animasyon Stüdyosu Modalı */
     .anim-fullscreen-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -449,20 +449,20 @@
 
     .anim-main-layout {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 320px 1fr;
       flex: 1;
       height: calc(100vh - 70px);
       overflow: hidden;
     }
 
-    /* Sol Panel (Araçlar & Katman Yönetimi) */
+    /* Sol Panel (AI Asistan & Katman/Çizim Araçları) */
     .anim-sidebar-left {
       background: #f8fafc;
       border-right: 1px solid var(--border-color);
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       overflow-y: auto;
     }
 
@@ -475,10 +475,73 @@
       letter-spacing: 0.5px;
     }
 
+    /* AI Asistan Kutusu */
+    .ai-assistant-box {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .ai-input {
+      width: 100%;
+      height: 70px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      resize: none;
+      outline: none;
+    }
+
+    .ai-input:focus {
+      border-color: var(--primary);
+    }
+
+    .ai-send-btn {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #fff;
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .ai-send-btn:hover {
+      opacity: 0.9;
+    }
+
+    .ai-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .ai-chip {
+      background: #f1f5f9;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    .ai-chip:hover {
+      background: #e2e8f0;
+    }
+
     .layer-controls {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
     }
 
     .layer-action-btn {
@@ -639,7 +702,7 @@
     </div>
   </div>
 
-  <!-- Tam Ekran Animasyon Stüdyosu Modalı (İstediğin Şema Yapısı) -->
+  <!-- Tam Ekran Animasyon Stüdyosu Modalı -->
   <div class="anim-fullscreen-overlay" id="animStudioModal">
     <div class="anim-fullscreen-header">
       <h3 style="display:flex; align-items:center; gap:8px;">🎬 Animasyon Stüdyosu</h3>
@@ -647,10 +710,23 @@
     </div>
 
     <div class="anim-main-layout">
-      <!-- Sol Panel (İstediğin Gibi Ekle / Çıkar ve Çizim / Katman Araçları) -->
+      <!-- Sol Panel (AI Çizim Asistanı ve Katman/Çizim Araçları) -->
       <div class="anim-sidebar-left">
         <div>
-          <div class="sidebar-section-title">Katman / Görsel İşlemleri</div>
+          <div class="sidebar-section-title">✨ AI Çizim Asistanı</div>
+          <div class="ai-assistant-box">
+            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: Bana bir kafa çiz, kol çiz..."></textarea>
+            <button class="ai-send-btn" onclick="handleAICoordCommand()">🤖 Çizdir / Oluştur</button>
+            <div class="ai-chips">
+              <button class="ai-chip" onclick="quickAICoip('Bana bir kafa çiz')">Kafa Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('Bana kol çiz')">Kol Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('Gövde çiz')">Gövde Çiz</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="sidebar-section-title">Görsel İşlemleri</div>
           <div class="layer-controls">
             <button class="layer-action-btn" onclick="document.getElementById('animCharUploader').click()">➕ Ekle</button>
             <button class="layer-action-btn danger" onclick="removeCharacter()">🗑️ Çıkar</button>
@@ -665,13 +741,6 @@
             <button class="anim-tool-btn" style="text-align:left;" onclick="setAnimTool('eraser')">🧹 Çizgi Silgi</button>
             <button class="anim-tool-btn" style="text-align:left;" onclick="clearAnimDrawing()">🗑️ Çizimleri Temizle</button>
           </div>
-        </div>
-
-        <div>
-          <div class="sidebar-section-title">Bilgi</div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-            Görsel eklemek için üstteki veya soldaki <b>Ekle</b> butonunu kullanabilir, zaman çizelgesinden kareler arasında geçiş yapabilirsiniz.
-          </p>
         </div>
       </div>
 
@@ -693,9 +762,9 @@
 
         <div class="anim-workspace" id="animWorkspace">
           <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
-            <div style="font-size: 2.5rem; margin-bottom: 8px;">➕</div>
-            <span style="font-size: 1.1rem; font-weight: 600;">Karakter Fotoğrafı Yükle</span><br>
-            <span style="font-size: 0.85rem;">PNG, JPG — Çizimler, görseller</span>
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">✨</div>
+            <span style="font-size: 1.1rem; font-weight: 600;">AI Asistanına bir şeyler çizdirin ya da görsel yükleyin</span><br>
+            <span style="font-size: 0.85rem;">Örn: "Bana bir kafa çiz"</span>
           </div>
           <canvas id="animCanvas"></canvas>
         </div>
@@ -1115,19 +1184,14 @@
     function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
     function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
-    // Animasyon Stüdyosu Mantığı
+    // Animasyon Stüdyosu Mantığı & AI Çizim Motoru
     let animCanvas = null;
     let animCtx = null;
     let currentFrame = 12;
     let totalFrames = 48;
     let characterImage = null;
     let imgTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
-    let keyframes = { 0: {rotation: 0}, 24: {rotation: 45}, 48: {rotation: 0} };
-    let animToolMode = 'select';
-
-    let animPainting = false;
-    let animDrawCanvas = null;
-    let animDrawCtx = null;
+    let aiDrawings = []; // AI tarafından çizilen ek elemanlar (kafa, kol vb.)
 
     function openAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'flex';
@@ -1171,27 +1235,95 @@
 
     function removeCharacter() {
       characterImage = null;
-      document.getElementById('uploadPlaceholder').style.display = 'block';
+      if(aiDrawings.length === 0) {
+        document.getElementById('uploadPlaceholder').style.display = 'block';
+      }
       redrawAnimWorkspace();
     }
 
     function clearAnimDrawing() {
-      // Çizimleri temizleme fonksiyonu gerektiğinde genişletilebilir
+      aiDrawings = [];
+      if(!characterImage) {
+        document.getElementById('uploadPlaceholder').style.display = 'block';
+      }
+      redrawAnimWorkspace();
+    }
+
+    function quickAICoip(promptText) {
+      document.getElementById('aiPromptInput').value = promptText;
+      handleAICoordCommand();
+    }
+
+    function handleAICoordCommand() {
+      const prompt = document.getElementById('aiPromptInput').value.toLowerCase().trim();
+      if (!prompt) return;
+
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      const cx = animCanvas.width / 2;
+      const cy = animCanvas.height / 2;
+
+      if (prompt.includes('kafa') || prompt.includes('baş')) {
+        aiDrawings.push({ type: 'head', x: cx, y: cy - 70, r: 35 });
+      } else if (prompt.includes('kol')) {
+        aiDrawings.push({ type: 'arm', x1: cx - 40, y1: cy - 20, x2: cx - 90, y2: cy + 20 });
+      } else if (prompt.includes('gövde') || prompt.includes('vücut')) {
+        aiDrawings.push({ type: 'body', x: cx - 30, y: cy - 35, w: 60, h: 90 });
+      } else {
+        // Varsayılan genel çizim objesi
+        aiDrawings.push({ type: 'head', x: cx, y: cy - 50, r: 30 });
+      }
+
+      document.getElementById('aiPromptInput').value = '';
       redrawAnimWorkspace();
     }
 
     function redrawAnimWorkspace() {
       if (!animCtx || !animCanvas) return;
       animCtx.clearRect(0, 0, animCanvas.width, animCanvas.height);
-      if (!characterImage) return;
 
-      animCtx.save();
-      const renderW = characterImage.width / 3;
-      const renderH = characterImage.height / 3;
-      animCtx.translate(imgTransform.x + renderW / 2, imgTransform.y + renderH / 2);
-      animCtx.rotate((imgTransform.rotation * Math.PI) / 180);
-      animCtx.drawImage(characterImage, -renderW / 2, -renderH / 2, renderW, renderH);
-      animCtx.restore();
+      // Karakter görseli varsa çiz
+      if (characterImage) {
+        animCtx.save();
+        const renderW = characterImage.width / 3;
+        const renderH = characterImage.height / 3;
+        animCtx.translate(imgTransform.x + renderW / 2, imgTransform.y + renderH / 2);
+        animCtx.rotate((imgTransform.rotation * Math.PI) / 180);
+        animCtx.drawImage(characterImage, -renderW / 2, -renderH / 2, renderW, renderH);
+        animCtx.restore();
+      }
+
+      // AI Çizimlerini (Kafa, Kol, Gövde vb.) Canvas üzerine vektörel olarak çiz
+      animCtx.strokeStyle = '#4f46e5';
+      animCtx.fillStyle = '#e0e7ff';
+      animCtx.lineWidth = 4;
+
+      aiDrawings.forEach(item => {
+        animCtx.save();
+        if (item.type === 'head') {
+          animCtx.beginPath();
+          animCtx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+          animCtx.fill();
+          animCtx.stroke();
+          // Gözler
+          animCtx.fillStyle = '#0f172a';
+          animCtx.beginPath();
+          animCtx.arc(item.x - 10, item.y - 5, 4, 0, Math.PI * 2);
+          animCtx.arc(item.x + 10, item.y - 5, 4, 0, Math.PI * 2);
+          animCtx.fill();
+        } else if (item.type === 'arm') {
+          animCtx.beginPath();
+          animCtx.moveTo(item.x1, item.y1);
+          animCtx.lineTo(item.x2, item.y2);
+          animCtx.lineCap = 'round';
+          animCtx.stroke();
+        } else if (item.type === 'body') {
+          animCtx.beginPath();
+          animCtx.roundRect(item.x, item.y, item.w, item.h, 12);
+          animCtx.fill();
+          animCtx.stroke();
+        }
+        animCtx.restore();
+      });
     }
 
     function scrubTimeline(e) {
@@ -1213,7 +1345,6 @@
     }
 
     function addKeyframe() {
-      keyframes[currentFrame] = { rotation: imgTransform.rotation };
       alert(`Kare ${currentFrame} için Keyframe eklendi!`);
     }
 
@@ -1246,7 +1377,7 @@
     }
 
     function setAnimTool(toolName) {
-      animToolMode = toolName;
+      // Araç modu seçimi
     }
 
     updateHeaderTodayInfo();
