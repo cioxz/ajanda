@@ -765,6 +765,52 @@
       flex-direction: column;
       gap: 8px;
     }
+
+    /* Sağ Tık Özelleştirme Menüsü (Context Menu) Stilleri */
+    .custom-context-menu {
+      position: absolute;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 3000;
+      min-width: 200px;
+    }
+
+    .context-menu-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 4px;
+    }
+
+    .context-menu-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .context-menu-row input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .context-menu-row input[type="color"] {
+      width: 100%;
+      height: 32px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
   </style>
 </head>
 <body>
@@ -863,9 +909,7 @@
             <label style="font-size: 0.85rem; font-weight: 600; margin-top: 8px;">Kalınlık:</label>
             <input type="number" id="bpThicknessInput" value="1" min="1" max="5" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
             
-            <!-- KATMAN EKLE BUTONU (Boyutu otomatik +1 yapar) -->
             <button class="ai-send-btn" style="margin-top: 8px; background: #10b981;" onclick="addBlueprintLayer()">➕ Katman Ekle (+1)</button>
-            
             <button class="ai-send-btn" style="margin-top: 8px;" onclick="generateBlueprint()">🔄 Şemayı Güncelle</button>
           </div>
         </div>
@@ -884,9 +928,10 @@
         <div id="panelArt" class="studio-panel active">
           <div class="anim-top-toolbar">
             <div class="anim-tools">
-              <button class="anim-tool-btn active" onclick="setAnimTool('pencil')">✏️ Çizim Kalemi</button>
-              <button class="anim-tool-btn" onclick="setAnimTool('eraser')">🧹 Silgi</button>
+              <button class="anim-tool-btn active" id="toolBtnPencil" onclick="setAnimTool('pencil')" oncontextmenu="openToolSettings(event, 'pencil')">✏️ Çizim Kalemi</button>
+              <button class="anim-tool-btn" id="toolBtnEraser" onclick="setAnimTool('eraser')" oncontextmenu="openToolSettings(event, 'eraser')">🧹 Silgi</button>
             </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">(İpucu: Kalem veya silgiye sağ tıklayarak renk, kalınlık ve opaklık ayarlayabilirsiniz)</span>
             <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
           </div>
 
@@ -930,6 +975,26 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Sağ Tık Ayarlar Menüsü (Pencil / Eraser için) -->
+  <div class="custom-context-menu" id="toolContextMenu">
+    <div class="context-menu-title" id="contextMenuTitle">Kalem Ayarları</div>
+    
+    <div class="context-menu-row" id="rowColor">
+      <span>Renk:</span>
+      <input type="color" id="ctxColorPicker" value="#4f46e5" onchange="updateToolSetting('color', this.value)">
+    </div>
+
+    <div class="context-menu-row">
+      <span>Kalınlık: <b id="ctxSizeVal">4</b>px</span>
+      <input type="range" id="ctxSizeRange" min="1" max="50" value="4" oninput="updateToolSetting('size', this.value)">
+    </div>
+
+    <div class="context-menu-row" id="rowOpacity">
+      <span>Opaklık: <b id="ctxOpacityVal">100</b>%</span>
+      <input type="range" id="ctxOpacityRange" min="10" max="100" value="100" oninput="updateToolSetting('opacity', this.value)">
     </div>
   </div>
 
@@ -1366,6 +1431,7 @@
 
     function closeAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'none';
+      document.getElementById('toolContextMenu').style.display = 'none';
     }
 
     function switchStudio(type) {
@@ -1390,6 +1456,7 @@
       sidebarArt.style.display = 'none';
       sidebarMc.style.display = 'none';
       sidebarBlueprint.style.display = 'none';
+      document.getElementById('toolContextMenu').style.display = 'none';
 
       if (type === 'art') {
         tabArt.classList.add('active');
@@ -1451,21 +1518,27 @@
       }
     }
 
-    // Katman Ekle fonksiyonu (Boyutu otomatik +1 yapar ve şemayı günceller)
     function addBlueprintLayer() {
       const sizeInput = document.getElementById('bpSizeInput');
       let currentVal = parseInt(sizeInput.value) || 20;
-      currentVal += 1; // Boyutu tam olarak +1 artırır
+      currentVal += 1;
       if (currentVal > 60) currentVal = 60;
       sizeInput.value = currentVal;
       generateBlueprint();
     }
 
-    // --- RESİM / ÇİZİM STÜDYOSU (GEMINI DESTEKLİ) ---
+    // --- RESİM / ÇİZİM STÜDYOSU & SAĞ TIK ÖZELLİKLERİ ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
     const ctxAnim = animCanvasEl.getContext('2d');
+
+    // Kalem ve Silgi Özellikleri Nesnesi
+    const toolSettings = {
+      pencil: { size: 4, color: '#4f46e5', opacity: 100 },
+      eraser: { size: 25, opacity: 100 }
+    };
+    let activeContextTool = 'pencil';
 
     function initAnimCanvasSize() {
       const workspace = document.getElementById('animWorkspace');
@@ -1492,6 +1565,7 @@
       ctxAnim.beginPath();
       ctxAnim.moveTo(e.clientX - rect.left, e.clientY - rect.top);
       document.getElementById('uploadPlaceholder').style.display = 'none';
+      document.getElementById('toolContextMenu').style.display = 'none';
     });
 
     animCanvasEl.addEventListener('mousemove', (e) => {
@@ -1502,11 +1576,13 @@
 
       if (animMode === 'eraser') {
         ctxAnim.globalCompositeOperation = 'destination-out';
-        ctxAnim.lineWidth = 30;
+        ctxAnim.lineWidth = toolSettings.eraser.size;
+        ctxAnim.globalAlpha = toolSettings.eraser.opacity / 100;
       } else {
         ctxAnim.globalCompositeOperation = 'source-over';
-        ctxAnim.lineWidth = 4;
-        ctxAnim.strokeStyle = '#4f46e5';
+        ctxAnim.lineWidth = toolSettings.pencil.size;
+        ctxAnim.strokeStyle = toolSettings.pencil.color;
+        ctxAnim.globalAlpha = toolSettings.pencil.opacity / 100;
       }
 
       ctxAnim.lineCap = 'round';
@@ -1520,15 +1596,78 @@
       ctxAnim.beginPath();
     });
 
+    // Sağ Tık Menüsünü Açma (Kalem veya Silgiye Sağ Tıklayınca)
+    function openToolSettings(event, toolType) {
+      event.preventDefault(); // Tarayıcının varsayılan sağ tık menüsünü engelle
+      activeContextTool = toolType;
+      const menu = document.getElementById('toolContextMenu');
+      const titleEl = document.getElementById('contextMenuTitle');
+      const rowColor = document.getElementById('rowColor');
+      const rowOpacity = document.getElementById('rowOpacity');
+      
+      const sizeRange = document.getElementById('ctxSizeRange');
+      const sizeVal = document.getElementById('ctxSizeVal');
+      const opacityRange = document.getElementById('ctxOpacityRange');
+      const opacityVal = document.getElementById('ctxOpacityVal');
+      const colorPicker = document.getElementById('ctxColorPicker');
+
+      if (toolType === 'pencil') {
+        titleEl.innerText = '✏️ Kalem Seçenekleri';
+        rowColor.style.display = 'flex';
+        rowOpacity.style.display = 'flex';
+        sizeRange.value = toolSettings.pencil.size;
+        sizeVal.innerText = toolSettings.pencil.size;
+        opacityRange.value = toolSettings.pencil.opacity;
+        opacityVal.innerText = toolSettings.pencil.opacity;
+        colorPicker.value = toolSettings.pencil.color;
+      } else if (toolType === 'eraser') {
+        titleEl.innerText = '🧹 Silgi Seçenekleri';
+        rowColor.style.display = 'none';
+        rowOpacity.style.display = 'flex';
+        sizeRange.value = toolSettings.eraser.size;
+        sizeVal.innerText = toolSettings.eraser.size;
+        opacityRange.value = toolSettings.eraser.opacity;
+        opacityVal.innerText = toolSettings.eraser.opacity;
+      }
+
+      // Menüyü tıklanan fare konumuna konumlandır
+      menu.style.left = `${Math.min(event.pageX, window.innerWidth - 230)}px`;
+      menu.style.top = `${Math.min(event.pageY, window.innerHeight - 220)}px`;
+      menu.style.display = 'flex';
+    }
+
+    // Sağ tık menüsü dışına tıklandığında menüyü kapat
+    window.addEventListener('click', (e) => {
+      const menu = document.getElementById('toolContextMenu');
+      if (!menu.contains(e.target) && !e.target.oncontextmenu) {
+        menu.style.display = 'none';
+      }
+    });
+
+    // Menü içindeki değişiklikleri güncelle
+    function updateToolSetting(type, val) {
+      if (type === 'size') {
+        toolSettings[activeContextTool].size = parseInt(val);
+        document.getElementById('ctxSizeVal').innerText = val;
+      } else if (type === 'opacity') {
+        toolSettings[activeContextTool].opacity = parseInt(val);
+        document.getElementById('ctxOpacityVal').innerText = val;
+      } else if (type === 'color') {
+        toolSettings.pencil.color = val;
+      }
+    }
+
     function setAnimTool(tool) {
       animMode = tool;
       document.querySelectorAll('.anim-workspace-container .anim-tool-btn').forEach(b => {
-        if (b.innerText.includes('Çizim') || b.innerText.includes('Silgi') || b.innerText.includes('Kalem')) {
+        if (b.id === 'toolBtnPencil' || b.id === 'toolBtnEraser') {
           b.classList.remove('active');
         }
       });
-      if (event && event.currentTarget) {
-        event.currentTarget.classList.add('active');
+      if (tool === 'pencil') {
+        document.getElementById('toolBtnPencil').classList.add('active');
+      } else if (tool === 'eraser') {
+        document.getElementById('toolBtnEraser').classList.add('active');
       }
     }
 
@@ -1606,9 +1745,9 @@
       const cy = animCanvasEl.height / 2;
 
       ctxAnim.globalCompositeOperation = 'source-over';
-      ctxAnim.strokeStyle = '#4f46e5';
+      ctxAnim.strokeStyle = toolSettings.pencil.color;
       ctxAnim.fillStyle = '#e0e7ff';
-      ctxAnim.lineWidth = 3;
+      ctxAnim.lineWidth = toolSettings.pencil.size;
       ctxAnim.lineCap = 'round';
       ctxAnim.lineJoin = 'round';
 
@@ -1616,8 +1755,8 @@
         ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 25, 45, 0, Math.PI * 2); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 55); ctxAnim.lineTo(cx - 55, cy - 90); ctxAnim.lineTo(cx - 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy - 55); ctxAnim.lineTo(cx + 55, cy - 90); ctxAnim.lineTo(cx + 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = '#4f46e5'; ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = '#4f46e5'; ctxAnim.fill();
+        ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = toolSettings.pencil.color; ctxAnim.fill();
+        ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = toolSettings.pencil.color; ctxAnim.fill();
         ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 20, 4, 0, Math.PI * 2); ctxAnim.fill();
         ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy + 45, 40, 55, 0, 0, Math.PI * 2); ctxAnim.stroke();
       } 
@@ -1647,7 +1786,7 @@
       handleGeminiAICommand();
     }
 
-    // --- MINECRAFT STÜDYOSU (AI ENTEGRASYONLU) ---
+    // --- MINECRAFT STÜDYOSU ---
     async function handleMinecraftAI() {
       const prompt = document.getElementById('mcPromptInput').value.trim();
       if (!prompt) return;
