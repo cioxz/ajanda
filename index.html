@@ -1182,15 +1182,77 @@
       renderCalendar();
     }
 
+    // --- ANIMASYON STÜDYOSU (GÜNCELLENMİŞ VE TAM ÇÖZÜMLÜ KOD) ---
+    let animDrawing = false;
+    let animMode = 'pencil';
+    const animCanvasEl = document.getElementById('animCanvas');
+    const ctxAnim = animCanvasEl.getContext('2d');
+
+    function initAnimCanvasSize() {
+      const workspace = document.getElementById('animWorkspace');
+      if (workspace && animCanvasEl) {
+        if (animCanvasEl.width !== workspace.clientWidth || animCanvasEl.height !== workspace.clientHeight) {
+          const tempImage = new Image();
+          tempImage.src = animCanvasEl.toDataURL();
+          
+          animCanvasEl.width = workspace.clientWidth;
+          animCanvasEl.height = workspace.clientHeight;
+          
+          tempImage.onload = () => {
+            ctxAnim.drawImage(tempImage, 0, 0);
+          };
+        }
+      }
+    }
+
     function openAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'flex';
+      setTimeout(initAnimCanvasSize, 50);
     }
 
     function closeAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'none';
     }
 
+    window.addEventListener('resize', initAnimCanvasSize);
+
+    animCanvasEl.addEventListener('mousedown', (e) => {
+      if (animMode === 'select' || animMode === 'rotate' || animMode === 'tag') return;
+      animDrawing = true;
+      const rect = animCanvasEl.getBoundingClientRect();
+      ctxAnim.beginPath();
+      ctxAnim.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+    });
+
+    animCanvasEl.addEventListener('mousemove', (e) => {
+      if (!animDrawing || animMode === 'select' || animMode === 'rotate' || animMode === 'tag') return;
+      const rect = animCanvasEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (animMode === 'eraser') {
+        ctxAnim.globalCompositeOperation = 'destination-out';
+        ctxAnim.lineWidth = 25;
+      } else {
+        ctxAnim.globalCompositeOperation = 'source-over';
+        ctxAnim.lineWidth = 4;
+        ctxAnim.strokeStyle = '#0f172a';
+      }
+
+      ctxAnim.lineCap = 'round';
+      ctxAnim.lineJoin = 'round';
+      ctxAnim.lineTo(x, y);
+      ctxAnim.stroke();
+    });
+
+    window.addEventListener('mouseup', () => {
+      animDrawing = false;
+      ctxAnim.beginPath();
+    });
+
     function setAnimTool(tool) {
+      animMode = tool;
       document.querySelectorAll('.anim-tool-btn').forEach(b => {
         if (!b.innerText.includes('Başa Sar') && !b.innerText.includes('Oynat') && !b.innerText.includes('Keyframe')) {
           b.classList.remove('active');
@@ -1202,9 +1264,7 @@
     }
 
     function clearAnimDrawing() {
-      const canvasAnim = document.getElementById('animCanvas');
-      const ctxAnim = canvasAnim.getContext('2d');
-      ctxAnim.clearRect(0, 0, canvasAnim.width, canvasAnim.height);
+      ctxAnim.clearRect(0, 0, animCanvasEl.width, animCanvasEl.height);
     }
 
     function loadAnimCharacter(event) {
@@ -1212,21 +1272,57 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          const placeholder = document.getElementById('uploadPlaceholder');
-          placeholder.style.display = 'none';
+          const img = new Image();
+          img.onload = function() {
+            initAnimCanvasSize();
+            ctxAnim.globalCompositeOperation = 'source-over';
+            ctxAnim.drawImage(img, 0, 0, animCanvasEl.width, animCanvasEl.height);
+            document.getElementById('uploadPlaceholder').style.display = 'none';
+          }
+          img.src = e.target.result;
         }
         reader.readAsDataURL(file);
       }
     }
 
     function removeCharacter() {
+      ctxAnim.clearRect(0, 0, animCanvasEl.width, animCanvasEl.height);
       document.getElementById('uploadPlaceholder').style.display = 'block';
     }
 
     function handleAICoordCommand() {
-      const prompt = document.getElementById('aiPromptInput').value;
+      const prompt = document.getElementById('aiPromptInput').value.toLowerCase();
       if (!prompt.trim()) return;
-      alert(`AI Asistan komutu alındı: "${prompt}". Çizim oluşturuluyor...`);
+
+      initAnimCanvasSize();
+      const centerX = animCanvasEl.width / 2;
+      const centerY = animCanvasEl.height / 2;
+
+      ctxAnim.globalCompositeOperation = 'source-over';
+      ctxAnim.strokeStyle = '#4f46e5';
+      ctxAnim.fillStyle = '#4f46e5';
+      ctxAnim.lineWidth = 4;
+
+      if (prompt.includes('kafa') || prompt.includes('çiz')) {
+        ctxAnim.beginPath();
+        ctxAnim.arc(centerX, centerY - 40, 45, 0, Math.PI * 2);
+        ctxAnim.stroke();
+      } else if (prompt.includes('kol')) {
+        ctxAnim.beginPath();
+        ctxAnim.moveTo(centerX - 60, centerY);
+        ctxAnim.lineTo(centerX + 60, centerY);
+        ctxAnim.stroke();
+      } else if (prompt.includes('gövde')) {
+        ctxAnim.beginPath();
+        ctxAnim.rect(centerX - 30, centerY - 20, 60, 90);
+        ctxAnim.stroke();
+      } else {
+        ctxAnim.beginPath();
+        ctxAnim.arc(centerX, centerY, 30, 0, Math.PI * 2);
+        ctxAnim.fill();
+      }
+
+      document.getElementById('uploadPlaceholder').style.display = 'none';
     }
 
     function quickAICoip(text) {
