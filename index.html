@@ -862,6 +862,10 @@
             <input type="number" id="bpSizeInput" value="20" min="5" max="60" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
             <label style="font-size: 0.85rem; font-weight: 600; margin-top: 8px;">Kalınlık:</label>
             <input type="number" id="bpThicknessInput" value="1" min="1" max="5" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
+            
+            <!-- KATMAN EKLE BUTONU (Boyutu otomatik +1 yapar) -->
+            <button class="ai-send-btn" style="margin-top: 8px; background: #10b981;" onclick="addBlueprintLayer()">➕ Katman Ekle (+1)</button>
+            
             <button class="ai-send-btn" style="margin-top: 8px;" onclick="generateBlueprint()">🔄 Şemayı Güncelle</button>
           </div>
         </div>
@@ -1445,6 +1449,16 @@
           gridContainer.appendChild(cell);
         }
       }
+    }
+
+    // Katman Ekle fonksiyonu (Boyutu otomatik +1 yapar ve şemayı günceller)
+    function addBlueprintLayer() {
+      const sizeInput = document.getElementById('bpSizeInput');
+      let currentVal = parseInt(sizeInput.value) || 20;
+      currentVal += 1; // Boyutu tam olarak +1 artırır
+      if (currentVal > 60) currentVal = 60;
+      sizeInput.value = currentVal;
+      generateBlueprint();
     }
 
     // --- RESİM / ÇİZİM STÜDYOSU (GEMINI DESTEKLİ) ---
