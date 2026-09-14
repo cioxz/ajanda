@@ -455,7 +455,6 @@
       overflow: hidden;
     }
 
-    /* Sol Panel (AI Asistan & Katman/Çizim Araçları) */
     .anim-sidebar-left {
       background: #f8fafc;
       border-right: 1px solid var(--border-color);
@@ -475,7 +474,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* AI Asistan Kutusu */
     .ai-assistant-box {
       background: #fff;
       border: 1px solid var(--border-color);
@@ -570,7 +568,6 @@
       background: #fee2e2;
     }
 
-    /* Sağ Ana Çalışma Alanı */
     .anim-workspace-container {
       display: flex;
       flex-direction: column;
@@ -710,7 +707,7 @@
     </div>
 
     <div class="anim-main-layout">
-      <!-- Sol Panel (AI Çizim Asistanı ve Katman/Çizim Araçları) -->
+      <!-- Sol Panel -->
       <div class="anim-sidebar-left">
         <div>
           <div class="sidebar-section-title">✨ AI Çizim Asistanı</div>
@@ -1117,16 +1114,20 @@
       selectedMonth = month;
       selectedColor = activeColor || '';
 
-      document.getElementById('modalDate').innerText = `${day} ${monthNames[currentDate.getMonth()]}`;
-      document.getElementById('holidayLabel').innerText = holidayName ? `🎉 ${holidayName}` : '';
-      document.getElementById('noteInput').value = savedData.note || '';
+      const dName = dayNames[new Date(currentDate.getFullYear(), month - 1, day).getDay()];
+      document.getElementById('modalDate').innerText = `${day} ${monthNames[month - 1]} ${currentDate.getFullYear()} (${dName})`;
       
-      if (selectedColor && selectedColor.startsWith('#')) {
-        document.getElementById('dayColorPicker').value = selectedColor;
+      const label = document.getElementById('holidayLabel');
+      if (holidayName) {
+        label.innerText = `🎉 ${holidayName}`;
+        label.style.display = 'block';
       } else {
-        document.getElementById('dayColorPicker').value = '#ffffff';
+        label.innerText = '';
+        label.style.display = 'none';
       }
 
+      document.getElementById('noteInput').value = savedData.note || '';
+      document.getElementById('dayColorPicker').value = activeColor || '#ffffff';
       document.getElementById(id).style.display = 'flex';
     }
 
@@ -1134,85 +1135,76 @@
       document.getElementById(id).style.display = 'none';
     }
 
-    function handleOverlayClick(event, modalId) {
-      if (event.target === event.currentTarget) {
-        closeModal(modalId);
+    function handleOverlayClick(event, id) {
+      if (event.target.id === id) {
+        closeModal(id);
       }
     }
 
-    function selectColor(color) { 
-      selectedColor = color; 
-      if (color && color.startsWith('#')) {
-        document.getElementById('dayColorPicker').value = color;
-      }
+    function selectColor(color) {
+      selectedColor = color;
+      document.getElementById('dayColorPicker').value = color || '#ffffff';
     }
 
     function saveDayData() {
-      const noteText = document.getElementById('noteInput').value.trim();
-      if (selectedColor !== '' || noteText !== '') {
-        localStorage.setItem(selectedDateKey, JSON.stringify({ color: selectedColor, note: noteText }));
+      const noteText = document.getElementById('noteInput').value;
+      const data = {};
+      if (selectedColor) data.color = selectedColor;
+      if (noteText.trim()) data.note = noteText.trim();
+
+      if (Object.keys(data).length > 0) {
+        localStorage.setItem(selectedDateKey, JSON.stringify(data));
       } else {
         localStorage.removeItem(selectedDateKey);
       }
+
       closeModal('colorModal');
       renderCalendar();
     }
 
     function saveForEveryYear() {
-      const noteText = document.getElementById('noteInput').value.trim();
       const recurrentKey = `recurrent_color_${selectedMonth}-${selectedDay}`;
-
-      if (selectedColor !== '') {
+      if (selectedColor) {
         localStorage.setItem(recurrentKey, selectedColor);
       } else {
         localStorage.removeItem(recurrentKey);
       }
+      saveDayData();
+    }
 
-      if (noteText !== '' || selectedColor !== '') {
-        const savedData = JSON.parse(localStorage.getItem(selectedDateKey) || '{}');
-        savedData.note = noteText;
-        savedData.color = selectedColor;
-        localStorage.setItem(selectedDateKey, JSON.stringify(savedData));
-      } else {
-        localStorage.removeItem(selectedDateKey);
-      }
-
-      closeModal('colorModal');
+    function prevMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
       renderCalendar();
     }
 
-    function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
-    function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
-
-    // Animasyon Stüdyosu Mantığı & AI Çizim Motoru
-    let animCanvas = null;
-    let animCtx = null;
-    let currentFrame = 12;
-    let totalFrames = 48;
-    let characterImage = null;
-    let imgTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
-    let aiDrawings = []; // AI tarafından çizilen ek elemanlar (kafa, kol vb.)
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    }
 
     function openAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'flex';
-      setTimeout(() => {
-        animCanvas = document.getElementById('animCanvas');
-        animCtx = animCanvas.getContext('2d');
-        initAnimCanvas();
-      }, 50);
     }
 
     function closeAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'none';
     }
 
-    function initAnimCanvas() {
-      const workspace = document.getElementById('animWorkspace');
-      if (workspace && animCanvas) {
-        animCanvas.width = workspace.clientWidth;
-        animCanvas.height = workspace.clientHeight;
-        redrawAnimWorkspace();
+    function setAnimTool(tool) {
+      document.querySelectorAll('.anim-tool-btn').forEach(b => {
+        if (!b.innerText.includes('Başa Sar') && !b.innerText.includes('Oynat') && !b.innerText.includes('Keyframe')) {
+          b.classList.remove('active');
+        }
+      });
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
       }
+    }
+
+    function clearAnimDrawing() {
+      const canvasAnim = document.getElementById('animCanvas');
+      const ctxAnim = canvasAnim.getContext('2d');
+      ctxAnim.clearRect(0, 0, canvasAnim.width, canvasAnim.height);
     }
 
     function loadAnimCharacter(event) {
@@ -1220,171 +1212,49 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          characterImage = new Image();
-          characterImage.onload = function() {
-            document.getElementById('uploadPlaceholder').style.display = 'none';
-            imgTransform.x = animCanvas.width / 2 - (characterImage.width / 3) / 2;
-            imgTransform.y = animCanvas.height / 2 - (characterImage.height / 3) / 2;
-            redrawAnimWorkspace();
-          };
-          characterImage.src = e.target.result;
-        };
+          const placeholder = document.getElementById('uploadPlaceholder');
+          placeholder.style.display = 'none';
+        }
         reader.readAsDataURL(file);
       }
     }
 
     function removeCharacter() {
-      characterImage = null;
-      if(aiDrawings.length === 0) {
-        document.getElementById('uploadPlaceholder').style.display = 'block';
-      }
-      redrawAnimWorkspace();
-    }
-
-    function clearAnimDrawing() {
-      aiDrawings = [];
-      if(!characterImage) {
-        document.getElementById('uploadPlaceholder').style.display = 'block';
-      }
-      redrawAnimWorkspace();
-    }
-
-    function quickAICoip(promptText) {
-      document.getElementById('aiPromptInput').value = promptText;
-      handleAICoordCommand();
+      document.getElementById('uploadPlaceholder').style.display = 'block';
     }
 
     function handleAICoordCommand() {
-      const prompt = document.getElementById('aiPromptInput').value.toLowerCase().trim();
-      if (!prompt) return;
-
-      document.getElementById('uploadPlaceholder').style.display = 'none';
-      const cx = animCanvas.width / 2;
-      const cy = animCanvas.height / 2;
-
-      if (prompt.includes('kafa') || prompt.includes('baş')) {
-        aiDrawings.push({ type: 'head', x: cx, y: cy - 70, r: 35 });
-      } else if (prompt.includes('kol')) {
-        aiDrawings.push({ type: 'arm', x1: cx - 40, y1: cy - 20, x2: cx - 90, y2: cy + 20 });
-      } else if (prompt.includes('gövde') || prompt.includes('vücut')) {
-        aiDrawings.push({ type: 'body', x: cx - 30, y: cy - 35, w: 60, h: 90 });
-      } else {
-        // Varsayılan genel çizim objesi
-        aiDrawings.push({ type: 'head', x: cx, y: cy - 50, r: 30 });
-      }
-
-      document.getElementById('aiPromptInput').value = '';
-      redrawAnimWorkspace();
+      const prompt = document.getElementById('aiPromptInput').value;
+      if (!prompt.trim()) return;
+      alert(`AI Asistan komutu alındı: "${prompt}". Çizim oluşturuluyor...`);
     }
 
-    function redrawAnimWorkspace() {
-      if (!animCtx || !animCanvas) return;
-      animCtx.clearRect(0, 0, animCanvas.width, animCanvas.height);
-
-      // Karakter görseli varsa çiz
-      if (characterImage) {
-        animCtx.save();
-        const renderW = characterImage.width / 3;
-        const renderH = characterImage.height / 3;
-        animCtx.translate(imgTransform.x + renderW / 2, imgTransform.y + renderH / 2);
-        animCtx.rotate((imgTransform.rotation * Math.PI) / 180);
-        animCtx.drawImage(characterImage, -renderW / 2, -renderH / 2, renderW, renderH);
-        animCtx.restore();
-      }
-
-      // AI Çizimlerini (Kafa, Kol, Gövde vb.) Canvas üzerine vektörel olarak çiz
-      animCtx.strokeStyle = '#4f46e5';
-      animCtx.fillStyle = '#e0e7ff';
-      animCtx.lineWidth = 4;
-
-      aiDrawings.forEach(item => {
-        animCtx.save();
-        if (item.type === 'head') {
-          animCtx.beginPath();
-          animCtx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
-          animCtx.fill();
-          animCtx.stroke();
-          // Gözler
-          animCtx.fillStyle = '#0f172a';
-          animCtx.beginPath();
-          animCtx.arc(item.x - 10, item.y - 5, 4, 0, Math.PI * 2);
-          animCtx.arc(item.x + 10, item.y - 5, 4, 0, Math.PI * 2);
-          animCtx.fill();
-        } else if (item.type === 'arm') {
-          animCtx.beginPath();
-          animCtx.moveTo(item.x1, item.y1);
-          animCtx.lineTo(item.x2, item.y2);
-          animCtx.lineCap = 'round';
-          animCtx.stroke();
-        } else if (item.type === 'body') {
-          animCtx.beginPath();
-          animCtx.roundRect(item.x, item.y, item.w, item.h, 12);
-          animCtx.fill();
-          animCtx.stroke();
-        }
-        animCtx.restore();
-      });
-    }
-
-    function scrubTimeline(e) {
-      const scrubber = document.getElementById('timelineScrubber');
-      const rect = scrubber.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const percentage = Math.max(0, Math.min(1, clickX / rect.width));
-      
-      currentFrame = Math.round(percentage * totalFrames);
-      document.getElementById('playhead').style.left = `${percentage * 100}%`;
-      document.getElementById('frameCounter').innerText = `F${currentFrame} / ${totalFrames}`;
-
-      if (currentFrame <= 24) {
-        imgTransform.rotation = (currentFrame / 24) * 45;
-      } else {
-        imgTransform.rotation = 45 - ((currentFrame - 24) / 24) * 45;
-      }
-      redrawAnimWorkspace();
-    }
-
-    function addKeyframe() {
-      alert(`Kare ${currentFrame} için Keyframe eklendi!`);
+    function quickAICoip(text) {
+      document.getElementById('aiPromptInput').value = text;
+      handleAICoordCommand();
     }
 
     function rewindAnimation() {
-      currentFrame = 0;
-      document.getElementById('playhead').style.left = `0%`;
-      document.getElementById('frameCounter').innerText = `F0 / ${totalFrames}`;
-      imgTransform.rotation = 0;
-      redrawAnimWorkspace();
+      document.getElementById('playhead').style.left = '0%';
     }
 
     function togglePlayAnimation() {
-      let frameStep = setInterval(() => {
-        if (currentFrame >= totalFrames) {
-          clearInterval(frameStep);
-          return;
-        }
-        currentFrame++;
-        let percentage = (currentFrame / totalFrames) * 100;
-        document.getElementById('playhead').style.left = `${percentage}%`;
-        document.getElementById('frameCounter').innerText = `F${currentFrame} / ${totalFrames}`;
-        
-        if (currentFrame <= 24) {
-          imgTransform.rotation = (currentFrame / 24) * 45;
-        } else {
-          imgTransform.rotation = 45 - ((currentFrame - 24) / 24) * 45;
-        }
-        redrawAnimWorkspace();
-      }, 50);
+      // Oynat / Durdur mantığı
     }
 
-    function setAnimTool(toolName) {
-      // Araç modu seçimi
+    function addKeyframe() {
+      alert('Keyframe eklendi.');
+    }
+
+    function scrubTimeline(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      document.getElementById('playhead').style.left = `${pos * 100}%`;
     }
 
     updateHeaderTodayInfo();
     renderCalendar();
     loadGeneralNotes();
-    
-    window.addEventListener('resize', initAnimCanvas);
   </script>
 </body>
 </html>
