@@ -639,28 +639,29 @@
     .context-menu {
       display: none;
       position: absolute;
-      background: #252526;
-      border: 1px solid #454545;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      border-radius: 6px;
-      padding: 8px;
+      background: #2b2b2b;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 5px 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       z-index: 3000;
-      min-width: 180px;
-      color: #fff;
+      min-width: 160px;
     }
-    .context-menu button, .context-menu .menu-item-row {
-      display: block;
-      width: 100%;
+    .context-menu div, .context-menu button {
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 13px;
       background: none;
       border: none;
-      color: #fff;
-      padding: 8px 12px;
+      color: white;
       text-align: left;
-      cursor: pointer;
-      border-radius: 4px;
-      font-size: 13px;
+      width: 100%;
+      display: block;
     }
-    .context-menu button:hover { background: #007acc; }
+    .context-menu div:hover, .context-menu button:hover {
+      background-color: #ff0022;
+    }
     .context-menu hr { border: 0; border-top: 1px solid #444; margin: 4px 0; }
 
     .studio-panel {
@@ -793,7 +794,7 @@
       border: 1px solid var(--border-color);
     }
 
-    /* CapCut-Stili Video & Animasyon Stüdyosu Ekleri */
+    /* Video & Animasyon Stüdyosu (CapCut + Zaman Çizelgesi Barı) */
     .capcut-studio-wrapper {
       display: flex;
       flex-direction: column;
@@ -808,13 +809,26 @@
 
     .capcut-preview-viewport {
       flex: 1;
-      background: #111;
+      background: #121212;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
       min-height: 220px;
+    }
+
+    .target-shape {
+      width: 50px;
+      height: 50px;
+      background-color: red;
+      border: 2px solid white;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 5;
     }
 
     .capcut-canvas {
@@ -842,15 +856,48 @@
       align-items: center;
     }
 
-    .capcut-timeline-trackbox {
+    .timeline-container {
       flex: 1;
-      background: #222;
-      border: 1px solid #333;
+      height: 90px;
+      background-color: #1a1a1a;
+      border-radius: 8px;
       position: relative;
-      border-radius: 6px;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #333;
       overflow: hidden;
-      cursor: pointer;
     }
+
+    .timeline-bar {
+      position: absolute;
+      top: 25px;
+      left: 20px;
+      width: 400px;
+      height: 36px;
+      background-color: #ff0022;
+      border-radius: 6px;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      font-size: 13px;
+      font-weight: bold;
+      user-select: none;
+      cursor: grab;
+      z-index: 8;
+    }
+
+    .resize-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: ew-resize;
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+    .resize-handle:hover { background-color: rgba(255, 255, 255, 0.8); }
+    .resize-handle.left { left: 0; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+    .resize-handle.right { right: 0; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
 
     .capcut-playhead {
       position: absolute;
@@ -863,14 +910,14 @@
 
     .capcut-clip-element {
       position: absolute;
-      top: 10px;
-      height: 40px;
+      top: 5px;
+      height: 20px;
       background: #3b82f6;
-      border-radius: 6px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      font-size: 0.75rem;
+      padding: 0 6px;
+      font-size: 0.7rem;
       font-weight: 600;
       color: #fff;
       border: 1px solid #60a5fa;
@@ -927,7 +974,7 @@
         <h3 id="studioMainTitle">🎨 Resim Stüdyosu</h3>
         <div class="studio-tabs">
           <button class="studio-tab-btn active" id="tabArt" onclick="switchStudio('art')">Resim Stüdyosu</button>
-          <button class="studio-tab-btn" id="tabAnim" onclick="switchStudio('anim')">🎬 Video Stüdyosu (CapCut)</button>
+          <button class="studio-tab-btn" id="tabAnim" onclick="switchStudio('anim')">🎬 Video & Animasyon Stüdyosu</button>
           <button class="studio-tab-btn" id="tabMc" onclick="switchStudio('minecraft')">Minecraft Stüdyosu</button>
           <button class="studio-tab-btn" id="tabBlueprint" onclick="switchStudio('blueprint')">📐 Daire Şeması</button>
         </div>
@@ -954,7 +1001,7 @@
 
         <!-- CapCut Video / Animasyon Kontrolleri -->
         <div id="sidebarAnim" class="studio-sidebar-content" style="display: none;">
-          <div class="sidebar-section-title">🎬 Video Klip Araçları</div>
+          <div class="sidebar-section-title">🎬 Video & Klip Araçları</div>
           <div class="ai-assistant-box">
             <button class="ai-send-btn" onclick="addVideoClip('rect', document.getElementById('capcutColorPicker').value)">➕ Kare Klip Ekle</button>
             <button class="ai-send-btn" onclick="addVideoClip('circle', document.getElementById('capcutColorPicker').value)">➕ Daire Klip Ekle</button>
@@ -963,8 +1010,8 @@
             <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
             <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">İpuçları:</div>
             <div style="font-size:0.75rem; color:var(--text-muted);">
-              • Tuvalde klip üstüne tıklayıp sürükleyerek **taşıyabilirsin**.<br>
-              • Klip üstüne **sağ tıklayarak** rengini, metnini, şeklini ve 2 pozisyon arası animasyonunu ayarlayabilirsin.
+              • Zaman barını sürükleyebilir, uçlarındaki tutamaklardan uzatıp kısaltabilirsiniz.<br>
+              • Kırmızı şekle ve klip öğelerine **sağ tıklayarak** özel seçenekleri açabilirsiniz.
             </div>
             <button class="btn-secondary" onclick="clearVideoClips()" style="margin-top:4px;">Tümünü Sıfırla</button>
           </div>
@@ -1043,7 +1090,7 @@
         <div id="panelAnim" class="studio-panel">
           <div class="anim-top-toolbar">
             <div class="anim-tools">
-              <button class="anim-tool-btn active">🎬 Video Araçları</button>
+              <button class="anim-tool-btn active">🎬 Video & Zaman Çizelgesi Araçları</button>
               <button class="anim-tool-btn" onclick="document.getElementById('capcutImageLoader').click()">🖼️ Fotoğraf Ekle</button>
               <button class="anim-tool-btn" onclick="clearVideoClips()" style="color: #d9534f;">Tümünü Sıfırla</button>
             </div>
@@ -1054,18 +1101,30 @@
           <input type="file" id="capcutImageLoader" accept="image/*" style="display: none;" />
 
           <div class="capcut-studio-wrapper">
-            <div class="capcut-preview-viewport">
+            <!-- Animasyon Tuval & Şekil Alanı -->
+            <div class="capcut-preview-viewport" id="viewport">
+              <div class="target-shape" id="shape"></div>
               <canvas id="capcutCanvas" width="700" height="350" class="capcut-canvas"></canvas>
             </div>
+            
+            <!-- Zaman Çizelgesi Paneli -->
             <div class="capcut-timeline-panel">
               <div class="capcut-timeline-toolbar">
                 <button class="anim-tool-btn" onclick="toggleCapCutPlay()">▶ Oynat / Durdur</button>
                 <button class="anim-tool-btn" onclick="resetCapCutTimeline()">⏮ Başa Dön</button>
                 <span id="capcutTimecode" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Kare: 0 / 100</span>
               </div>
-              <div class="capcut-timeline-trackbox" id="capcutTrackBox" onclick="scrubCapCutTimeline(event)">
+              
+              <div class="timeline-container" id="timelineTrack" onclick="scrubCapCutTimeline(event)">
                 <div class="capcut-playhead" id="capcutPlayhead"></div>
                 <div id="capcutClipsContainer"></div>
+                
+                <!-- Sürüklenebilir ve Boyutlandırılabilir Zaman Barı -->
+                <div class="timeline-bar" id="timelineBar">
+                  #1 rect
+                  <div class="resize-handle left" id="handleLeft"></div>
+                  <div class="resize-handle right" id="handleRight"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -1131,7 +1190,14 @@
     <button onclick="setTool('magnifier')">Büyüteç</button>
   </div>
 
-  <!-- CapCut Sağ Tık Düzenleme Menüsü (Geliştirilmiş) -->
+  <!-- Kırmızı Şekil Sağ Tık Özel Menüsü -->
+  <div class="context-menu" id="contextMenu">
+    <div onclick="alert('Şekil rengi değiştirildi'); document.getElementById('shape').style.backgroundColor='#00ffcc';">Renk Değiştir</div>
+    <div onclick="alert('Animasyon süresi sıfırlandı'); document.getElementById('timelineBar').style.left='20px';">Süreyi Sıfırla</div>
+    <div onclick="alert('Şekil gizlendi'); document.getElementById('shape').style.display='none';">Sil</div>
+  </div>
+
+  <!-- CapCut Sağ Tık Düzenleme Menüsü -->
   <div id="capcut-context-menu" class="context-menu">
     <div style="padding: 4px 12px; font-size:11px; color:#aaa; font-weight:bold;">Klip Özelleştirme</div>
     <hr>
@@ -1203,6 +1269,7 @@
   </div>
 
   <script>
+    /* --- 1. TAKVİM VE GENEL NOT SİSTEMİ --- */
     let currentDate = new Date();
     const realToday = new Date();
     let selectedDateKey = '';
@@ -1525,7 +1592,7 @@
         document.getElementById('tabAnim').classList.add('active');
         document.getElementById('panelAnim').classList.add('active');
         document.getElementById('sidebarAnim').style.display = 'flex';
-        document.getElementById('studioMainTitle').innerText = '🎬 Video Stüdyosu (CapCut)';
+        document.getElementById('studioMainTitle').innerText = '🎬 Video & Animasyon Stüdyosu';
         document.getElementById('activeStudioName').innerText = 'Video Stüdyosu';
         initCapCutStudio();
       } else if (type === 'minecraft') {
@@ -1544,61 +1611,101 @@
       }
     }
 
-    function updateBlueprintParams() { generateBlueprint(); }
+    /* --- 2. SÜRÜKLENEBİLİR ZAMAN ÇİZELGESİ VE ANİMASYON DÜZENLEYİCİ MANTIĞI --- */
+    const timelineBar = document.getElementById('timelineBar');
+    const handleLeft = document.getElementById('handleLeft');
+    const handleRight = document.getElementById('handleRight');
+    const timelineTrack = document.getElementById('timelineTrack');
+    const shape = document.getElementById('shape');
+    const contextMenu = document.getElementById('contextMenu');
 
-    function generateBlueprint() {
-      let size = parseInt(document.getElementById('bpSizeInput').value);
-      let thickness = parseInt(document.getElementById('bpThickInput').value);
+    let isTimelineDragging = false;
+    let isResizingLeft = false;
+    let isResizingRight = false;
+    let dragStartX, dragStartLeft, dragStartWidth;
 
-      if (isNaN(size) || size < 3) size = 3;
-      if (isNaN(thickness) || thickness < 1) thickness = 1;
+    // Barı Taşıma (Drag)
+    timelineBar.addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('resize-handle')) return;
+      isTimelineDragging = true;
+      timelineBar.style.cursor = 'grabbing';
+      dragStartX = e.clientX;
+      dragStartLeft = timelineBar.offsetLeft;
+    });
 
-      const container = document.getElementById('blueprintGridContainer');
-      const statsText = document.getElementById('bpStatsText');
-      container.innerHTML = '';
+    // Sol Tutamak ile Kısaltma/Uzatma
+    handleLeft.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      isResizingLeft = true;
+      dragStartX = e.clientX;
+      dragStartLeft = timelineBar.offsetLeft;
+      dragStartWidth = timelineBar.offsetWidth;
+    });
 
-      const grid = document.createElement('div');
-      grid.classList.add('blueprint-grid');
-      grid.style.gridTemplateColumns = `repeat(${size}, 18px)`;
+    // Sağ Tutamak ile Kısaltma/Uzatma
+    handleRight.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      isResizingRight = true;
+      dragStartX = e.clientX;
+      dragStartWidth = timelineBar.offsetWidth;
+    });
 
-      const center = (size - 1) / 2;
-      const outerRadius = size / 2;
-      const innerRadius = Math.max(0, outerRadius - thickness);
-      let activeBlocksCount = 0;
+    // Fare Hareket Ettiğinde Zaman Barı Güncellemesi
+    window.addEventListener('mousemove', (e) => {
+      const trackWidth = timelineTrack.offsetWidth;
 
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const cell = document.createElement('div');
-          cell.classList.add('bp-cell');
+      if (isTimelineDragging) {
+        const dx = e.clientX - dragStartX;
+        let newLeft = dragStartLeft + dx;
+        
+        if (newLeft < 0) newLeft = 0;
+        if (newLeft + timelineBar.offsetWidth > trackWidth) {
+          newLeft = trackWidth - timelineBar.offsetWidth;
+        }
+        timelineBar.style.left = newLeft + 'px';
+      } 
+      else if (isResizingLeft) {
+        const dx = e.clientX - dragStartX;
+        let newWidth = dragStartWidth - dx;
+        let newLeft = dragStartLeft + dx;
 
-          const dx = x - center;
-          const dy = y - center;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        if (newWidth > 30 && newLeft >= 0) {
+          timelineBar.style.width = newWidth + 'px';
+          timelineBar.style.left = newLeft + 'px';
+        }
+      } 
+      else if (isResizingRight) {
+        const dx = e.clientX - dragStartX;
+        let newWidth = dragStartWidth + dx;
 
-          const isCenter = (Math.abs(dx) === 0 && Math.abs(dy) === 0);
-          const isAxis = (dx === 0 || dy === 0) && dist <= outerRadius;
-          const isEdge = dist <= outerRadius && dist >= innerRadius;
-
-          if (isCenter && size % 2 !== 0) {
-            cell.classList.add('center');
-            activeBlocksCount++;
-          } else if (isEdge) {
-            cell.classList.add('active');
-            activeBlocksCount++;
-          } else if (isAxis) {
-            cell.classList.add('axis');
-            activeBlocksCount++;
-          }
-
-          grid.appendChild(cell);
+        if (newWidth > 30 && (timelineBar.offsetLeft + newWidth) <= trackWidth) {
+          timelineBar.style.width = newWidth + 'px';
         }
       }
+    });
 
-      container.appendChild(grid);
-      statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
-    }
+    // Fare Bırakıldığında
+    window.addEventListener('mouseup', () => {
+      isTimelineDragging = false;
+      isResizingLeft = false;
+      isResizingRight = false;
+      timelineBar.style.cursor = 'grab';
+    });
 
-    /* --- CapCut Video Stüdyosu (Geliştirilmiş Animasyon & Şekil Düzenleme) --- */
+    // Kırmızı Şeklin Üzerine Sağ Tıklama (Context Menu)
+    shape.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      contextMenu.style.display = 'block';
+      contextMenu.style.left = e.clientX + 'px';
+      contextMenu.style.top = e.clientY + 'px';
+    });
+
+    // Menü dışına tıklandığında menüyü kapat
+    window.addEventListener('click', () => {
+      contextMenu.style.display = 'none';
+    });
+
+    /* --- 3. VIDEO & ANİMASYON STÜDYOSU (CAPCUT UYUMLU) --- */
     let capcutClips = [
       { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 150, startY: 175, endX: 350, endY: 175, sizeScale: 1, textContent: 'Klip #1' },
       { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 400, startY: 150, endX: 400, endY: 280, sizeScale: 1, textContent: 'Klip #2' },
@@ -1666,7 +1773,6 @@
       });
     }
 
-    /* Klibin Mevcut Karedeki İnterpole Edilmiş (2 Pozisyon Arasındaki) Konumu */
     function getClipCurrentPos(clip, f) {
       const endX = clip.endX !== undefined ? clip.endX : clip.startX;
       const endY = clip.endY !== undefined ? clip.endY : clip.startY;
@@ -1734,7 +1840,6 @@
             ccCtx.drawImage(clip.imgElement, curX - imgSize/2, curY - imgSize/2, imgSize, imgSize);
           }
 
-          /* 2 Pozisyon Hareket Çizgisi Gösterimi */
           if (clip.endX !== undefined && (clip.startX !== clip.endX || clip.startY !== clip.endY)) {
             ccCtx.beginPath();
             ccCtx.setLineDash([4, 4]);
@@ -1763,7 +1868,7 @@
         if (capcutCurrentFrame >= clip.startFrame && capcutCurrentFrame <= clip.endFrame) {
           const box = getClipBoundingBox(clip, capcutCurrentFrame);
           if (mouseX >= box.left && mouseX <= box.right && mouseY >= box.top && mouseY <= box.bottom) {
-            if (e.button === 2) { // Sağ tık
+            if (e.button === 2) {
               e.preventDefault();
               ccSelectedClipForMenu = clip;
               const menu = document.getElementById('capcut-context-menu');
@@ -1771,7 +1876,7 @@
               menu.style.left = `${e.clientX}px`;
               menu.style.top = `${e.clientY}px`;
               return;
-            } else if (e.button === 0) { // Sol tık sürükleme
+            } else if (e.button === 0) {
               ccDraggingClip = clip;
               const pos = getClipCurrentPos(clip, capcutCurrentFrame);
               ccDragOffsetX = mouseX - pos.x;
@@ -1810,7 +1915,6 @@
     window.addEventListener('mouseup', () => { ccDraggingClip = null; });
     ccCanvas.addEventListener('contextmenu', (e) => { e.preventDefault(); });
 
-    /* CapCut Sağ Tık Menü Fonksiyonları */
     function ccMenuChangeShape() {
       if (ccSelectedClipForMenu) {
         const newShape = prompt("Yeni şekil seçin (rect = Kare, circle = Daire, line = Çizgi, text = Metin):", ccSelectedClipForMenu.type);
@@ -1927,7 +2031,8 @@
     }
 
     function scrubCapCutTimeline(e) {
-      const box = document.getElementById('capcutTrackBox');
+      if (e.target.closest('#timelineBar')) return;
+      const box = document.getElementById('timelineTrack');
       const rect = box.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const ratio = Math.max(0, Math.min(1, clickX / rect.width));
@@ -1963,6 +2068,7 @@
       if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
     });
 
+    /* --- 4. RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
     let animDrawing = false;
     let currentTool = 'brush';
     let currentBrush = 'normal';
@@ -2017,8 +2123,6 @@
         menu.style.top = `${btnRect.bottom + 4}px`;
       }
     }
-
-    window.addEventListener('click', () => closeAllMenus());
 
     function setTool(tool) {
       currentTool = tool;
@@ -2257,7 +2361,7 @@
     }
 
     function handleSmartSketchCommand() {
-      const prompt = document.getElementById('aiPromptInput').value.trim().toLowerCase();
+      const promptText = document.getElementById('aiPromptInput').value.trim().toLowerCase();
       initAnimCanvasSize();
       document.getElementById('uploadPlaceholder').style.display = 'none';
       const cx = animCanvasEl.width / 2, cy = animCanvasEl.height / 2;
@@ -2266,7 +2370,7 @@
       ctxAnim.strokeStyle = document.getElementById('animColorPicker').value;
       ctxAnim.lineWidth = 3;
 
-      if (prompt.includes('insan') || prompt.includes('kisi') || prompt.includes('figür')) {
+      if (promptText.includes('insan') || promptText.includes('kisi') || promptText.includes('figür')) {
         ctxAnim.beginPath();
         ctxAnim.arc(cx, cy - 60, 20, 0, Math.PI * 2);
         ctxAnim.moveTo(cx, cy - 40); ctxAnim.lineTo(cx, cy + 20);
@@ -2275,7 +2379,7 @@
         ctxAnim.moveTo(cx, cy + 20); ctxAnim.lineTo(cx - 30, cy + 80);
         ctxAnim.moveTo(cx, cy + 20); ctxAnim.lineTo(cx + 30, cy + 80);
         ctxAnim.stroke();
-      } else if (prompt.includes('portre') || prompt.includes('yüz')) {
+      } else if (promptText.includes('portre') || promptText.includes('yüz')) {
         ctxAnim.beginPath();
         ctxAnim.arc(cx, cy, 60, 0, Math.PI * 2);
         ctxAnim.arc(cx - 20, cy - 10, 6, 0, Math.PI * 2);
@@ -2283,7 +2387,7 @@
         ctxAnim.moveTo(cx, cy - 5); ctxAnim.lineTo(cx, cy + 15);
         ctxAnim.arc(cx, cy + 20, 15, 0, Math.PI);
         ctxAnim.stroke();
-      } else if (prompt.includes('kedi')) {
+      } else if (promptText.includes('kedi')) {
         ctxAnim.beginPath();
         ctxAnim.arc(cx, cy, 40, 0, Math.PI * 2);
         ctxAnim.moveTo(cx - 30, cy - 25); ctxAnim.lineTo(cx - 50, cy - 60); ctxAnim.lineTo(cx - 10, cy - 35);
@@ -2299,37 +2403,98 @@
 
     function quickAICoip(text) { document.getElementById('aiPromptInput').value = text; handleSmartSketchCommand(); }
 
+    /* --- 5. MINECRAFT ASİSTANI VE DERECE DAİRE ŞEMASI --- */
     async function handleMinecraftAI() {
-      const prompt = document.getElementById('mcPromptInput').value.trim();
-      if (!prompt) return;
+      const promptText = document.getElementById('mcPromptInput').value.trim();
+      if (!promptText) return;
       const apiKey = localStorage.getItem('gemini_api_key');
-      if (!apiKey) { alert("API anahtarı gerekli."); return; }
+      if (!apiKey) { alert("API anahtarı gerekli. Lütfen üstteki ayarlar düğmesinden API anahtarınızı girin."); return; }
 
       const outputBox = document.getElementById('mcOutputBox');
-      outputBox.innerText = "Gemini kod üretiyor...";
+      outputBox.innerText = "Gemini yanıt üretiyor...";
 
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: `Minecraft sunucu geliştirme ve skript bağlamında yanıtla: ${prompt}` }] }] })
+          body: JSON.stringify({ contents: [{ parts: [{ text: `Minecraft sunucu geliştirme ve skript bağlamında yanıtla: ${promptText}` }] }] })
         });
         const data = await res.json();
-        if (data.candidates && data.candidates[0].content) {
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
           outputBox.innerText = data.candidates[0].content.parts[0].text;
         } else {
-          outputBox.innerText = "Yanıt alınamadı.";
+          outputBox.innerText = "Yanıt alınamadı veya bir hata oluştu: " + JSON.stringify(data);
         }
       } catch (err) {
-        outputBox.innerText = "Bağlantı hatası.";
+        outputBox.innerText = "Hata oluştu: " + err.message;
       }
     }
 
-    function quickMcPrompt(text) { document.getElementById('mcPromptInput').value = text; handleMinecraftAI(); }
+    function quickMcPrompt(text) {
+      document.getElementById('mcPromptInput').value = text;
+      handleMinecraftAI();
+    }
 
-    updateHeaderTodayInfo();
-    renderCalendar();
-    loadGeneralNotes();
+    function updateBlueprintParams() { generateBlueprint(); }
+
+    function generateBlueprint() {
+      let size = parseInt(document.getElementById('bpSizeInput').value);
+      let thickness = parseInt(document.getElementById('bpThickInput').value);
+
+      if (isNaN(size) || size < 3) size = 3;
+      if (isNaN(thickness) || thickness < 1) thickness = 1;
+
+      const container = document.getElementById('blueprintGridContainer');
+      const statsText = document.getElementById('bpStatsText');
+      container.innerHTML = '';
+
+      const grid = document.createElement('div');
+      grid.classList.add('blueprint-grid');
+      grid.style.gridTemplateColumns = `repeat(${size}, 18px)`;
+
+      const center = (size - 1) / 2;
+      const outerRadius = size / 2;
+      const innerRadius = Math.max(0, outerRadius - thickness);
+      let activeBlocksCount = 0;
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const cell = document.createElement('div');
+          cell.classList.add('bp-cell');
+
+          const dx = x - center;
+          const dy = y - center;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          const isCenter = (Math.abs(dx) === 0 && Math.abs(dy) === 0);
+          const isAxis = (dx === 0 || dy === 0) && dist <= outerRadius;
+          const isEdge = dist <= outerRadius && dist >= innerRadius;
+
+          if (isCenter && size % 2 !== 0) {
+            cell.classList.add('center');
+            activeBlocksCount++;
+          } else if (isEdge) {
+            cell.classList.add('active');
+            activeBlocksCount++;
+          } else if (isAxis) {
+            cell.classList.add('axis');
+            activeBlocksCount++;
+          }
+
+          grid.appendChild(cell);
+        }
+      }
+
+      container.appendChild(grid);
+      statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
+    }
+
+    // Uygulama Başlatma
+    window.onload = () => {
+      updateHeaderTodayInfo();
+      renderCalendar();
+      loadGeneralNotes();
+    };
   </script>
 </body>
 </html>
