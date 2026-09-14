@@ -428,7 +428,7 @@
       border-color: var(--primary);
     }
 
-    /* Tam Ekran Animasyon Stüdyosu Modalı */
+    /* Tam Ekran Animasyon Stüdyosu Modalı (İstediğin Şema Düzeni) */
     .anim-fullscreen-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -447,13 +447,75 @@
       background: #f8fafc;
     }
 
-    .anim-addon-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 24px;
+    .anim-main-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
       flex: 1;
       height: calc(100vh - 70px);
+      overflow: hidden;
+    }
+
+    /* Sol Panel (Araçlar & Katman Yönetimi) */
+    .anim-sidebar-left {
+      background: #f8fafc;
+      border-right: 1px solid var(--border-color);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .layer-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .layer-action-btn {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      transition: background 0.2s;
+    }
+
+    .layer-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .layer-action-btn.danger {
+      color: #ef4444;
+      border-color: #fca5a5;
+    }
+
+    .layer-action-btn.danger:hover {
+      background: #fee2e2;
+    }
+
+    /* Sağ Ana Çalışma Alanı */
+    .anim-workspace-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 20px;
+      gap: 16px;
+      background: #fff;
+      overflow: hidden;
     }
 
     .anim-top-toolbar {
@@ -462,6 +524,10 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
+      background: #f8fafc;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
     }
 
     .anim-tools {
@@ -470,14 +536,14 @@
     }
 
     .anim-tool-btn {
-      background: #f8fafc;
+      background: #fff;
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 10px;
+      padding: 8px 14px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       transition: background 0.2s;
     }
 
@@ -573,44 +639,74 @@
     </div>
   </div>
 
-  <!-- Tam Ekran Animasyon Stüdyosu Modalı -->
+  <!-- Tam Ekran Animasyon Stüdyosu Modalı (İstediğin Şema Yapısı) -->
   <div class="anim-fullscreen-overlay" id="animStudioModal">
     <div class="anim-fullscreen-header">
       <h3 style="display:flex; align-items:center; gap:8px;">🎬 Animasyon Stüdyosu</h3>
       <button class="delete-btn" onclick="closeAnimStudio()">✕ Kapat</button>
     </div>
 
-    <div class="anim-addon-container">
-      <div class="anim-top-toolbar">
-        <div class="anim-tools">
-          <button class="anim-tool-btn active" onclick="setAnimTool('select')">↖ Seç</button>
-          <button class="anim-tool-btn" onclick="setAnimTool('tag')">◎ Etiket</button>
-          <button class="anim-tool-btn" onclick="setAnimTool('rotate')">⊕ Döndür</button>
-        </div>
+    <div class="anim-main-layout">
+      <!-- Sol Panel (İstediğin Gibi Ekle / Çıkar ve Çizim / Katman Araçları) -->
+      <div class="anim-sidebar-left">
         <div>
-          <button class="anim-tool-btn" onclick="rewindAnimation()">⏮ Başa Sar</button>
-          <button class="anim-tool-btn" onclick="togglePlayAnimation()">▶ Oynat</button>
-          <span id="frameCounter" style="margin-left: 12px; font-weight: bold; font-size: 0.9rem;">F12 / 48</span>
-          <button class="anim-tool-btn" style="margin-left: 12px;" onclick="addKeyframe()">+ Keyframe</button>
+          <div class="sidebar-section-title">Katman / Görsel İşlemleri</div>
+          <div class="layer-controls">
+            <button class="layer-action-btn" onclick="document.getElementById('animCharUploader').click()">➕ Ekle</button>
+            <button class="layer-action-btn danger" onclick="removeCharacter()">🗑️ Çıkar</button>
+          </div>
+          <input type="file" id="animCharUploader" accept="image/*" style="display:none" onchange="loadAnimCharacter(event)">
+        </div>
+
+        <div>
+          <div class="sidebar-section-title">Çizim Araçları</div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button class="anim-tool-btn" style="text-align:left;" onclick="setAnimTool('pencil')">✏️ Serbest Çizim</button>
+            <button class="anim-tool-btn" style="text-align:left;" onclick="setAnimTool('eraser')">🧹 Çizgi Silgi</button>
+            <button class="anim-tool-btn" style="text-align:left;" onclick="clearAnimDrawing()">🗑️ Çizimleri Temizle</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="sidebar-section-title">Bilgi</div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+            Görsel eklemek için üstteki veya soldaki <b>Ekle</b> butonunu kullanabilir, zaman çizelgesinden kareler arasında geçiş yapabilirsiniz.
+          </p>
         </div>
       </div>
 
-      <div class="anim-workspace" id="animWorkspace">
-        <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
-          <div style="font-size: 2.5rem; margin-bottom: 8px;">➕</div>
-          <span style="font-size: 1.1rem; font-weight: 600;">Karakter Fotoğrafı Yükle</span><br>
-          <span style="font-size: 0.85rem;">PNG, JPG — Çizimler, görseller</span>
+      <!-- Sağ Ana Çalışma Alanı -->
+      <div class="anim-workspace-container">
+        <div class="anim-top-toolbar">
+          <div class="anim-tools">
+            <button class="anim-tool-btn active" onclick="setAnimTool('select')">↖ Seç / Taşı</button>
+            <button class="anim-tool-btn" onclick="setAnimTool('tag')">◎ Etiket</button>
+            <button class="anim-tool-btn" onclick="setAnimTool('rotate')">⊕ Döndür</button>
+          </div>
+          <div>
+            <button class="anim-tool-btn" onclick="rewindAnimation()">⏮ Başa Sar</button>
+            <button class="anim-tool-btn" onclick="togglePlayAnimation()">▶ Oynat</button>
+            <span id="frameCounter" style="margin-left: 12px; font-weight: bold; font-size: 0.9rem;">F12 / 48</span>
+            <button class="anim-tool-btn" style="margin-left: 12px;" onclick="addKeyframe()">+ Keyframe</button>
+          </div>
         </div>
-        <input type="file" id="animCharUploader" accept="image/*" style="display:none" onchange="loadAnimCharacter(event)">
-        <canvas id="animCanvas"></canvas>
-      </div>
 
-      <div class="anim-timeline-container">
-        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-          <span>0</span><span>8</span><span>16</span><span>24</span><span>32</span><span>40</span><span>48</span>
+        <div class="anim-workspace" id="animWorkspace">
+          <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">➕</div>
+            <span style="font-size: 1.1rem; font-weight: 600;">Karakter Fotoğrafı Yükle</span><br>
+            <span style="font-size: 0.85rem;">PNG, JPG — Çizimler, görseller</span>
+          </div>
+          <canvas id="animCanvas"></canvas>
         </div>
-        <div class="anim-timeline-scrubber" id="timelineScrubber" onclick="scrubTimeline(event)">
-          <div class="anim-playhead" id="playhead" style="left: 25%;"></div>
+
+        <div class="anim-timeline-container">
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+            <span>0</span><span>8</span><span>16</span><span>24</span><span>32</span><span>40</span><span>48</span>
+          </div>
+          <div class="anim-timeline-scrubber" id="timelineScrubber" onclick="scrubTimeline(event)">
+            <div class="anim-playhead" id="playhead" style="left: 25%;"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1027,6 +1123,11 @@
     let characterImage = null;
     let imgTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
     let keyframes = { 0: {rotation: 0}, 24: {rotation: 45}, 48: {rotation: 0} };
+    let animToolMode = 'select';
+
+    let animPainting = false;
+    let animDrawCanvas = null;
+    let animDrawCtx = null;
 
     function openAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'flex';
@@ -1066,6 +1167,17 @@
         };
         reader.readAsDataURL(file);
       }
+    }
+
+    function removeCharacter() {
+      characterImage = null;
+      document.getElementById('uploadPlaceholder').style.display = 'block';
+      redrawAnimWorkspace();
+    }
+
+    function clearAnimDrawing() {
+      // Çizimleri temizleme fonksiyonu gerektiğinde genişletilebilir
+      redrawAnimWorkspace();
     }
 
     function redrawAnimWorkspace() {
@@ -1134,13 +1246,7 @@
     }
 
     function setAnimTool(toolName) {
-      const buttons = document.querySelectorAll('.anim-addon-container .anim-tool-btn');
-      buttons.forEach(btn => {
-        if(!btn.getAttribute('onclick')?.includes('play') && !btn.getAttribute('onclick')?.includes('rewind') && !btn.getAttribute('onclick')?.includes('Keyframe')) {
-          btn.classList.remove('active');
-        }
-      });
-      event.currentTarget.classList.add('active');
+      animToolMode = toolName;
     }
 
     updateHeaderTodayInfo();
