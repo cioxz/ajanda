@@ -674,9 +674,10 @@
     .studio-panel {
       display: none;
       width: 100%;
-      height: 100%;
+      flex: 1;
       flex-direction: column;
       gap: 16px;
+      overflow: hidden;
     }
 
     .studio-panel.active {
@@ -714,17 +715,6 @@
       gap: 16px;
       height: 100%;
       overflow-y: auto;
-    }
-
-    .blueprint-controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      background: #f8fafc;
-      padding: 12px 16px;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      flex-wrap: wrap;
     }
 
     .blueprint-grid-wrapper {
@@ -1442,12 +1432,14 @@
           const dy = y - center;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Daire hesaplama mantığı
           if (Math.abs(distance - radius) <= (thickness * 0.65)) {
             cell.classList.add('active');
-          } else if (Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) {
+          } else if (sizeInput % 2 !== 0 && Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) {
             cell.classList.add('center');
             cell.title = "Merkez";
+          } else if (sizeInput % 2 === 0 && (x === Math.floor(center) || x === Math.ceil(center)) && (y === Math.floor(center) || y === Math.ceil(center))) {
+            cell.classList.add('center');
+            cell.title = "Merkez Bölgesi";
           }
 
           gridContainer.appendChild(cell);
@@ -1629,7 +1621,7 @@
       else if (prompt.includes('kule')) {
         ctxAnim.beginPath(); ctxAnim.rect(cx - 25, cy - 30, 50, 110); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.rect(cx - 32, cy - 50, 64, 20); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctx kus = ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx, cy - 100); ctxAnim.lineTo(cx + 35, cy - 50); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx, cy - 100); ctxAnim.lineTo(cx + 35, cy - 50); ctxAnim.closePath(); ctxAnim.stroke();
       }
       else {
         ctxAnim.beginPath(); ctxAnim.rect(cx - 40, cy - 40, 80, 80); ctxAnim.stroke();
