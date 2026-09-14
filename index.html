@@ -479,7 +479,7 @@
 
     .anim-main-layout {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 360px 1fr; /* Sol panel genişletildi */
       flex: 1;
       height: calc(100vh - 70px);
       overflow: hidden;
@@ -517,13 +517,15 @@
 
     .ai-input {
       width: 100%;
-      height: 70px;
-      padding: 8px 10px;
+      min-height: 120px; /* Daha uzun ve geniş hale getirildi */
+      max-height: 250px;
+      padding: 10px 12px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      font-size: 0.85rem;
-      resize: none;
+      font-size: 0.9rem;
+      resize: vertical; /* Kullanıcı dikey olarak boyutlandırabilir */
       outline: none;
+      line-height: 1.4;
     }
 
     .ai-input:focus {
@@ -534,10 +536,10 @@
       background: linear-gradient(135deg, #4f46e5, #6366f1);
       color: #fff;
       border: none;
-      padding: 8px;
+      padding: 10px;
       border-radius: 8px;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       cursor: pointer;
       text-align: center;
     }
