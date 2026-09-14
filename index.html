@@ -708,7 +708,7 @@
       border: 1px solid #334155;
     }
 
-    /* Minecraft Blueprint / Çoklu Daire Şeması Stilleri */
+    /* Minecraft Blueprint / Daire Şeması Stilleri */
     .blueprint-container {
       display: flex;
       flex-direction: column;
@@ -724,37 +724,20 @@
       border-radius: 12px;
       padding: 20px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      align-items: flex-start;
-      justify-content: center;
-      overflow: auto;
-    }
-
-    .blueprint-card {
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    }
-
-    .blueprint-card-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-main);
+      justify-content: center;
+      gap: 16px;
+      overflow: auto;
     }
 
     .blueprint-grid {
       display: grid;
       gap: 1px;
       background: var(--border-color);
-      padding: 1px;
-      border-radius: 4px;
+      padding: 2px;
+      border-radius: 6px;
+      background-color: #cbd5e1;
     }
 
     .bp-cell {
@@ -764,11 +747,11 @@
     }
 
     .bp-cell.active {
-      background: #a855f7; /* Minecraft daire mor rengi */
+      background: #8b5cf6; /* Mor Minecraft Daire Çizgisi */
     }
 
     .bp-cell.center {
-      background: #334155;
+      background: #64748b; /* Merkez İşaretçi */
     }
 
     .anim-timeline-container {
@@ -868,7 +851,7 @@
         <div class="studio-tabs">
           <button class="studio-tab-btn active" id="tabArt" onclick="switchStudio('art')">Resim Stüdyosu</button>
           <button class="studio-tab-btn" id="tabMc" onclick="switchStudio('minecraft')">Minecraft Stüdyosu</button>
-          <button class="studio-tab-btn" id="tabBlueprint" onclick="switchStudio('blueprint')">📐 Minecraft Daire Şemaları</button>
+          <button class="studio-tab-btn" id="tabBlueprint" onclick="switchStudio('blueprint')">📐 Minecraft Daire Şeması</button>
         </div>
       </div>
       <button class="delete-btn" onclick="closeAnimStudio()">✕ Kapat</button>
@@ -915,15 +898,15 @@
           </div>
         </div>
 
-        <!-- Blueprint / Daire Katman Kontrolleri -->
+        <!-- Blueprint / Daire Kontrolleri (Sadece Boy ve Kalınlık) -->
         <div id="sidebarBlueprint" class="studio-sidebar-content" style="display: none;">
-          <div class="sidebar-section-title">📐 Daire / Katman Ayarları</div>
+          <div class="sidebar-section-title">📐 Daire Parametreleri</div>
           <div class="ai-assistant-box">
-            <label style="font-size: 0.85rem; font-weight: 600;">Başlangıç Çapı:</label>
-            <input type="number" id="bpSizeInput" value="15" min="3" max="45" step="2" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
+            <label style="font-size: 0.85rem; font-weight: 600;">Çap (Boy): <b id="bpSizeVal">15</b> blok</label>
+            <input type="range" id="bpSizeInput" min="3" max="51" step="2" value="15" oninput="updateBlueprintParams()" style="cursor: pointer; width: 100%;">
             
-            <button class="ai-send-btn" style="margin-top: 8px; background: #10b981;" onclick="addBlueprintLayer()">➕ Katman Ekle (+2 Çap)</button>
-            <button class="ai-send-btn" style="margin-top: 8px;" onclick="generateBlueprint()">🔄 Şemayı Yenile</button>
+            <label style="font-size: 0.85rem; font-weight: 600; margin-top: 8px;">Çizgi Kalınlığı: <b id="bpThickVal">1</b> blok</label>
+            <input type="range" id="bpThickInput" min="1" max="5" value="1" oninput="updateBlueprintParams()" style="cursor: pointer; width: 100%;">
           </div>
         </div>
 
@@ -973,7 +956,7 @@
         <!-- Blueprint / Daire Paneli -->
         <div id="panelBlueprint" class="studio-panel">
           <div class="anim-top-toolbar">
-            <span style="font-weight: 600; font-size: 0.9rem;" id="bpInfoTitle">Minecraft Pixel Art Daire Rehberi (3 - 45 Çap)</span>
+            <span style="font-weight: 600; font-size: 0.9rem;" id="bpInfoTitle">Minecraft Piksel Daire Şeması</span>
             <button class="anim-tool-btn" onclick="generateBlueprint()">Yenile</button>
           </div>
           <div class="blueprint-grid-wrapper" id="blueprintGridContainer"></div>
@@ -1486,70 +1469,58 @@
         tabBlueprint.classList.add('active');
         panelBlueprint.classList.add('active');
         sidebarBlueprint.style.display = 'flex';
-        mainTitle.innerText = '📐 Minecraft Daire Şemaları';
-        activeStudioName.innerText = 'Minecraft Daire Rehber Şeması';
+        mainTitle.innerText = '📐 Minecraft Daire Şeması';
+        activeStudioName.innerText = 'Minecraft Daire Şeması';
         generateBlueprint();
       }
     }
 
-    // --- ÇOKLU MINECRAFT DAİRE ŞEMASI OLUŞTURUCU ---
+    // --- MINECRAFT DAİRE ŞEMASI (BOY VE KALINLIK) ---
+    function updateBlueprintParams() {
+      const size = document.getElementById('bpSizeInput').value;
+      const thick = document.getElementById('bpThickInput').value;
+      document.getElementById('bpSizeVal').innerText = size;
+      document.getElementById('bpThickVal').innerText = thick;
+      generateBlueprint();
+    }
+
     function generateBlueprint() {
-      const startSize = parseInt(document.getElementById('bpSizeInput').value) || 15;
+      const size = parseInt(document.getElementById('bpSizeInput').value) || 15;
+      const thickness = parseInt(document.getElementById('bpThickInput').value) || 1;
       const container = document.getElementById('blueprintGridContainer');
       container.innerHTML = '';
 
-      // 3'ten 45'e kadar ikişer ikişer artan standart Minecraft daire çapları
-      const diameters = [3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45];
+      const grid = document.createElement('div');
+      grid.classList.add('blueprint-grid');
+      grid.style.gridTemplateColumns = `repeat(${size}, 16px)`;
 
-      diameters.forEach(size => {
-        const card = document.createElement('div');
-        card.classList.add('blueprint-card');
+      const radius = size / 2;
+      const center = (size - 1) / 2;
 
-        const title = document.createElement('div');
-        title.classList.add('blueprint-card-title');
-        title.innerText = `${size} x ${size}`;
-        card.appendChild(title);
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const cell = document.createElement('div');
+          cell.classList.add('bp-cell');
 
-        const grid = document.createElement('div');
-        grid.classList.add('blueprint-grid');
-        grid.style.gridTemplateColumns = `repeat(${size}, 6px)`;
+          const dx = x - center;
+          const dy = y - center;
+          const distance = Math.sqrt(dx * dx + dy * dy);
 
-        const radius = size / 2;
-        const center = (size - 1) / 2;
-
-        for (let y = 0; y < size; y++) {
-          for (let x = 0; x < size; x++) {
-            const cell = document.createElement('div');
-            cell.classList.add('bp-cell');
-
-            const dx = x - center;
-            const dy = y - center;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (Math.abs(distance - radius) <= 0.55) {
-              cell.classList.add('active');
-            } else if ((Math.abs(dx) <= 0.3 && Math.abs(dy) <= radius) || (Math.abs(dy) <= 0.3 && Math.abs(dx) <= radius)) {
-              cell.classList.add('center');
-            }
-
-            grid.appendChild(cell);
+          // Kalınlık ve boy hesaplaması
+          if (distance <= radius && distance >= (radius - thickness * 0.75)) {
+            cell.classList.add('active');
+          } else if (Math.abs(dx) <= 0.3 && Math.abs(dy) <= 0.3) {
+            cell.classList.add('center');
           }
+
+          grid.appendChild(cell);
         }
+      }
 
-        card.appendChild(grid);
-        container.appendChild(card);
-      });
+      container.appendChild(grid);
     }
 
-    function addBlueprintLayer() {
-      const sizeInput = document.getElementById('bpSizeInput');
-      let val = parseInt(sizeInput.value) || 15;
-      val += 2;
-      if (val > 45) val = 45;
-      sizeInput.value = val;
-    }
-
-    // --- RESİM / ÇİZİM STÜDYOSU & OPAKILIK DÜZELTMESİ ---
+    // --- RESİM / ÇİZİM STÜDYOSU & OPAKLIK DÜZELTMESİ ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
@@ -1595,6 +1566,7 @@
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
+      // Opaklık ve ayarların doğru uygulanması
       if (animMode === 'eraser') {
         ctxAnim.globalCompositeOperation = 'destination-out';
         ctxAnim.lineWidth = toolSettings.eraser.size;
@@ -1742,7 +1714,7 @@
         const data = await res.json();
         
         if (data.candidates && data.candidates[0].content) {
-          outputDiv.innerHTML = `<span style="color:green; font-weight:600;">Başarılı:</span> "${prompt}" tuvale yansıtıldı!`;
+          outputDiv.innerHTML = `<span style="color:green; font-weight:600;>Başarılı:</span> "${prompt}" tuvale yansıtıldı!`;
           drawGeminiShape(prompt.toLowerCase());
         } else if (data.error) {
           outputDiv.innerHTML = `<span style="color:red;">Hata: ${data.error.message}</span>`;
