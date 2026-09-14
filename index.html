@@ -6,16 +6,16 @@
   <title>Gelişmiş Takvim & Çoklu Stüdyo Platformu</title>
   <style>
     :root {
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --border-color: #e2e8f0;
-      --holiday-bg: #fee2e2;
-      --holiday-text: #dc2626;
-      --today-border: #4f46e5;
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --border-color: #334155;
+      --holiday-bg: #450a0a;
+      --holiday-text: #fca5a5;
+      --today-border: #6366f1;
     }
 
     * {
@@ -45,7 +45,7 @@
     }
 
     .open-anim-btn {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
       color: #fff;
       border: none;
       padding: 12px 20px;
@@ -55,17 +55,17 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .open-anim-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
     }
 
     .settings-btn {
-      background: #f1f5f9;
+      background: var(--card-bg);
       color: var(--text-main);
       border: 1px solid var(--border-color);
       padding: 12px 16px;
@@ -92,7 +92,7 @@
       background: var(--card-bg);
       border-radius: 20px;
       padding: 24px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       border: 1px solid var(--border-color);
     }
 
@@ -118,7 +118,7 @@
     }
 
     .nav-btn {
-      background: #f1f5f9;
+      background: var(--border-color);
       border: none;
       padding: 8px 14px;
       border-radius: 10px;
@@ -129,7 +129,7 @@
     }
 
     .nav-btn:hover {
-      background: #e2e8f0;
+      background: #475569;
     }
 
     .weekdays-grid {
@@ -159,14 +159,14 @@
       font-weight: 500;
       cursor: pointer;
       user-select: none;
-      background: #fff;
+      background: #1e293b;
       transition: all 0.15s ease;
     }
 
     .day:hover {
       border-color: var(--primary);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     .day.empty {
@@ -184,7 +184,7 @@
     .day.holiday {
       background-color: var(--holiday-bg);
       color: var(--holiday-text);
-      border-color: #fca5a5;
+      border-color: #7f1d1d;
     }
 
     .note-icon {
@@ -232,7 +232,7 @@
     }
 
     .note-item {
-      background: #f8fafc;
+      background: #0f172a;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 14px;
@@ -270,7 +270,7 @@
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
@@ -279,12 +279,14 @@
     }
 
     .modal-content {
-      background: #fff;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
       padding: 24px;
       border-radius: 20px;
       width: 90%;
       max-width: 500px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
     .modal-header {
@@ -317,9 +319,8 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      border: 2px solid #fff;
+      border: 2px solid var(--border-color);
       cursor: pointer;
-      box-shadow: 0 0 0 1px var(--border-color);
       transition: transform 0.1s;
     }
 
@@ -331,6 +332,8 @@
       width: 100%;
       height: 110px;
       padding: 12px;
+      background: #0f172a;
+      color: var(--text-main);
       border: 1px solid var(--border-color);
       border-radius: 10px;
       resize: none;
@@ -364,7 +367,7 @@
     }
 
     .btn-secondary {
-      background: #f1f5f9;
+      background: var(--border-color);
       color: var(--text-main);
       border: none;
       padding: 9px 18px;
@@ -374,7 +377,7 @@
     }
 
     .btn-secondary:hover {
-      background: #e2e8f0;
+      background: #475569;
     }
 
     .editor-wrapper {
@@ -385,7 +388,7 @@
       border-radius: 10px;
       margin-bottom: 14px;
       overflow: hidden;
-      background: #fff;
+      background: #0f172a;
     }
 
     .editor-wrapper textarea {
@@ -422,7 +425,7 @@
     .tool-btn {
       padding: 6px 12px;
       border: 1px solid var(--border-color);
-      background: #f8fafc;
+      background: #0f172a;
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.85rem;
@@ -436,11 +439,11 @@
       border-color: var(--primary);
     }
 
-    /* Stüdyolar Modalı */
+    /* Stüdyolar Modalı (Yenilenmiş UI) */
     .anim-fullscreen-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: #ffffff;
+      background: #0f172a;
       display: none;
       flex-direction: column;
       z-index: 2000;
@@ -452,7 +455,7 @@
       align-items: center;
       padding: 16px 24px;
       border-bottom: 1px solid var(--border-color);
-      background: #f8fafc;
+      background: #1e293b;
     }
 
     .studio-tabs {
@@ -461,7 +464,7 @@
     }
 
     .studio-tab-btn {
-      background: #f1f5f9;
+      background: #0f172a;
       border: 1px solid var(--border-color);
       padding: 8px 16px;
       border-radius: 8px;
@@ -486,7 +489,7 @@
     }
 
     .anim-sidebar-left {
-      background: #f8fafc;
+      background: #1e293b;
       border-right: 1px solid var(--border-color);
       padding: 20px;
       display: flex;
@@ -505,35 +508,31 @@
     }
 
     .ai-assistant-box {
-      background: #fff;
+      background: #0f172a;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
 
     .ai-input {
       width: 100%;
-      min-height: 120px;
-      max-height: 250px;
+      min-height: 100px;
+      max-height: 200px;
       padding: 10px 12px;
+      background: #1e293b;
       border: 1px solid var(--border-color);
+      color: var(--text-main);
       border-radius: 8px;
       font-size: 0.9rem;
       resize: vertical;
       outline: none;
-      line-height: 1.4;
-    }
-
-    .ai-input:focus {
-      border-color: var(--primary);
     }
 
     .ai-send-btn {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
       color: #fff;
       border: none;
       padding: 10px;
@@ -544,10 +543,6 @@
       text-align: center;
     }
 
-    .ai-send-btn:hover {
-      opacity: 0.9;
-    }
-
     .ai-chips {
       display: flex;
       flex-wrap: wrap;
@@ -556,17 +551,13 @@
     }
 
     .ai-chip {
-      background: #f1f5f9;
+      background: #334155;
       border: none;
       padding: 4px 8px;
       border-radius: 6px;
       font-size: 0.75rem;
       cursor: pointer;
       color: var(--text-main);
-    }
-
-    .ai-chip:hover {
-      background: #e2e8f0;
     }
 
     .layer-controls {
@@ -576,7 +567,7 @@
 
     .layer-action-btn {
       flex: 1;
-      background: #fff;
+      background: #0f172a;
       border: 1px solid var(--border-color);
       padding: 8px;
       border-radius: 8px;
@@ -584,20 +575,11 @@
       font-weight: 600;
       font-size: 0.85rem;
       color: var(--text-main);
-      transition: background 0.2s;
-    }
-
-    .layer-action-btn:hover {
-      background: #f1f5f9;
     }
 
     .layer-action-btn.danger {
       color: #ef4444;
-      border-color: #fca5a5;
-    }
-
-    .layer-action-btn.danger:hover {
-      background: #fee2e2;
+      border-color: #7f1d1d;
     }
 
     .anim-workspace-container {
@@ -606,7 +588,7 @@
       flex: 1;
       padding: 20px;
       gap: 16px;
-      background: #fff;
+      background: #0f172a;
       overflow: hidden;
     }
 
@@ -616,7 +598,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      background: #f8fafc;
+      background: #1e293b;
       padding: 12px 16px;
       border: 1px solid var(--border-color);
       border-radius: 12px;
@@ -628,7 +610,7 @@
     }
 
     .anim-tool-btn {
-      background: #fff;
+      background: #0f172a;
       border: 1px solid var(--border-color);
       color: var(--text-main);
       padding: 8px 14px;
@@ -636,11 +618,6 @@
       cursor: pointer;
       font-weight: 500;
       font-size: 0.85rem;
-      transition: background 0.2s;
-    }
-
-    .anim-tool-btn:hover {
-      background: #f1f5f9;
     }
 
     .anim-tool-btn.active {
@@ -663,7 +640,7 @@
     }
 
     .minecraft-box {
-      background: #f1f5f9;
+      background: #1e293b;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 16px;
@@ -675,7 +652,7 @@
     }
 
     .mc-output {
-      background: #0f172a;
+      background: #090d16;
       color: #38bdf8;
       padding: 14px;
       border-radius: 8px;
@@ -683,80 +660,54 @@
       font-size: 0.9rem;
       white-space: pre-wrap;
       flex: 1;
-      border: 1px solid #334155;
-    }
-
-    /* Görseldeki Stil Uyarlandı: Minecraft Blueprint Stili */
-    .blueprint-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      height: 100%;
-      overflow-y: auto;
-    }
-
-    .blueprint-card-box {
-      background: #fff;
       border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 20px;
+    }
+
+    /* Yeni Yenilenmiş Minecraft Blueprint / Daire Şeması UI Stili */
+    .blueprint-card-box {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      gap: 12px;
     }
 
     .bp-input-row {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-    }
-
-    .bp-label-header {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-main);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      gap: 4px;
     }
 
     .bp-input-box {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 12px 16px;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
-      transition: border-color 0.2s;
-    }
-
-    .bp-input-box:focus-within {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 14px;
     }
 
     .bp-input-box input {
       border: none;
       outline: none;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--text-main);
-      width: 100px;
+      width: 80px;
       background: transparent;
     }
 
     .bp-input-box span {
       color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
     }
 
     .blueprint-grid-wrapper {
       flex: 1;
-      background: #f8fafc;
+      background: #1e293b;
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 24px;
@@ -771,28 +722,28 @@
     .blueprint-grid {
       display: grid;
       gap: 1px;
-      background-color: #000000;
-      border: 1px solid #000000;
+      background-color: #000;
+      border: 2px solid var(--border-color);
       padding: 1px;
-      border-radius: 2px;
+      border-radius: 6px;
     }
 
     .bp-cell {
       width: 18px;
       height: 18px;
-      background: #ffffff;
+      background: #0f172a;
     }
 
     .bp-cell.active {
-      background: #3b82f6; /* Görseldeki mavi tonu */
+      background: #3b82f6; /* Klasik Minecraft Mavi Blok */
     }
 
     .bp-cell.axis {
-      background: #94a3b8; /* Gri eksen / haç çizgisi tonu */
+      background: #475569; /* Eksen çizgileri */
     }
 
     .bp-cell.center {
-      background: #1e293b; /* Tam merkezdeki koyu blok */
+      background: #94a3b8; /* Tam Merkez */
     }
 
     .bp-stats-text {
@@ -800,24 +751,28 @@
       font-weight: 500;
       color: var(--text-main);
       text-align: center;
+      background: #0f172a;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
     }
 
     .anim-timeline-container {
-      background: #f8fafc;
+      background: #1e293b;
       border: 1px solid var(--border-color);
-      padding: 16px;
+      padding: 12px 16px;
       border-radius: 12px;
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
-    /* Sağ Tık Özelleştirme Menüsü */
     .custom-context-menu {
       position: absolute;
-      background: #ffffff;
+      background: #1e293b;
       border: 1px solid var(--border-color);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       border-radius: 12px;
       padding: 12px;
       display: none;
@@ -842,20 +797,6 @@
       gap: 4px;
       font-size: 0.85rem;
       font-weight: 500;
-    }
-
-    .context-menu-row input[type="range"] {
-      width: 100%;
-      cursor: pointer;
-    }
-
-    .context-menu-row input[type="color"] {
-      width: 100%;
-      height: 32px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      cursor: pointer;
-      background: none;
     }
   </style>
 </head>
@@ -912,23 +853,13 @@
         <div id="sidebarArt" class="studio-sidebar-content">
           <div class="sidebar-section-title">✨ Gemini AI Çizim Asistanı</div>
           <div class="ai-assistant-box">
-            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz, kule çiz..."></textarea>
+            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz..."></textarea>
             <button class="ai-send-btn" onclick="handleGeminiAICommand()">🤖 Gemini ile Çizdir</button>
             <div class="ai-chips">
-              <button class="ai-chip" onclick="quickAICoip('kedi çiz')">Kedi Çiz</button>
-              <button class="ai-chip" onclick="quickAICoip('uçak çiz')">Uçak Çiz</button>
-              <button class="ai-chip" onclick="quickAICoip('insan çiz')">İnsan Çiz</button>
-              <button class="ai-chip" onclick="quickAICoip('kule çiz')">Kule Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('kedi çiz')">Kedi</button>
+              <button class="ai-chip" onclick="quickAICoip('uçak çiz')">Uçak</button>
+              <button class="ai-chip" onclick="quickAICoip('kule çiz')">Kule</button>
             </div>
-          </div>
-
-          <div style="margin-top: 16px;">
-            <div class="sidebar-section-title">Görsel İşlemleri</div>
-            <div class="layer-controls">
-              <button class="layer-action-btn" onclick="document.getElementById('animCharUploader').click()">➕ Yükle</button>
-              <button class="layer-action-btn danger" onclick="removeCharacter()">🗑️ Kaldır</button>
-            </div>
-            <input type="file" id="animCharUploader" accept="image/*" style="display:none" onchange="loadAnimCharacter(event)">
           </div>
         </div>
 
@@ -936,46 +867,38 @@
         <div id="sidebarMc" class="studio-sidebar-content" style="display: none;">
           <div class="sidebar-section-title">⛏️ Minecraft Asistanı</div>
           <div class="ai-assistant-box">
-            <textarea class="ai-input" id="mcPromptInput" placeholder="Örn: Otomatik kapı skripti yaz, LuckPerms rank ayarla..."></textarea>
-            <button class="ai-send-btn" onclick="handleMinecraftAI()">✨ Gemini'ye Kod/Skript Ürettir</button>
+            <textarea class="ai-input" id="mcPromptInput" placeholder="Skript veya komut yaz..."></textarea>
+            <button class="ai-send-btn" onclick="handleMinecraftAI()">✨ Gemini'ye Ürettir</button>
             <div class="ai-chips">
-              <button class="ai-chip" onclick="quickMcPrompt('Karşılama Skripti yaz')">Skript</button>
+              <button class="ai-chip" onclick="quickMcPrompt('Karşılama Skripti')">Skript</button>
               <button class="ai-chip" onclick="quickMcPrompt('WorldEdit komutları')">WorldEdit</button>
-              <button class="ai-chip" onclick="quickMcPrompt('Sunucu optimizasyon ipuçları')">Optimizasyon</button>
             </div>
           </div>
         </div>
 
-        <!-- Blueprint / Daire Kontrolleri (Görsele Benzer Input Formatı) -->
+        <!-- Yenilenmiş Daire / Blueprint Kontrolleri -->
         <div id="sidebarBlueprint" class="studio-sidebar-content" style="display: none;">
-          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">Generate the circle</div>
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
-            Experiment with the diameter to create your Minecraft circle.
+          <div style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Circle Generator</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
+            Minecraft daire şemanızı özelleştirin.
           </div>
 
           <div class="blueprint-card-box">
             <div class="bp-input-row">
-              <div class="bp-label-header"><span>Diameter</span></div>
+              <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">Çap (Diameter)</span>
               <div class="bp-input-box">
-                <input type="number" id="bpSizeInput" min="3" max="51" step="1" value="10" oninput="updateBlueprintParams()">
+                <input type="number" id="bpSizeInput" min="3" max="61" step="1" value="15" oninput="updateBlueprintParams()">
                 <span>blocks</span>
               </div>
             </div>
 
             <div class="bp-input-row">
-              <div class="bp-label-header"><span>Thickness</span></div>
+              <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">Kalınlık (Thickness)</span>
               <div class="bp-input-box">
                 <input type="number" id="bpThickInput" min="1" max="10" step="1" value="1" oninput="updateBlueprintParams()">
                 <span>blocks</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="sidebar-section-title" style="margin-top: 16px;">Hızlı Durum</div>
-          <div id="aiResponseOutput" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
-            Asistan hazır. İstediğiniz komutu seçip çalıştırabilirsiniz.
           </div>
         </div>
       </div>
@@ -986,18 +909,15 @@
         <div id="panelArt" class="studio-panel active">
           <div class="anim-top-toolbar">
             <div class="anim-tools">
-              <button class="anim-tool-btn active" id="toolBtnPencil" onclick="setAnimTool('pencil')" oncontextmenu="openToolSettings(event, 'pencil')">✏️ Çizim Kalemi</button>
+              <button class="anim-tool-btn active" id="toolBtnPencil" onclick="setAnimTool('pencil')" oncontextmenu="openToolSettings(event, 'pencil')">✏️ Kalem</button>
               <button class="anim-tool-btn" id="toolBtnEraser" onclick="setAnimTool('eraser')" oncontextmenu="openToolSettings(event, 'eraser')">🧹 Silgi</button>
             </div>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">(İpucu: Kalem veya silgiye sağ tıklayarak renk, kalınlık ve opaklık ayarlayabilirsiniz)</span>
             <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
           </div>
-
-          <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#f8fafc; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+          <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#0f172a; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
             <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
               <div style="font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
-              <span style="font-size: 1.1rem; font-weight: 600;">Gemini'ye çizdirin ya da serbest çizim yapın</span><br>
-              <span style="font-size: 0.85rem;">Örn: "kedi çiz", "kule çiz"</span>
+              <span style="font-size: 1rem; font-weight: 600;">Serbest çizim yapın veya Gemini ile çizdirin</span>
             </div>
             <canvas id="animCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:auto;"></canvas>
           </div>
@@ -1006,28 +926,25 @@
         <!-- Minecraft Stüdyosu Paneli -->
         <div id="panelMc" class="studio-panel">
           <div class="anim-top-toolbar">
-            <span style="font-weight: 600; font-size: 0.9rem;">Minecraft Sunucu & Skript Geliştirme Stüdyosu</span>
-            <button class="anim-tool-btn" onclick="document.getElementById('mcOutputBox').innerText = 'Çıktı temizlendi.'">Temizle</button>
+            <span style="font-weight: 600; font-size: 0.9rem;">Sunucu & Skript Konsolu</span>
+            <button class="anim-tool-btn" onclick="document.getElementById('mcOutputBox').innerText = 'Konsol temizlendi.'">Temizle</button>
           </div>
           <div class="minecraft-box">
-            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Gemini Yanıtı / Kod Konsolu:</div>
-            <div class="mc-output" id="mcOutputBox">Minecraft ile ilgili skript, komut veya sunucu yönetimi isteklerinizi sol taraftan yazabilirsiniz...</div>
+            <div class="mc-output" id="mcOutputBox">Minecraft kod ve skript çıktısı burada görünecek...</div>
           </div>
         </div>
 
-        <!-- Blueprint / Daire Paneli (Görseldeki Gibi İstatistik ve Grid Yapısı) -->
+        <!-- Daire / Blueprint Paneli -->
         <div id="panelBlueprint" class="studio-panel">
           <div class="blueprint-grid-wrapper">
-            <div class="bp-stats-text" id="bpStatsText">You will need <b>0</b> blocks to build this circle.</div>
+            <div class="bp-stats-text" id="bpStatsText">Bu daireyi inşa etmek için <b>0</b> blok gereklidir.</div>
             <div id="blueprintGridContainer" style="display: flex; align-items: center; justify-content: center; overflow: auto; max-width: 100%; max-height: 100%;"></div>
           </div>
         </div>
 
         <div class="anim-timeline-container">
-          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-            <span>Aktif Stüdyo Modu</span>
-            <span id="activeStudioName">Resim Stüdyosu</span>
-          </div>
+          <span>Aktif Modül</span>
+          <span id="activeStudioName" style="color:var(--text-main); font-weight:600;">Resim Stüdyosu</span>
         </div>
       </div>
     </div>
@@ -1035,21 +952,14 @@
 
   <!-- Sağ Tık Ayarlar Menüsü -->
   <div class="custom-context-menu" id="toolContextMenu">
-    <div class="context-menu-title" id="contextMenuTitle">Kalem Ayarları</div>
-    
+    <div class="context-menu-title" id="contextMenuTitle">Ayarlar</div>
     <div class="context-menu-row" id="rowColor">
       <span>Renk:</span>
-      <input type="color" id="ctxColorPicker" value="#4f46e5" onchange="updateToolSetting('color', this.value)">
+      <input type="color" id="ctxColorPicker" value="#6366f1" onchange="updateToolSetting('color', this.value)" style="width:100%; height:30px; border:none; background:none; cursor:pointer;">
     </div>
-
     <div class="context-menu-row">
       <span>Kalınlık: <b id="ctxSizeVal">4</b>px</span>
-      <input type="range" id="ctxSizeRange" min="1" max="50" value="4" oninput="updateToolSetting('size', this.value)">
-    </div>
-
-    <div class="context-menu-row" id="rowOpacity">
-      <span>Opaklık: <b id="ctxOpacityVal">100</b>%</span>
-      <input type="range" id="ctxOpacityRange" min="10" max="100" value="100" oninput="updateToolSetting('opacity', this.value)">
+      <input type="range" id="ctxSizeRange" min="1" max="50" value="4" oninput="updateToolSetting('size', this.value)" style="width:100%;">
     </div>
   </div>
 
@@ -1063,13 +973,12 @@
       <div class="holiday-label" id="holidayLabel"></div>
 
       <div class="color-palette">
-        <div class="color-btn" style="background:#ffffff;" title="Sıfırla" onclick="selectColor('')"></div>
-        <div class="color-btn" style="background:#fecaca;" onclick="selectColor('#fecaca')"></div>
-        <div class="color-btn" style="background:#fef08a;" onclick="selectColor('#fef08a')"></div>
-        <div class="color-btn" style="background:#bbf7d0;" onclick="selectColor('#bbf7d0')"></div>
-        <div class="color-btn" style="background:#bfdbfe;" onclick="selectColor('#bfdbfe')"></div>
-        <div class="color-btn" style="background:#e9d5ff;" onclick="selectColor('#e9d5ff')"></div>
-        <input type="color" id="dayColorPicker" style="border:none; width:30px; height:30px; cursor:pointer; background:none;" onchange="selectColor(this.value)">
+        <div class="color-btn" style="background:#1e293b;" title="Sıfırla" onclick="selectColor('')"></div>
+        <div class="color-btn" style="background:#7f1d1d;" onclick="selectColor('#7f1d1d')"></div>
+        <div class="color-btn" style="background:#713f12;" onclick="selectColor('#713f12')"></div>
+        <div class="color-btn" style="background:#14532d;" onclick="selectColor('#14532d')"></div>
+        <div class="color-btn" style="background:#1e3a8a;" onclick="selectColor('#1e3a8a')"></div>
+        <div class="color-btn" style="background:#581c87;" onclick="selectColor('#581c87')"></div>
       </div>
 
       <textarea id="noteInput" placeholder="Bu güne özel not yazın..."></textarea>
@@ -1081,7 +990,7 @@
     </div>
   </div>
 
-  <!-- iOS Stil Çizimli Not Modalı -->
+  <!-- Not Modalı -->
   <div class="modal-overlay" id="iosNoteModal" onclick="handleOverlayClick(event, 'iosNoteModal')">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -1092,10 +1001,7 @@
       <div class="toolbar">
         <button class="tool-btn active" id="btnWriteMode" onclick="setMode('write')">✏️ Yazı</button>
         <button class="tool-btn" id="btnDrawMode" onclick="setMode('draw')">🎨 Çizim</button>
-        <button class="tool-btn" id="btnEraser" onclick="setMode('eraser')">🧹 Silgi</button>
-        <button class="tool-btn" onclick="triggerImageUpload()">📷 Görsel</button>
         <button class="tool-btn" onclick="clearInlineCanvas()" style="margin-left:auto;">Temizle</button>
-        <input type="file" id="imageUploader" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
       </div>
 
       <div class="editor-wrapper" id="editorWrapper">
@@ -1117,7 +1023,6 @@
     let selectedColor = '';
     let selectedDay = 1;
     let selectedMonth = 1;
-    let attachedImage = null;
     let currentMode = 'write';
 
     const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
@@ -1239,19 +1144,12 @@
       currentMode = mode;
       const btnWrite = document.getElementById('btnWriteMode');
       const btnDraw = document.getElementById('btnDrawMode');
-      const btnEraser = document.getElementById('btnEraser');
-
       initCanvasSize();
-
       btnWrite.classList.remove('active');
       btnDraw.classList.remove('active');
-      btnEraser.classList.remove('active');
 
       if (mode === 'draw') {
         btnDraw.classList.add('active');
-        canvas.classList.add('active-draw');
-      } else if (mode === 'eraser') {
-        btnEraser.classList.add('active');
         canvas.classList.add('active-draw');
       } else {
         btnWrite.classList.add('active');
@@ -1282,15 +1180,9 @@
       const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
       const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
-      if (currentMode === 'eraser') {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = 20;
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#0f172a';
-      }
-
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#f8fafc';
       ctx.lineCap = 'round';
       ctx.lineTo(x, y);
       ctx.stroke();
@@ -1299,9 +1191,6 @@
     canvas.addEventListener('mousedown', startPosition);
     canvas.addEventListener('mouseup', endPosition);
     canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('touchstart', startPosition);
-    canvas.addEventListener('touchend', endPosition);
-    canvas.addEventListener('touchmove', draw);
 
     function loadGeneralNotes() {
       const notesList = document.getElementById('generalNotesList');
@@ -1309,37 +1198,29 @@
       const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
 
       if (notes.length === 0) {
-        notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:24px 0;">Henüz kayıtlı notunuz yok.<br><b>"+ Not"</b> butonuna basarak ekleyin!</div>';
+        notesList.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:24px 0;">Henüz not yok.<br><b>"+ Not"</b> ile ekleyin!</div>';
         return;
       }
 
       notes.forEach((note, index) => {
         const item = document.createElement('div');
         item.classList.add('note-item');
-
-        let contentHtml = `
+        item.innerHTML = `
           <div class="note-item-header">
             <span>${note.timestamp || ''}</span>
             <button class="delete-btn" onclick="deleteNote(${index})">✕</button>
           </div>
+          ${note.text ? `<div class="note-item-text">${note.text}</div>` : ''}
+          ${note.drawing ? `<img src="${note.drawing}" alt="Çizim">` : ''}
         `;
-
-        if (note.text) contentHtml += `<div class="note-item-text">${note.text}</div>`;
-        if (note.drawing) contentHtml += `<img src="${note.drawing}" alt="Çizim">`;
-        if (note.image) contentHtml += `<img src="${note.image}" alt="Görsel">`;
-
-        item.innerHTML = contentHtml;
         notesList.appendChild(item);
       });
     }
 
     function openIosNoteModal() {
       const now = new Date();
-      const dateStr = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      
-      document.getElementById('iosModalTimestamp').innerText = dateStr;
+      document.getElementById('iosModalTimestamp').innerText = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
       document.getElementById('iosNoteInput').value = '';
-      attachedImage = null;
       canvasInitialized = false;
       clearInlineCanvas();
       document.getElementById('iosNoteModal').style.display = 'flex';
@@ -1351,31 +1232,14 @@
       const timeStr = document.getElementById('iosModalTimestamp').innerText;
       let drawingData = hasDrawn ? canvas.toDataURL() : null;
 
-      if (!text.trim() && !attachedImage && !drawingData) return;
+      if (!text.trim() && !drawingData) return;
 
       const notes = JSON.parse(localStorage.getItem('user_general_notes') || '[]');
-      notes.unshift({ text: text.trim(), drawing: drawingData, image: attachedImage, timestamp: timeStr });
+      notes.unshift({ text: text.trim(), drawing: drawingData, timestamp: timeStr });
       localStorage.setItem('user_general_notes', JSON.stringify(notes));
 
       closeModal('iosNoteModal');
       loadGeneralNotes();
-    }
-
-    function triggerImageUpload() {
-      document.getElementById('imageUploader').click();
-    }
-
-    function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          attachedImage = event.target.result;
-          const textarea = document.getElementById('iosNoteInput');
-          textarea.value += "\n[📷 Görsel Eklendi]";
-        };
-        reader.readAsDataURL(file);
-      }
     }
 
     function deleteNote(index) {
@@ -1390,21 +1254,8 @@
       selectedDay = day;
       selectedMonth = month;
       selectedColor = activeColor || '';
-
-      const dName = dayNames[new Date(currentDate.getFullYear(), month - 1, day).getDay()];
-      document.getElementById('modalDate').innerText = `${day} ${monthNames[month - 1]} ${currentDate.getFullYear()} (${dName})`;
-      
-      const label = document.getElementById('holidayLabel');
-      if (holidayName) {
-        label.innerText = `🎉 ${holidayName}`;
-        label.style.display = 'block';
-      } else {
-        label.innerText = '';
-        label.style.display = 'none';
-      }
-
+      document.getElementById('modalDate').innerText = `${day} ${monthNames[month - 1]}`;
       document.getElementById('noteInput').value = savedData.note || '';
-      document.getElementById('dayColorPicker').value = activeColor || '#ffffff';
       document.getElementById(id).style.display = 'flex';
     }
 
@@ -1413,14 +1264,11 @@
     }
 
     function handleOverlayClick(event, id) {
-      if (event.target.id === id) {
-        closeModal(id);
-      }
+      if (event.target.id === id) closeModal(id);
     }
 
     function selectColor(color) {
       selectedColor = color;
-      document.getElementById('dayColorPicker').value = color || '#ffffff';
     }
 
     function saveDayData() {
@@ -1434,49 +1282,23 @@
       } else {
         localStorage.removeItem(selectedDateKey);
       }
-
       closeModal('colorModal');
       renderCalendar();
     }
 
     function saveForEveryYear() {
       const recurrentKey = `recurrent_color_${selectedMonth}-${selectedDay}`;
-      if (selectedColor) {
-        localStorage.setItem(recurrentKey, selectedColor);
-      } else {
-        localStorage.removeItem(recurrentKey);
-      }
+      if (selectedColor) localStorage.setItem(recurrentKey, selectedColor);
+      else localStorage.removeItem(recurrentKey);
       saveDayData();
     }
 
-    function prevMonth() {
-      currentDate.setMonth(currentDate.getMonth() - 1);
-      renderCalendar();
-    }
-
-    function nextMonth() {
-      currentDate.setMonth(currentDate.getMonth() + 1);
-      renderCalendar();
-    }
+    function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
+    function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
     function configureApiKey() {
-      const currentKey = localStorage.getItem('gemini_api_key') || '';
-      const newKey = prompt("Gemini API anahtarınızı girin:", currentKey);
-      if (newKey !== null) {
-        localStorage.setItem('gemini_api_key', newKey.trim());
-        alert("API anahtarı kaydedildi!");
-      }
-    }
-
-    function getApiKey() {
-      let key = localStorage.getItem('gemini_api_key');
-      if (!key) {
-        key = prompt("Stüdyo özelliklerini kullanmak için lütfen Gemini API anahtarınızı girin:");
-        if (key) {
-          localStorage.setItem('gemini_api_key', key.trim());
-        }
-      }
-      return key;
+      const key = prompt("Gemini API anahtarınızı girin:", localStorage.getItem('gemini_api_key') || '');
+      if (key !== null) localStorage.setItem('gemini_api_key', key.trim());
     }
 
     function openAnimStudio() {
@@ -1486,67 +1308,51 @@
 
     function closeAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'none';
-      document.getElementById('toolContextMenu').style.display = 'none';
     }
 
     function switchStudio(type) {
-      const tabArt = document.getElementById('tabArt');
-      const tabMc = document.getElementById('tabMc');
-      const tabBlueprint = document.getElementById('tabBlueprint');
-      const panelArt = document.getElementById('panelArt');
-      const panelMc = document.getElementById('panelMc');
-      const panelBlueprint = document.getElementById('panelBlueprint');
-      const sidebarArt = document.getElementById('sidebarArt');
-      const sidebarMc = document.getElementById('sidebarMc');
-      const sidebarBlueprint = document.getElementById('sidebarBlueprint');
-      const mainTitle = document.getElementById('studioMainTitle');
-      const activeStudioName = document.getElementById('activeStudioName');
-
-      tabArt.classList.remove('active');
-      tabMc.classList.remove('active');
-      tabBlueprint.classList.remove('active');
-      panelArt.classList.remove('active');
-      panelMc.classList.remove('active');
-      panelBlueprint.classList.remove('active');
-      sidebarArt.style.display = 'none';
-      sidebarMc.style.display = 'none';
-      sidebarBlueprint.style.display = 'none';
-      document.getElementById('toolContextMenu').style.display = 'none';
+      document.getElementById('tabArt').classList.remove('active');
+      document.getElementById('tabMc').classList.remove('active');
+      document.getElementById('tabBlueprint').classList.remove('active');
+      document.getElementById('panelArt').classList.remove('active');
+      document.getElementById('panelMc').classList.remove('active');
+      document.getElementById('panelBlueprint').classList.remove('active');
+      document.getElementById('sidebarArt').style.display = 'none';
+      document.getElementById('sidebarMc').style.display = 'none';
+      document.getElementById('sidebarBlueprint').style.display = 'none';
 
       if (type === 'art') {
-        tabArt.classList.add('active');
-        panelArt.classList.add('active');
-        sidebarArt.style.display = 'flex';
-        mainTitle.innerText = '🎨 Resim Stüdyosu';
-        activeStudioName.innerText = 'Resim Stüdyosu';
+        document.getElementById('tabArt').classList.add('active');
+        document.getElementById('panelArt').classList.add('active');
+        document.getElementById('sidebarArt').style.display = 'flex';
+        document.getElementById('studioMainTitle').innerText = '🎨 Resim Stüdyosu';
+        document.getElementById('activeStudioName').innerText = 'Resim Stüdyosu';
         setTimeout(initAnimCanvasSize, 50);
       } else if (type === 'minecraft') {
-        tabMc.classList.add('active');
-        panelMc.classList.add('active');
-        sidebarMc.style.display = 'flex';
-        mainTitle.innerText = '⛏️ Minecraft Stüdyosu';
-        activeStudioName.innerText = 'Minecraft Stüdyosu';
+        document.getElementById('tabMc').classList.add('active');
+        document.getElementById('panelMc').classList.add('active');
+        document.getElementById('sidebarMc').style.display = 'flex';
+        document.getElementById('studioMainTitle').innerText = '⛏️ Minecraft Stüdyosu';
+        document.getElementById('activeStudioName').innerText = 'Minecraft Stüdyosu';
       } else if (type === 'blueprint') {
-        tabBlueprint.classList.add('active');
-        panelBlueprint.classList.add('active');
-        sidebarBlueprint.style.display = 'flex';
-        mainTitle.innerText = '📐 Minecraft Daire Şeması';
-        activeStudioName.innerText = 'Minecraft Daire Şeması';
+        document.getElementById('tabBlueprint').classList.add('active');
+        document.getElementById('panelBlueprint').classList.add('active');
+        document.getElementById('sidebarBlueprint').style.display = 'flex';
+        document.getElementById('studioMainTitle').innerText = '📐 Minecraft Daire Şeması';
+        document.getElementById('activeStudioName').innerText = 'Minecraft Daire Şeması';
         generateBlueprint();
       }
     }
 
-    // --- MİNECRAFT BLUEPRINT ŞEMA ÜRETİCİSİ (GÖRSEL STİLİ) ---
-    function updateBlueprintParams() {
-      generateBlueprint();
-    }
+    // --- DÜZELTİLMİŞ MINECRAFT DAİRE / ÇEMBER ALGORİTMASI ---
+    function updateBlueprintParams() { generateBlueprint(); }
 
     function generateBlueprint() {
-      let sizeInput = parseInt(document.getElementById('bpSizeInput').value);
-      let thickInput = parseInt(document.getElementById('bpThickInput').value);
+      let size = parseInt(document.getElementById('bpSizeInput').value);
+      let thickness = parseInt(document.getElementById('bpThickInput').value);
 
-      if (isNaN(sizeInput) || sizeInput < 3) sizeInput = 3;
-      if (isNaN(thickInput) || thickInput < 1) thickInput = 1;
+      if (isNaN(size) || size < 3) size = 3;
+      if (isNaN(thickness) || thickness < 1) thickness = 1;
 
       const container = document.getElementById('blueprintGridContainer');
       const statsText = document.getElementById('bpStatsText');
@@ -1554,29 +1360,30 @@
 
       const grid = document.createElement('div');
       grid.classList.add('blueprint-grid');
-      grid.style.gridTemplateColumns = `repeat(${sizeInput}, 20px)`;
+      grid.style.gridTemplateColumns = `repeat(${size}, 18px)`;
 
-      const radius = sizeInput / 2;
-      const center = (sizeInput - 1) / 2;
+      const center = (size - 1) / 2;
+      const outerRadius = size / 2;
+      const innerRadius = Math.max(0, outerRadius - thickness);
       let activeBlocksCount = 0;
 
-      for (let y = 0; y < sizeInput; y++) {
-        for (let x = 0; x < sizeInput; x++) {
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
           const cell = document.createElement('div');
           cell.classList.add('bp-cell');
 
           const dx = x - center;
           const dy = y - center;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
-          const isCenter = Math.abs(dx) <= 0.3 && Math.abs(dy) <= 0.3;
-          const isAxis = (Math.abs(dx) <= 0.3 || Math.abs(dy) <= 0.3) && distance <= radius;
-          const isCircleEdge = distance <= radius && distance >= (radius - thickInput * 0.75);
+          const isCenter = (Math.abs(dx) === 0 && Math.abs(dy) === 0);
+          const isAxis = (dx === 0 || dy === 0) && dist <= outerRadius;
+          const isEdge = dist <= outerRadius && dist >= innerRadius;
 
-          if (isCenter) {
+          if (isCenter && size % 2 !== 0) {
             cell.classList.add('center');
             activeBlocksCount++;
-          } else if (isCircleEdge) {
+          } else if (isEdge) {
             cell.classList.add('active');
             activeBlocksCount++;
           } else if (isAxis) {
@@ -1589,34 +1396,26 @@
       }
 
       container.appendChild(grid);
-      statsText.innerHTML = `You will need <b>${activeBlocksCount}</b> blocks to build this circle.`;
+      statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
     }
 
-    // --- RESİM / ÇİZİM STÜDYOSU & OPAKLIK DÜZELTMESİ ---
+    // --- ÇİZİM STÜDYOSU ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
     const ctxAnim = animCanvasEl.getContext('2d');
-
-    const toolSettings = {
-      pencil: { size: 4, color: '#4f46e5', opacity: 100 },
-      eraser: { size: 25, opacity: 100 }
-    };
+    const toolSettings = { pencil: { size: 4, color: '#6366f1' }, eraser: { size: 25 } };
     let activeContextTool = 'pencil';
 
     function initAnimCanvasSize() {
       const workspace = document.getElementById('animWorkspace');
       if (workspace && animCanvasEl) {
         if (animCanvasEl.width !== workspace.clientWidth || animCanvasEl.height !== workspace.clientHeight) {
-          const tempImage = new Image();
-          tempImage.src = animCanvasEl.toDataURL();
-          
+          const tempImg = new Image();
+          tempImg.src = animCanvasEl.toDataURL();
           animCanvasEl.width = workspace.clientWidth;
           animCanvasEl.height = workspace.clientHeight;
-          
-          tempImage.onload = () => {
-            ctxAnim.drawImage(tempImage, 0, 0);
-          };
+          tempImg.onload = () => ctxAnim.drawImage(tempImg, 0, 0);
         }
       }
     }
@@ -1629,7 +1428,6 @@
       ctxAnim.beginPath();
       ctxAnim.moveTo(e.clientX - rect.left, e.clientY - rect.top);
       document.getElementById('uploadPlaceholder').style.display = 'none';
-      document.getElementById('toolContextMenu').style.display = 'none';
     });
 
     animCanvasEl.addEventListener('mousemove', (e) => {
@@ -1641,93 +1439,23 @@
       if (animMode === 'eraser') {
         ctxAnim.globalCompositeOperation = 'destination-out';
         ctxAnim.lineWidth = toolSettings.eraser.size;
-        ctxAnim.globalAlpha = toolSettings.eraser.opacity / 100;
       } else {
         ctxAnim.globalCompositeOperation = 'source-over';
         ctxAnim.lineWidth = toolSettings.pencil.size;
         ctxAnim.strokeStyle = toolSettings.pencil.color;
-        ctxAnim.globalAlpha = toolSettings.pencil.opacity / 100;
       }
-
       ctxAnim.lineCap = 'round';
       ctxAnim.lineJoin = 'round';
       ctxAnim.lineTo(x, y);
       ctxAnim.stroke();
     });
 
-    window.addEventListener('mouseup', () => {
-      if (animDrawing) {
-        animDrawing = false;
-        ctxAnim.beginPath();
-      }
-    });
-
-    function openToolSettings(event, toolType) {
-      event.preventDefault();
-      activeContextTool = toolType;
-      const menu = document.getElementById('toolContextMenu');
-      const titleEl = document.getElementById('contextMenuTitle');
-      const rowColor = document.getElementById('rowColor');
-      
-      const sizeRange = document.getElementById('ctxSizeRange');
-      const sizeVal = document.getElementById('ctxSizeVal');
-      const opacityRange = document.getElementById('ctxOpacityRange');
-      const opacityVal = document.getElementById('ctxOpacityVal');
-      const colorPicker = document.getElementById('ctxColorPicker');
-
-      if (toolType === 'pencil') {
-        titleEl.innerText = '✏️ Kalem Seçenekleri';
-        rowColor.style.display = 'flex';
-        sizeRange.value = toolSettings.pencil.size;
-        sizeVal.innerText = toolSettings.pencil.size;
-        opacityRange.value = toolSettings.pencil.opacity;
-        opacityVal.innerText = toolSettings.pencil.opacity;
-        colorPicker.value = toolSettings.pencil.color;
-      } else if (toolType === 'eraser') {
-        titleEl.innerText = '🧹 Silgi Seçenekleri';
-        rowColor.style.display = 'none';
-        sizeRange.value = toolSettings.eraser.size;
-        sizeVal.innerText = toolSettings.eraser.size;
-        opacityRange.value = toolSettings.eraser.opacity;
-        opacityVal.innerText = toolSettings.eraser.opacity;
-      }
-
-      menu.style.left = `${Math.min(event.pageX, window.innerWidth - 230)}px`;
-      menu.style.top = `${Math.min(event.pageY, window.innerHeight - 220)}px`;
-      menu.style.display = 'flex';
-    }
-
-    window.addEventListener('click', (e) => {
-      const menu = document.getElementById('toolContextMenu');
-      if (!menu.contains(e.target) && !e.target.oncontextmenu) {
-        menu.style.display = 'none';
-      }
-    });
-
-    function updateToolSetting(type, val) {
-      if (type === 'size') {
-        toolSettings[activeContextTool].size = parseInt(val);
-        document.getElementById('ctxSizeVal').innerText = val;
-      } else if (type === 'opacity') {
-        toolSettings[activeContextTool].opacity = parseInt(val);
-        document.getElementById('ctxOpacityVal').innerText = val;
-      } else if (type === 'color') {
-        toolSettings.pencil.color = val;
-      }
-    }
+    window.addEventListener('mouseup', () => { if (animDrawing) { animDrawing = false; ctxAnim.beginPath(); } });
 
     function setAnimTool(tool) {
       animMode = tool;
-      document.querySelectorAll('.anim-workspace-container .anim-tool-btn').forEach(b => {
-        if (b.id === 'toolBtnPencil' || b.id === 'toolBtnEraser') {
-          b.classList.remove('active');
-        }
-      });
-      if (tool === 'pencil') {
-        document.getElementById('toolBtnPencil').classList.add('active');
-      } else if (tool === 'eraser') {
-        document.getElementById('toolBtnEraser').classList.add('active');
-      }
+      document.getElementById('toolBtnPencil').classList.toggle('active', tool === 'pencil');
+      document.getElementById('toolBtnEraser').classList.toggle('active', tool === 'eraser');
     }
 
     function clearAnimDrawing() {
@@ -1735,140 +1463,86 @@
       document.getElementById('uploadPlaceholder').style.display = 'block';
     }
 
-    function loadAnimCharacter(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            initAnimCanvasSize();
-            ctxAnim.globalCompositeOperation = 'source-over';
-            ctxAnim.globalAlpha = 1.0;
-            ctxAnim.drawImage(img, 0, 0, animCanvasEl.width, animCanvasEl.height);
-            document.getElementById('uploadPlaceholder').style.display = 'none';
-          }
-          img.src = e.target.result;
-        }
-        reader.readAsDataURL(file);
-      }
+    function openToolSettings(event, toolType) {
+      event.preventDefault();
+      activeContextTool = toolType;
+      const menu = document.getElementById('toolContextMenu');
+      document.getElementById('contextMenuTitle').innerText = toolType === 'pencil' ? '✏️ Kalem Ayarları' : '🧹 Silgi Ayarları';
+      document.getElementById('rowColor').style.display = toolType === 'pencil' ? 'flex' : 'none';
+      document.getElementById('ctxSizeRange').value = toolSettings[toolType].size;
+      document.getElementById('ctxSizeVal').innerText = toolSettings[toolType].size;
+
+      menu.style.left = `${Math.min(event.pageX, window.innerWidth - 230)}px`;
+      menu.style.top = `${Math.min(event.pageY, window.innerHeight - 200)}px`;
+      menu.style.display = 'flex';
     }
 
-    function removeCharacter() {
-      clearAnimDrawing();
+    window.addEventListener('click', (e) => {
+      const menu = document.getElementById('toolContextMenu');
+      if (!menu.contains(e.target) && !e.target.oncontextmenu) menu.style.display = 'none';
+    });
+
+    function updateToolSetting(type, val) {
+      if (type === 'size') {
+        toolSettings[activeContextTool].size = parseInt(val);
+        document.getElementById('ctxSizeVal').innerText = val;
+      } else if (type === 'color') {
+        toolSettings.pencil.color = val;
+      }
     }
 
     async function handleGeminiAICommand() {
       const prompt = document.getElementById('aiPromptInput').value.trim();
       if (!prompt) return;
+      const apiKey = localStorage.getItem('gemini_api_key');
+      if (!apiKey) { alert("API anahtarı gerekli."); return; }
 
-      const apiKey = getApiKey();
-      if (!apiKey) {
-        alert("API anahtarı gereklidir.");
-        return;
-      }
-
-      const outputDiv = document.getElementById('aiResponseOutput');
-      outputDiv.innerHTML = `<span style="color:var(--primary);">Gemini çiziyor...</span>`;
-      
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${prompt} istemini aldım. Tuvale çizim yapılıyor.` }] }]
-          })
-        });
-
-        const data = await res.json();
-        
-        if (data.candidates && data.candidates[0].content) {
-          outputDiv.innerHTML = `<span style="color:green; font-weight:600;">Başarılı:</span> "${prompt}" tuvale yansıtıldı!`;
-          drawGeminiShape(prompt.toLowerCase());
-        } else if (data.error) {
-          outputDiv.innerHTML = `<span style="color:red;">Hata: ${data.error.message}</span>`;
-        } else {
-          outputDiv.innerHTML = `<span style="color:red;">Yanıt alınamadı.</span>`;
-        }
-      } catch (error) {
-        outputDiv.innerHTML = `<span style="color:red;">Bağlantı hatası.</span>`;
-      }
-    }
-
-    function drawGeminiShape(prompt) {
       initAnimCanvasSize();
       document.getElementById('uploadPlaceholder').style.display = 'none';
-      
-      const cx = animCanvasEl.width / 2;
-      const cy = animCanvasEl.height / 2;
-
+      const cx = animCanvasEl.width / 2, cy = animCanvasEl.height / 2;
       ctxAnim.globalCompositeOperation = 'source-over';
-      ctxAnim.globalAlpha = 1.0;
       ctxAnim.strokeStyle = toolSettings.pencil.color;
-      ctxAnim.lineWidth = toolSettings.pencil.size;
-      ctxAnim.lineCap = 'round';
-      ctxAnim.lineJoin = 'round';
-
+      ctxAnim.lineWidth = 4;
       ctxAnim.beginPath();
       if (prompt.includes('kedi')) {
-        ctxAnim.arc(cx, cy - 25, 45, 0, Math.PI * 2);
-        ctxAnim.moveTo(cx - 35, cy - 55); ctxAnim.lineTo(cx - 55, cy - 90); ctxAnim.lineTo(cx - 15, cy - 60);
-        ctxAnim.moveTo(cx + 35, cy - 55); ctxAnim.lineTo(cx + 55, cy - 90); ctxAnim.lineTo(cx + 15, cy - 60);
+        ctxAnim.arc(cx, cy, 50, 0, Math.PI * 2);
+        ctxAnim.moveTo(cx - 35, cy - 35); ctxAnim.lineTo(cx - 60, cy - 70);
+        ctxAnim.moveTo(cx + 35, cy - 35); ctxAnim.lineTo(cx + 60, cy - 70);
       } else {
-        ctxAnim.rect(cx - 40, cy - 40, 80, 80);
+        ctxAnim.rect(cx - 50, cy - 50, 100, 100);
       }
       ctxAnim.stroke();
     }
 
-    function quickAICoip(text) {
-      document.getElementById('aiPromptInput').value = text;
-      handleGeminiAICommand();
-    }
+    function quickAICoip(text) { document.getElementById('aiPromptInput').value = text; handleGeminiAICommand(); }
 
     async function handleMinecraftAI() {
       const prompt = document.getElementById('mcPromptInput').value.trim();
       if (!prompt) return;
-
-      const apiKey = getApiKey();
-      if (!apiKey) {
-        alert("API anahtarı gereklidir.");
-        return;
-      }
+      const apiKey = localStorage.getItem('gemini_api_key');
+      if (!apiKey) { alert("API anahtarı gerekli."); return; }
 
       const outputBox = document.getElementById('mcOutputBox');
-      outputBox.innerText = "Gemini Minecraft için kod/skript hazırlıyor...";
-
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+      outputBox.innerText = "Gemini kod üretiyor...";
 
       try {
-        const res = await fetch(url, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `Minecraft sunucu geliştirme ve skript bağlamında şu isteği yanıtla: ${prompt}` }] }]
-          })
+          body: JSON.stringify({ contents: [{ parts: [{ text: `Minecraft sunucu geliştirme ve skript bağlamında yanıtla: ${prompt}` }] }] })
         });
-
         const data = await res.json();
-        
         if (data.candidates && data.candidates[0].content) {
           outputBox.innerText = data.candidates[0].content.parts[0].text;
-        } else if (data.error) {
-          outputBox.innerText = `Hata: ${data.error.message}`;
         } else {
           outputBox.innerText = "Yanıt alınamadı.";
         }
-      } catch (error) {
-        outputBox.innerText = `Bağlantı hatası: ${error}`;
+      } catch (err) {
+        outputBox.innerText = "Bağlantı hatası.";
       }
     }
 
-    function quickMcPrompt(text) {
-      document.getElementById('mcPromptInput').value = text;
-      handleMinecraftAI();
-    }
+    function quickMcPrompt(text) { document.getElementById('mcPromptInput').value = text; handleMinecraftAI(); }
 
     updateHeaderTodayInfo();
     renderCalendar();
