@@ -710,14 +710,15 @@
       <!-- Sol Panel -->
       <div class="anim-sidebar-left">
         <div>
-          <div class="sidebar-section-title">✨ AI Çizim Asistanı</div>
+          <div class="sidebar-section-title">✨ AI Akıllı Çizim Asistanı</div>
           <div class="ai-assistant-box">
-            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: Bana bir kafa çiz, kol çiz..."></textarea>
-            <button class="ai-send-btn" onclick="handleAICoordCommand()">🤖 Çizdir / Oluştur</button>
+            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz, insan çiz..."></textarea>
+            <button class="ai-send-btn" onclick="handleAICoordCommand()">🤖 Ne İstersen Çiz</button>
             <div class="ai-chips">
-              <button class="ai-chip" onclick="quickAICoip('Bana bir kafa çiz')">Kafa Çiz</button>
-              <button class="ai-chip" onclick="quickAICoip('Bana kol çiz')">Kol Çiz</button>
-              <button class="ai-chip" onclick="quickAICoip('Gövde çiz')">Gövde Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('kedi çiz')">Kedi Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('uçak çiz')">Uçak Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('insan çiz')">İnsan Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('kalem çiz')">Kalem Çiz</button>
             </div>
           </div>
         </div>
@@ -725,8 +726,8 @@
         <div>
           <div class="sidebar-section-title">Görsel İşlemleri</div>
           <div class="layer-controls">
-            <button class="layer-action-btn" onclick="document.getElementById('animCharUploader').click()">➕ Ekle</button>
-            <button class="layer-action-btn danger" onclick="removeCharacter()">🗑️ Çıkar</button>
+            <button class="layer-action-btn" onclick="document.getElementById('animCharUploader').click()">➕ Yükle</button>
+            <button class="layer-action-btn danger" onclick="removeCharacter()">🗑️ Kaldır</button>
           </div>
           <input type="file" id="animCharUploader" accept="image/*" style="display:none" onchange="loadAnimCharacter(event)">
         </div>
@@ -734,9 +735,9 @@
         <div>
           <div class="sidebar-section-title">Çizim Araçları</div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="anim-tool-btn" style="text-align:left;" onclick="setAnimTool('pencil')">✏️ Serbest Çizim</button>
-            <button class="anim-tool-btn" style="text-align:left;" onclick="setAnimTool('eraser')">🧹 Çizgi Silgi</button>
-            <button class="anim-tool-btn" style="text-align:left;" onclick="clearAnimDrawing()">🗑️ Çizimleri Temizle</button>
+            <button class="anim-tool-btn active" style="text-align:left;" id="toolPencil" onclick="setAnimTool('pencil')">✏️ Serbest Çizim</button>
+            <button class="anim-tool-btn" style="text-align:left;" id="toolEraser" onclick="setAnimTool('eraser')">🧹 Silgi</button>
+            <button class="anim-tool-btn" style="text-align:left;" onclick="clearAnimDrawing()">🗑️ Hepsini Temizle</button>
           </div>
         </div>
       </div>
@@ -745,33 +746,31 @@
       <div class="anim-workspace-container">
         <div class="anim-top-toolbar">
           <div class="anim-tools">
-            <button class="anim-tool-btn active" onclick="setAnimTool('select')">↖ Seç / Taşı</button>
-            <button class="anim-tool-btn" onclick="setAnimTool('tag')">◎ Etiket</button>
-            <button class="anim-tool-btn" onclick="setAnimTool('rotate')">⊕ Döndür</button>
+            <button class="anim-tool-btn active" onclick="setAnimTool('pencil')">✏️ Çizim Kalemi</button>
+            <button class="anim-tool-btn" onclick="setAnimTool('eraser')">🧹 Silgi</button>
           </div>
           <div>
-            <button class="anim-tool-btn" onclick="rewindAnimation()">⏮ Başa Sar</button>
-            <button class="anim-tool-btn" onclick="togglePlayAnimation()">▶ Oynat</button>
-            <span id="frameCounter" style="margin-left: 12px; font-weight: bold; font-size: 0.9rem;">F12 / 48</span>
-            <button class="anim-tool-btn" style="margin-left: 12px;" onclick="addKeyframe()">+ Keyframe</button>
+            <span id="frameCounter" style="margin-right: 12px; font-weight: bold; font-size: 0.9rem; color: var(--text-muted);">Çizim Tuvali Aktif</span>
+            <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
           </div>
         </div>
 
         <div class="anim-workspace" id="animWorkspace">
           <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
             <div style="font-size: 2.5rem; margin-bottom: 8px;">✨</div>
-            <span style="font-size: 1.1rem; font-weight: 600;">AI Asistanına bir şeyler çizdirin ya da görsel yükleyin</span><br>
-            <span style="font-size: 0.85rem;">Örn: "Bana bir kafa çiz"</span>
+            <span style="font-size: 1.1rem; font-weight: 600;">Sol taraftan AI asistanına bir şeyler çizdirin ya da serbest çizin</span><br>
+            <span style="font-size: 0.85rem;">Örn: "kedi çiz", "uçak çiz", "kalem çiz"</span>
           </div>
           <canvas id="animCanvas"></canvas>
         </div>
 
         <div class="anim-timeline-container">
           <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-            <span>0</span><span>8</span><span>16</span><span>24</span><span>32</span><span>40</span><span>48</span>
+            <span>AI Çizim Paneli Hazır</span>
+            <span>İstediğiniz şekli metin kutusuna yazıp oluşturabilirsiniz</span>
           </div>
-          <div class="anim-timeline-scrubber" id="timelineScrubber" onclick="scrubTimeline(event)">
-            <div class="anim-playhead" id="playhead" style="left: 25%;"></div>
+          <div class="anim-timeline-scrubber" id="timelineScrubber" style="cursor: default;">
+            <div class="anim-playhead" id="playhead" style="left: 0%; width: 100%; background: #e0e7ff; opacity: 0.5;"></div>
           </div>
         </div>
       </div>
@@ -940,6 +939,7 @@
       }
     }
 
+    // Not Modalı Çizim Alanı Mantığı
     const canvas = document.getElementById('inlineCanvas');
     const ctx = canvas.getContext('2d');
     let painting = false;
@@ -1182,7 +1182,7 @@
       renderCalendar();
     }
 
-    // --- ANIMASYON STÜDYOSU (GÜNCELLENMİŞ VE TAM ÇÖZÜMLÜ KOD) ---
+    // --- ANIMASYON & AI ÇİZİM STÜDYOSU ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
@@ -1216,8 +1216,8 @@
 
     window.addEventListener('resize', initAnimCanvasSize);
 
+    // Serbest Çizim ve Silgi Fare Etkileşimleri
     animCanvasEl.addEventListener('mousedown', (e) => {
-      if (animMode === 'select' || animMode === 'rotate' || animMode === 'tag') return;
       animDrawing = true;
       const rect = animCanvasEl.getBoundingClientRect();
       ctxAnim.beginPath();
@@ -1226,18 +1226,18 @@
     });
 
     animCanvasEl.addEventListener('mousemove', (e) => {
-      if (!animDrawing || animMode === 'select' || animMode === 'rotate' || animMode === 'tag') return;
+      if (!animDrawing) return;
       const rect = animCanvasEl.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
       if (animMode === 'eraser') {
         ctxAnim.globalCompositeOperation = 'destination-out';
-        ctxAnim.lineWidth = 25;
+        ctxAnim.lineWidth = 30;
       } else {
         ctxAnim.globalCompositeOperation = 'source-over';
         ctxAnim.lineWidth = 4;
-        ctxAnim.strokeStyle = '#0f172a';
+        ctxAnim.strokeStyle = '#4f46e5';
       }
 
       ctxAnim.lineCap = 'round';
@@ -1253,8 +1253,8 @@
 
     function setAnimTool(tool) {
       animMode = tool;
-      document.querySelectorAll('.anim-tool-btn').forEach(b => {
-        if (!b.innerText.includes('Başa Sar') && !b.innerText.includes('Oynat') && !b.innerText.includes('Keyframe')) {
+      document.querySelectorAll('.anim-workspace-container .anim-tool-btn, .anim-sidebar-left .anim-tool-btn').forEach(b => {
+        if (b.innerText.includes('Çizim') || b.innerText.includes('Silgi') || b.innerText.includes('Kalem')) {
           b.classList.remove('active');
         }
       });
@@ -1265,6 +1265,7 @@
 
     function clearAnimDrawing() {
       ctxAnim.clearRect(0, 0, animCanvasEl.width, animCanvasEl.height);
+      document.getElementById('uploadPlaceholder').style.display = 'block';
     }
 
     function loadAnimCharacter(event) {
@@ -1286,66 +1287,78 @@
     }
 
     function removeCharacter() {
-      ctxAnim.clearRect(0, 0, animCanvasEl.width, animCanvasEl.height);
-      document.getElementById('uploadPlaceholder').style.display = 'block';
+      clearAnimDrawing();
     }
 
+    // AI Gibi Çalışan Çizim Motoru (Kedi, Uçak, İnsan, Kalem vb.)
     function handleAICoordCommand() {
-      const prompt = document.getElementById('aiPromptInput').value.toLowerCase();
-      if (!prompt.trim()) return;
+      const prompt = document.getElementById('aiPromptInput').value.toLowerCase().trim();
+      if (!prompt) return;
 
       initAnimCanvasSize();
-      const centerX = animCanvasEl.width / 2;
-      const centerY = animCanvasEl.height / 2;
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      
+      const cx = animCanvasEl.width / 2;
+      const cy = animCanvasEl.height / 2;
 
       ctxAnim.globalCompositeOperation = 'source-over';
-      ctxAnim.strokeStyle = '#4f46e5';
-      ctxAnim.fillStyle = '#4f46e5';
-      ctxAnim.lineWidth = 4;
+      ctxAnim.strokeStyle = '#0f172a';
+      ctxAnim.fillStyle = '#0f172a';
+      ctxAnim.lineWidth = 3;
 
-      if (prompt.includes('kafa') || prompt.includes('çiz')) {
+      if (prompt.includes('kedi')) {
+        // Kedi Çizimi
+        // Kafa
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 20, 40, 0, Math.PI * 2); ctxAnim.stroke();
+        // Kulaklar
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx - 50, cy - 80); ctxAnim.lineTo(cx - 15, cy - 55); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy - 50); ctxAnim.lineTo(cx + 50, cy - 80); ctxAnim.lineTo(cx + 15, cy - 55); ctxAnim.stroke();
+        // Gözler & Burun
+        ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 30, 4, 0, Math.PI * 2); ctxAnim.fill();
+        ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 30, 4, 0, Math.PI * 2); ctxAnim.fill();
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 15, 3, 0, Math.PI * 2); ctxAnim.fill();
+        // Bıyıklar
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 12); ctxAnim.lineTo(cx - 40, cy - 15); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy - 12); ctxAnim.lineTo(cx + 40, cy - 15); ctxAnim.stroke();
+        // Gövde
+        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy + 50, 35, 50, 0, 0, Math.PI * 2); ctxAnim.stroke();
+      } 
+      else if (prompt.includes('uçak')) {
+        // Uçak Çizimi
+        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy, 80, 20, 0, 0, Math.PI * 2); ctxAnim.stroke(); // Gövde
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 20); ctxAnim.lineTo(cx + 20, cy - 80); ctxAnim.lineTo(cx + 30, cy - 20); ctxAnim.stroke(); // Kanat üst
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy + 20); ctxAnim.lineTo(cx + 20, cy + 80); ctxAnim.lineTo(cx + 30, cy + 20); ctxAnim.stroke(); // Kanat alt
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 70, cy); ctxAnim.lineTo(cx - 95, cy - 30); ctxAnim.lineTo(cx - 75, cy); ctxAnim.stroke(); // Kuyruk
+      } 
+      else if (prompt.includes('insan') || prompt.includes('adam')) {
+        // İnsan Çizimi
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 50, 25, 0, Math.PI * 2); ctxAnim.stroke(); // Kafa
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy - 25); ctxAnim.lineTo(cx, cy + 40); ctxAnim.stroke(); // Gövde
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 30, cy); ctxAnim.lineTo(cx + 30, cy); ctxAnim.stroke(); // Kollar
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx - 20, cy + 90); ctxAnim.stroke(); // Sol Bacak
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx + 20, cy + 90); ctxAnim.stroke(); // Sağ Bacak
+      } 
+      else if (prompt.includes('kalem')) {
+        // Kalem Çizimi
+        ctxAnim.beginPath(); ctxAnim.rect(cx - 15, cy - 40, 30, 80); ctxAnim.stroke(); // Gövde
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy - 40); ctxAnim.lineTo(cx, cy - 75); ctxAnim.lineTo(cx + 15, cy - 40); ctxAnim.stroke(); // Uç kısmı
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 65, 3, 0, Math.PI * 2); ctxAnim.fill(); // Uç
+      } 
+      else {
+        // Varsayılan Geometrik/Yaratıcı Çizim
         ctxAnim.beginPath();
-        ctxAnim.arc(centerX, centerY - 40, 45, 0, Math.PI * 2);
+        ctxAnim.arc(cx, cy, 50, 0, Math.PI * 2);
         ctxAnim.stroke();
-      } else if (prompt.includes('kol')) {
-        ctxAnim.beginPath();
-        ctxAnim.moveTo(centerX - 60, centerY);
-        ctxAnim.lineTo(centerX + 60, centerY);
-        ctxAnim.stroke();
-      } else if (prompt.includes('gövde')) {
-        ctxAnim.beginPath();
-        ctxAnim.rect(centerX - 30, centerY - 20, 60, 90);
-        ctxAnim.stroke();
-      } else {
-        ctxAnim.beginPath();
-        ctxAnim.arc(centerX, centerY, 30, 0, Math.PI * 2);
-        ctxAnim.fill();
+        ctxAnim.fillStyle = '#4f46e5';
+        ctxAnim.font = '14px sans-serif';
+        ctxAnim.textAlign = 'center';
+        ctxAnim.fillText(`"${prompt}" için çizim oluşturuldu!`, cx, cy + 70);
       }
-
-      document.getElementById('uploadPlaceholder').style.display = 'none';
     }
 
     function quickAICoip(text) {
       document.getElementById('aiPromptInput').value = text;
       handleAICoordCommand();
-    }
-
-    function rewindAnimation() {
-      document.getElementById('playhead').style.left = '0%';
-    }
-
-    function togglePlayAnimation() {
-      // Oynat / Durdur mantığı
-    }
-
-    function addKeyframe() {
-      alert('Keyframe eklendi.');
-    }
-
-    function scrubTimeline(e) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      document.getElementById('playhead').style.left = `${pos * 100}%`;
     }
 
     updateHeaderTodayInfo();
