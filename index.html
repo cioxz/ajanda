@@ -708,7 +708,7 @@
       border: 1px solid #334155;
     }
 
-    /* Blueprint / Daire Oluşturucu Stilleri */
+    /* Minecraft Blueprint / Çoklu Daire Şeması Stilleri */
     .blueprint-container {
       display: flex;
       flex-direction: column;
@@ -722,38 +722,53 @@
       background: #f8fafc;
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 16px;
+      padding: 20px;
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: flex-start;
       justify-content: center;
       overflow: auto;
     }
 
+    .blueprint-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .blueprint-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
     .blueprint-grid {
       display: grid;
-      gap: 2px;
+      gap: 1px;
       background: var(--border-color);
-      padding: 2px;
-      border-radius: 6px;
+      padding: 1px;
+      border-radius: 4px;
     }
 
     .bp-cell {
-      width: 24px;
-      height: 24px;
+      width: 14px;
+      height: 14px;
       background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      border-radius: 2px;
     }
 
     .bp-cell.active {
-      background: #3b82f6; /* Mavi daire çizgisi */
+      background: #a855f7; /* Minecraft daire mor rengi */
     }
 
     .bp-cell.center {
-      background: #1e293b; /* Merkez nokta */
+      background: #334155;
     }
 
     .anim-timeline-container {
@@ -766,7 +781,7 @@
       gap: 8px;
     }
 
-    /* Sağ Tık Özelleştirme Menüsü (Context Menu) Stilleri */
+    /* Sağ Tık Özelleştirme Menüsü */
     .custom-context-menu {
       position: absolute;
       background: #ffffff;
@@ -853,7 +868,7 @@
         <div class="studio-tabs">
           <button class="studio-tab-btn active" id="tabArt" onclick="switchStudio('art')">Resim Stüdyosu</button>
           <button class="studio-tab-btn" id="tabMc" onclick="switchStudio('minecraft')">Minecraft Stüdyosu</button>
-          <button class="studio-tab-btn" id="tabBlueprint" onclick="switchStudio('blueprint')">📐 Çap/Daire Şeması</button>
+          <button class="studio-tab-btn" id="tabBlueprint" onclick="switchStudio('blueprint')">📐 Minecraft Daire Şemaları</button>
         </div>
       </div>
       <button class="delete-btn" onclick="closeAnimStudio()">✕ Kapat</button>
@@ -900,17 +915,15 @@
           </div>
         </div>
 
-        <!-- Blueprint / Daire Kontrolleri -->
+        <!-- Blueprint / Daire Katman Kontrolleri -->
         <div id="sidebarBlueprint" class="studio-sidebar-content" style="display: none;">
-          <div class="sidebar-section-title">📐 Daire / Çember Ayarları</div>
+          <div class="sidebar-section-title">📐 Daire / Katman Ayarları</div>
           <div class="ai-assistant-box">
-            <label style="font-size: 0.85rem; font-weight: 600;">Boyut (Örn: 20x20):</label>
-            <input type="number" id="bpSizeInput" value="20" min="5" max="60" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
-            <label style="font-size: 0.85rem; font-weight: 600; margin-top: 8px;">Kalınlık:</label>
-            <input type="number" id="bpThicknessInput" value="1" min="1" max="5" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
+            <label style="font-size: 0.85rem; font-weight: 600;">Başlangıç Çapı:</label>
+            <input type="number" id="bpSizeInput" value="15" min="3" max="45" step="2" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem;" onchange="generateBlueprint()">
             
-            <button class="ai-send-btn" style="margin-top: 8px; background: #10b981;" onclick="addBlueprintLayer()">➕ Katman Ekle (+1)</button>
-            <button class="ai-send-btn" style="margin-top: 8px;" onclick="generateBlueprint()">🔄 Şemayı Güncelle</button>
+            <button class="ai-send-btn" style="margin-top: 8px; background: #10b981;" onclick="addBlueprintLayer()">➕ Katman Ekle (+2 Çap)</button>
+            <button class="ai-send-btn" style="margin-top: 8px;" onclick="generateBlueprint()">🔄 Şemayı Yenile</button>
           </div>
         </div>
 
@@ -960,12 +973,10 @@
         <!-- Blueprint / Daire Paneli -->
         <div id="panelBlueprint" class="studio-panel">
           <div class="anim-top-toolbar">
-            <span style="font-weight: 600; font-size: 0.9rem;" id="bpInfoTitle">Minecraft 20x20 Daire Blueprint Şeması</span>
+            <span style="font-weight: 600; font-size: 0.9rem;" id="bpInfoTitle">Minecraft Pixel Art Daire Rehberi (3 - 45 Çap)</span>
             <button class="anim-tool-btn" onclick="generateBlueprint()">Yenile</button>
           </div>
-          <div class="blueprint-grid-wrapper">
-            <div class="blueprint-grid" id="blueprintGrid"></div>
-          </div>
+          <div class="blueprint-grid-wrapper" id="blueprintGridContainer"></div>
         </div>
 
         <div class="anim-timeline-container">
@@ -978,7 +989,7 @@
     </div>
   </div>
 
-  <!-- Sağ Tık Ayarlar Menüsü (Pencil / Eraser için) -->
+  <!-- Sağ Tık Ayarlar Menüsü -->
   <div class="custom-context-menu" id="toolContextMenu">
     <div class="context-menu-title" id="contextMenuTitle">Kalem Ayarları</div>
     
@@ -1208,7 +1219,11 @@
       if (currentMode === 'write') return;
       painting = true;
       hasDrawn = true;
-      draw(e);
+      ctx.beginPath();
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      ctx.moveTo(x, y);
     }
 
     function endPosition() {
@@ -1235,8 +1250,6 @@
       ctx.lineCap = 'round';
       ctx.lineTo(x, y);
       ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x, y);
     }
 
     canvas.addEventListener('mousedown', startPosition);
@@ -1402,7 +1415,6 @@
       renderCalendar();
     }
 
-    // --- API ANAHTARI YÖNETİMİ ---
     function configureApiKey() {
       const currentKey = localStorage.getItem('gemini_api_key') || '';
       const newKey = prompt("Gemini API anahtarınızı girin:", currentKey);
@@ -1423,7 +1435,6 @@
       return key;
     }
 
-    // --- ÇOKLU STÜDYOLAR YÖNETİMİ ---
     function openAnimStudio() {
       document.getElementById('animStudioModal').style.display = 'flex';
       setTimeout(initAnimCanvasSize, 50);
@@ -1475,65 +1486,75 @@
         tabBlueprint.classList.add('active');
         panelBlueprint.classList.add('active');
         sidebarBlueprint.style.display = 'flex';
-        mainTitle.innerText = '📐 Çap/Daire Şeması';
-        activeStudioName.innerText = 'Çap/Daire Blueprint Şeması';
+        mainTitle.innerText = '📐 Minecraft Daire Şemaları';
+        activeStudioName.innerText = 'Minecraft Daire Rehber Şeması';
         generateBlueprint();
       }
     }
 
-    // --- BLUEPRINT / DAIRE OLUŞTURUCU MANTIĞI ---
+    // --- ÇOKLU MINECRAFT DAİRE ŞEMASI OLUŞTURUCU ---
     function generateBlueprint() {
-      const sizeInput = parseInt(document.getElementById('bpSizeInput').value) || 20;
-      const thickness = parseInt(document.getElementById('bpThicknessInput').value) || 1;
-      const gridContainer = document.getElementById('blueprintGrid');
-      document.getElementById('bpInfoTitle').innerText = `Minecraft ${sizeInput}x${sizeInput} Daire Blueprint Şeması`;
-      
-      gridContainer.innerHTML = '';
-      gridContainer.style.gridTemplateColumns = `repeat(${sizeInput}, 24px)`;
+      const startSize = parseInt(document.getElementById('bpSizeInput').value) || 15;
+      const container = document.getElementById('blueprintGridContainer');
+      container.innerHTML = '';
 
-      const radius = sizeInput / 2;
-      const center = (sizeInput - 1) / 2;
+      // 3'ten 45'e kadar ikişer ikişer artan standart Minecraft daire çapları
+      const diameters = [3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45];
 
-      for (let y = 0; y < sizeInput; y++) {
-        for (let x = 0; x < sizeInput; x++) {
-          const cell = document.createElement('div');
-          cell.classList.add('bp-cell');
+      diameters.forEach(size => {
+        const card = document.createElement('div');
+        card.classList.add('blueprint-card');
 
-          const dx = x - center;
-          const dy = y - center;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+        const title = document.createElement('div');
+        title.classList.add('blueprint-card-title');
+        title.innerText = `${size} x ${size}`;
+        card.appendChild(title);
 
-          if (Math.abs(distance - radius) <= (thickness * 0.65)) {
-            cell.classList.add('active');
-          } else if (sizeInput % 2 !== 0 && Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) {
-            cell.classList.add('center');
-            cell.title = "Merkez";
-          } else if (sizeInput % 2 === 0 && (x === Math.floor(center) || x === Math.ceil(center)) && (y === Math.floor(center) || y === Math.ceil(center))) {
-            cell.classList.add('center');
-            cell.title = "Merkez Bölgesi";
+        const grid = document.createElement('div');
+        grid.classList.add('blueprint-grid');
+        grid.style.gridTemplateColumns = `repeat(${size}, 6px)`;
+
+        const radius = size / 2;
+        const center = (size - 1) / 2;
+
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            const cell = document.createElement('div');
+            cell.classList.add('bp-cell');
+
+            const dx = x - center;
+            const dy = y - center;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (Math.abs(distance - radius) <= 0.55) {
+              cell.classList.add('active');
+            } else if ((Math.abs(dx) <= 0.3 && Math.abs(dy) <= radius) || (Math.abs(dy) <= 0.3 && Math.abs(dx) <= radius)) {
+              cell.classList.add('center');
+            }
+
+            grid.appendChild(cell);
           }
-
-          gridContainer.appendChild(cell);
         }
-      }
+
+        card.appendChild(grid);
+        container.appendChild(card);
+      });
     }
 
     function addBlueprintLayer() {
       const sizeInput = document.getElementById('bpSizeInput');
-      let currentVal = parseInt(sizeInput.value) || 20;
-      currentVal += 1;
-      if (currentVal > 60) currentVal = 60;
-      sizeInput.value = currentVal;
-      generateBlueprint();
+      let val = parseInt(sizeInput.value) || 15;
+      val += 2;
+      if (val > 45) val = 45;
+      sizeInput.value = val;
     }
 
-    // --- RESİM / ÇİZİM STÜDYOSU & SAĞ TIK ÖZELLİKLERİ ---
+    // --- RESİM / ÇİZİM STÜDYOSU & OPAKILIK DÜZELTMESİ ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
     const ctxAnim = animCanvasEl.getContext('2d');
 
-    // Kalem ve Silgi Özellikleri Nesnesi
     const toolSettings = {
       pencil: { size: 4, color: '#4f46e5', opacity: 100 },
       eraser: { size: 25, opacity: 100 }
@@ -1592,18 +1613,18 @@
     });
 
     window.addEventListener('mouseup', () => {
-      animDrawing = false;
-      ctxAnim.beginPath();
+      if (animDrawing) {
+        animDrawing = false;
+        ctxAnim.beginPath();
+      }
     });
 
-    // Sağ Tık Menüsünü Açma (Kalem veya Silgiye Sağ Tıklayınca)
     function openToolSettings(event, toolType) {
-      event.preventDefault(); // Tarayıcının varsayılan sağ tık menüsünü engelle
+      event.preventDefault();
       activeContextTool = toolType;
       const menu = document.getElementById('toolContextMenu');
       const titleEl = document.getElementById('contextMenuTitle');
       const rowColor = document.getElementById('rowColor');
-      const rowOpacity = document.getElementById('rowOpacity');
       
       const sizeRange = document.getElementById('ctxSizeRange');
       const sizeVal = document.getElementById('ctxSizeVal');
@@ -1614,7 +1635,6 @@
       if (toolType === 'pencil') {
         titleEl.innerText = '✏️ Kalem Seçenekleri';
         rowColor.style.display = 'flex';
-        rowOpacity.style.display = 'flex';
         sizeRange.value = toolSettings.pencil.size;
         sizeVal.innerText = toolSettings.pencil.size;
         opacityRange.value = toolSettings.pencil.opacity;
@@ -1623,20 +1643,17 @@
       } else if (toolType === 'eraser') {
         titleEl.innerText = '🧹 Silgi Seçenekleri';
         rowColor.style.display = 'none';
-        rowOpacity.style.display = 'flex';
         sizeRange.value = toolSettings.eraser.size;
         sizeVal.innerText = toolSettings.eraser.size;
         opacityRange.value = toolSettings.eraser.opacity;
         opacityVal.innerText = toolSettings.eraser.opacity;
       }
 
-      // Menüyü tıklanan fare konumuna konumlandır
       menu.style.left = `${Math.min(event.pageX, window.innerWidth - 230)}px`;
       menu.style.top = `${Math.min(event.pageY, window.innerHeight - 220)}px`;
       menu.style.display = 'flex';
     }
 
-    // Sağ tık menüsü dışına tıklandığında menüyü kapat
     window.addEventListener('click', (e) => {
       const menu = document.getElementById('toolContextMenu');
       if (!menu.contains(e.target) && !e.target.oncontextmenu) {
@@ -1644,7 +1661,6 @@
       }
     });
 
-    // Menü içindeki değişiklikleri güncelle
     function updateToolSetting(type, val) {
       if (type === 'size') {
         toolSettings[activeContextTool].size = parseInt(val);
@@ -1685,6 +1701,7 @@
           img.onload = function() {
             initAnimCanvasSize();
             ctxAnim.globalCompositeOperation = 'source-over';
+            ctxAnim.globalAlpha = 1.0;
             ctxAnim.drawImage(img, 0, 0, animCanvasEl.width, animCanvasEl.height);
             document.getElementById('uploadPlaceholder').style.display = 'none';
           }
@@ -1745,40 +1762,21 @@
       const cy = animCanvasEl.height / 2;
 
       ctxAnim.globalCompositeOperation = 'source-over';
+      ctxAnim.globalAlpha = 1.0;
       ctxAnim.strokeStyle = toolSettings.pencil.color;
-      ctxAnim.fillStyle = '#e0e7ff';
       ctxAnim.lineWidth = toolSettings.pencil.size;
       ctxAnim.lineCap = 'round';
       ctxAnim.lineJoin = 'round';
 
+      ctxAnim.beginPath();
       if (prompt.includes('kedi')) {
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 25, 45, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 55); ctxAnim.lineTo(cx - 55, cy - 90); ctxAnim.lineTo(cx - 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy - 55); ctxAnim.lineTo(cx + 55, cy - 90); ctxAnim.lineTo(cx + 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = toolSettings.pencil.color; ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = toolSettings.pencil.color; ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 20, 4, 0, Math.PI * 2); ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy + 45, 40, 55, 0, 0, Math.PI * 2); ctxAnim.stroke();
-      } 
-      else if (prompt.includes('uçak')) {
-        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy, 90, 22, 0, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy - 20); ctxAnim.lineTo(cx + 25, cy - 110); ctxAnim.lineTo(cx + 45, cy - 20); ctxAnim.closePath(); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy + 20); ctxAnim.lineTo(cx + 25, cy + 110); ctxAnim.lineTo(cx + 45, cy + 20); ctxAnim.closePath(); ctxAnim.stroke();
-      } 
-      else if (prompt.includes('insan') || prompt.includes('adam')) {
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 60, 22, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.rect(cx - 18, cy - 35, 36, 65); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 18, cy - 25); ctxAnim.lineTo(cx - 50, cy); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 18, cy - 25); ctxAnim.lineTo(cx + 50, cy); ctxAnim.stroke();
-      } 
-      else if (prompt.includes('kule')) {
-        ctxAnim.beginPath(); ctxAnim.rect(cx - 25, cy - 30, 50, 110); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.rect(cx - 32, cy - 50, 64, 20); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx, cy - 100); ctxAnim.lineTo(cx + 35, cy - 50); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.arc(cx, cy - 25, 45, 0, Math.PI * 2);
+        ctxAnim.moveTo(cx - 35, cy - 55); ctxAnim.lineTo(cx - 55, cy - 90); ctxAnim.lineTo(cx - 15, cy - 60);
+        ctxAnim.moveTo(cx + 35, cy - 55); ctxAnim.lineTo(cx + 55, cy - 90); ctxAnim.lineTo(cx + 15, cy - 60);
+      } else {
+        ctxAnim.rect(cx - 40, cy - 40, 80, 80);
       }
-      else {
-        ctxAnim.beginPath(); ctxAnim.rect(cx - 40, cy - 40, 80, 80); ctxAnim.stroke();
-      }
+      ctxAnim.stroke();
     }
 
     function quickAICoip(text) {
@@ -1786,7 +1784,6 @@
       handleGeminiAICommand();
     }
 
-    // --- MINECRAFT STÜDYOSU ---
     async function handleMinecraftAI() {
       const prompt = document.getElementById('mcPromptInput').value.trim();
       if (!prompt) return;
@@ -1814,8 +1811,7 @@
         const data = await res.json();
         
         if (data.candidates && data.candidates[0].content) {
-          const textRes = data.candidates[0].content.parts[0].text;
-          outputBox.innerText = textRes;
+          outputBox.innerText = data.candidates[0].content.parts[0].text;
         } else if (data.error) {
           outputBox.innerText = `Hata: ${data.error.message}`;
         } else {
