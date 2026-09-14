@@ -612,6 +612,7 @@
       gap: 8px;
       flex-wrap: wrap;
       position: relative;
+      align-items: center;
     }
 
     .anim-tool-btn {
@@ -623,6 +624,9 @@
       cursor: pointer;
       font-weight: 500;
       font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .anim-tool-btn.active {
@@ -1000,19 +1004,23 @@
         <div id="panelArt" class="studio-panel active">
           <div class="anim-top-toolbar">
             <div class="anim-tools">
-              <button class="anim-tool-btn active" id="toolBtnBrush" onclick="setAnimTool('brush')">✏️ Çiz</button>
-              <button class="anim-tool-btn" id="btn-brush-menu" oncontextmenu="openMenu(event, 'brush-menu'); return false;" title="Fırçalar (Sağ Tıkla)">Fırça ▾</button>
-              <button class="anim-tool-btn" id="btn-shape-menu" oncontextmenu="openMenu(event, 'shape-menu'); return false;" title="Şekiller (Sağ Tıkla)">Şekil ▾</button>
-              <button class="anim-tool-btn" id="btn-tools-menu" oncontextmenu="openMenu(event, 'tools-menu'); return false;" title="Araçlar (Sağ Tıkla)">Araçlar ▾</button>
-              <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
+              <button class="anim-tool-btn active" id="drawBtn" onclick="setAnimTool('brush')">✏️ Çiz</button>
+              <button class="anim-tool-btn" id="brushBtn" oncontextmenu="openMenu(event, 'brush-menu'); return false;" onclick="toggleMenu(event, 'brush-menu')">Fırça ▾</button>
+              <button class="anim-tool-btn" id="shapeBtn" oncontextmenu="openMenu(event, 'shape-menu'); return false;" onclick="toggleMenu(event, 'shape-menu')">Şekil ▾</button>
+              <button class="anim-tool-btn" id="toolsBtn" oncontextmenu="openMenu(event, 'tools-menu'); return false;" onclick="toggleMenu(event, 'tools-menu')">Araçlar ▾</button>
+              <button class="anim-tool-btn" id="imageBtn" onclick="document.getElementById('imageLoader').click()">🖼️ Fotoğraf Ekle</button>
+              <button class="anim-tool-btn" id="clearBtn" onclick="clearAnimDrawing()" style="color: #d9534f;">Tuvalı Temizle</button>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
               <label style="font-size: 0.85rem; font-weight: 600;">Renk: <input type="color" id="animColorPicker" value="#5c564f" style="border:none; width:28px; height:28px; vertical-align:middle; cursor:pointer; background:none;"></label>
               <label style="font-size: 0.85rem; font-weight: 600;">Boyut: <input type="range" id="animBrushSize" min="1" max="50" value="4" style="vertical-align:middle;"></label>
             </div>
           </div>
+          <!-- Gizli Dosya Seçici -->
+          <input type="file" id="imageLoader" name="imageLoader" accept="image/*" style="display: none;" />
+
           <div class="anim-workspace" id="animWorkspace" style="position:relative; width:100%; flex:1; background:#ffffff; border:2px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-            <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
+            <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('imageLoader').click()">
               <div style="font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
               <span style="font-size: 1rem; font-weight: 600;">Serbest çizim yapın, şekil seçin veya akıllı asistan kullanın</span>
             </div>
@@ -1067,7 +1075,7 @@
     </div>
   </div>
 
-  <!-- Fırçalar Menüsü (Sağ Tık) -->
+  <!-- Fırçalar Menüsü (Tık veya Sağ Tık) -->
   <div id="brush-menu" class="context-menu">
     <button onclick="setBrushType('normal')">Klasik Fırça</button>
     <button onclick="setBrushType('kaligrafi')">Kaligrafi Fırçası</button>
@@ -1077,7 +1085,7 @@
     <button onclick="setBrushType('suluboya')">Sulu Boya</button>
   </div>
 
-  <!-- Şekiller Menüsü (Sağ Tık) -->
+  <!-- Şekiller Menüsü (Tık veya Sağ Tık) -->
   <div id="shape-menu" class="context-menu">
     <button onclick="setShape('line')">Çizgi</button>
     <button onclick="setShape('rect')">Dikdörtgen</button>
@@ -1093,7 +1101,7 @@
     <button onclick="setShape('heart')">Kalp</button>
   </div>
 
-  <!-- Araçlar Menüsü (Sağ Tık) -->
+  <!-- Araçlar Menüsü (Tık veya Sağ Tık) -->
   <div id="tools-menu" class="context-menu">
     <button onclick="setTool('eyedropper')">Renk Seçici (Damlalık)</button>
     <button onclick="setTool('text')">Metin Aracı</button>
@@ -1713,6 +1721,19 @@
       menu.style.top = `${e.clientY}px`;
     }
 
+    function toggleMenu(e, menuId) {
+      e.stopPropagation();
+      const menu = document.getElementById(menuId);
+      const isVisible = menu.style.display === 'block';
+      closeAllMenus();
+      if (!isVisible) {
+        const btnRect = e.currentTarget.getBoundingClientRect();
+        menu.style.display = 'block';
+        menu.style.left = `${btnRect.left}px`;
+        menu.style.top = `${btnRect.bottom + 4}px`;
+      }
+    }
+
     window.addEventListener('click', () => closeAllMenus());
 
     function setTool(tool) {
@@ -1744,7 +1765,26 @@
 
     function setAnimTool(tool) {
       currentTool = tool;
+      document.querySelectorAll('.anim-top-toolbar .anim-tool-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('drawBtn').classList.add('active');
     }
+
+    // Fotoğraf Yükleme İşlevselliği
+    const imageLoader = document.getElementById('imageLoader');
+    imageLoader.addEventListener('change', (e) => {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const img = new Image();
+        img.onload = function () {
+          document.getElementById('uploadPlaceholder').style.display = 'none';
+          ctxAnim.drawImage(img, 50, 50, img.width / 2, img.height / 2);
+        }
+        img.src = event.target.result;
+      }
+      if (e.target.files[0]) {
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
 
     animCanvasEl.addEventListener('mousedown', (e) => {
       const rect = animCanvasEl.getBoundingClientRect();
