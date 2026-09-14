@@ -962,7 +962,10 @@
             <button class="ai-send-btn" onclick="addVideoClip('text', document.getElementById('capcutColorPicker').value, 'Yeni Metin')">➕ Metin Klipi Ekle</button>
             <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
             <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">İpuçları:</div>
-            <div style="font-size:0.75rem; color:var(--text-muted);">• Tuvalde klip üstüne tıklayıp sürükleyerek **taşıyabilirsin**.<br>• Klip üstüne **sağ tıklayarak** rengini, metnini, hızını/süresini ve boyutunu ayarlayabilirsin.</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">
+              • Tuvalde klip üstüne tıklayıp sürükleyerek **taşıyabilirsin**.<br>
+              • Klip üstüne **sağ tıklayarak** rengini, metnini, şeklini ve 2 pozisyon arası animasyonunu ayarlayabilirsin.
+            </div>
             <button class="btn-secondary" onclick="clearVideoClips()" style="margin-top:4px;">Tümünü Sıfırla</button>
           </div>
         </div>
@@ -1075,7 +1078,7 @@
             <button class="anim-tool-btn" onclick="document.getElementById('mcOutputBox').innerText = 'Konsol temizlendi.'">Temizle</button>
           </div>
           <div class="minecraft-box">
-            <div class="mc-output" id="mcOutputBox">Minecraft kod ve skript çıktısı burada görünecek...[cite: 8]</div>
+            <div class="mc-output" id="mcOutputBox">Minecraft kod ve skript çıktısı burada görünecek...</div>
           </div>
         </div>
 
@@ -1132,9 +1135,13 @@
   <div id="capcut-context-menu" class="context-menu">
     <div style="padding: 4px 12px; font-size:11px; color:#aaa; font-weight:bold;">Klip Özelleştirme</div>
     <hr>
+    <button onclick="ccMenuChangeShape()">📐 Şekli Değiştir / Düzenle</button>
     <button onclick="ccMenuChangeColor()">🎨 Renk Değiştir</button>
     <button onclick="ccMenuEditText()">✏️ Metni Düzenle</button>
     <button onclick="ccMenuChangeDuration()">⏱️ Süreyi/Bitiş Kare Ayarla</button>
+    <hr>
+    <button onclick="ccMenuSetStartPosition()">📍 1. Pozisyonu Kaydet (Başlangıç)</button>
+    <button onclick="ccMenuSetEndPosition()">🚩 2. Pozisyonu Kaydet (Bitiş)</button>
     <hr>
     <button onclick="ccMenuZoomIn()">🔍 Büyüt (Zoom +)</button>
     <button onclick="ccMenuZoomOut()">🔍 Küçült (Zoom -)</button>
@@ -1591,11 +1598,11 @@
       statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
     }
 
-    // CapCut Video Stüdyosu
+    /* --- CapCut Video Stüdyosu (Geliştirilmiş Animasyon & Şekil Düzenleme) --- */
     let capcutClips = [
-      { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 150, startY: 175, sizeScale: 1, textContent: 'Klip #1' },
-      { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 400, startY: 150, sizeScale: 1, textContent: 'Klip #2' },
-      { id: 3, type: 'line', color: '#10b981', startFrame: 10, endFrame: 70, startX: 250, startY: 250, sizeScale: 1, textContent: 'Çizgi' }
+      { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 150, startY: 175, endX: 350, endY: 175, sizeScale: 1, textContent: 'Klip #1' },
+      { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 400, startY: 150, endX: 400, endY: 280, sizeScale: 1, textContent: 'Klip #2' },
+      { id: 3, type: 'line', color: '#10b981', startFrame: 10, endFrame: 70, startX: 250, startY: 250, endX: 450, endY: 100, sizeScale: 1, textContent: 'Çizgi' }
     ];
     let capcutCurrentFrame = 0;
     const capcutMaxFrames = 100;
@@ -1617,14 +1624,18 @@
 
     function addVideoClip(type, color, customText = '') {
       const newId = capcutClips.length + 1;
+      const rx = 200 + Math.random() * 100;
+      const ry = 150 + Math.random() * 50;
       capcutClips.push({
         id: newId,
         type: type,
         color: color,
         startFrame: 0,
         endFrame: 70,
-        startX: 200 + Math.random() * 100,
-        startY: 150 + Math.random() * 50,
+        startX: rx,
+        startY: ry,
+        endX: rx,
+        endY: ry,
         sizeScale: 1,
         textContent: customText || (type === 'text' ? 'Örnek Metin' : `Klip #${newId}`)
       });
@@ -1655,13 +1666,29 @@
       });
     }
 
-    function getClipBoundingBox(clip) {
+    /* Klibin Mevcut Karedeki İnterpole Edilmiş (2 Pozisyon Arasındaki) Konumu */
+    function getClipCurrentPos(clip, f) {
+      const endX = clip.endX !== undefined ? clip.endX : clip.startX;
+      const endY = clip.endY !== undefined ? clip.endY : clip.startY;
+      const duration = clip.endFrame - clip.startFrame;
+
+      if (duration <= 0) return { x: clip.startX, y: clip.startY };
+
+      const progress = Math.max(0, Math.min(1, (f - clip.startFrame) / duration));
+      return {
+        x: clip.startX + (endX - clip.startX) * progress,
+        y: clip.startY + (endY - clip.startY) * progress
+      };
+    }
+
+    function getClipBoundingBox(clip, f) {
+      const pos = getClipCurrentPos(clip, f);
       const baseSize = 60 * (clip.sizeScale || 1);
       return {
-        left: clip.startX - baseSize / 2,
-        top: clip.startY - baseSize / 2,
-        right: clip.startX + baseSize / 2,
-        bottom: clip.startY + baseSize / 2
+        left: pos.x - baseSize / 2,
+        top: pos.y - baseSize / 2,
+        right: pos.x + baseSize / 2,
+        bottom: pos.y + baseSize / 2
       };
     }
 
@@ -1671,8 +1698,9 @@
 
       capcutClips.forEach(clip => {
         if (f >= clip.startFrame && f <= clip.endFrame) {
-          const curX = clip.startX;
-          const curY = clip.startY;
+          const pos = getClipCurrentPos(clip, f);
+          const curX = pos.x;
+          const curY = pos.y;
           const scale = clip.sizeScale || 1;
 
           ccCtx.fillStyle = clip.color;
@@ -1705,6 +1733,18 @@
             const imgSize = 60 * scale;
             ccCtx.drawImage(clip.imgElement, curX - imgSize/2, curY - imgSize/2, imgSize, imgSize);
           }
+
+          /* 2 Pozisyon Hareket Çizgisi Gösterimi */
+          if (clip.endX !== undefined && (clip.startX !== clip.endX || clip.startY !== clip.endY)) {
+            ccCtx.beginPath();
+            ccCtx.setLineDash([4, 4]);
+            ccCtx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+            ccCtx.lineWidth = 1;
+            ccCtx.moveTo(clip.startX, clip.startY);
+            ccCtx.lineTo(clip.endX, clip.endY);
+            ccCtx.stroke();
+            ccCtx.setLineDash([]);
+          }
         }
       });
 
@@ -1721,7 +1761,7 @@
       for (let i = capcutClips.length - 1; i >= 0; i--) {
         const clip = capcutClips[i];
         if (capcutCurrentFrame >= clip.startFrame && capcutCurrentFrame <= clip.endFrame) {
-          const box = getClipBoundingBox(clip);
+          const box = getClipBoundingBox(clip, capcutCurrentFrame);
           if (mouseX >= box.left && mouseX <= box.right && mouseY >= box.top && mouseY <= box.bottom) {
             if (e.button === 2) { // Sağ tık
               e.preventDefault();
@@ -1733,8 +1773,9 @@
               return;
             } else if (e.button === 0) { // Sol tık sürükleme
               ccDraggingClip = clip;
-              ccDragOffsetX = mouseX - clip.startX;
-              ccDragOffsetY = mouseY - clip.startY;
+              const pos = getClipCurrentPos(clip, capcutCurrentFrame);
+              ccDragOffsetX = mouseX - pos.x;
+              ccDragOffsetY = mouseY - pos.y;
               return;
             }
           }
@@ -1749,15 +1790,61 @@
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      ccDraggingClip.startX = mouseX - ccDragOffsetX;
-      ccDraggingClip.startY = mouseY - ccDragOffsetY;
+      const targetX = mouseX - ccDragOffsetX;
+      const targetY = mouseY - ccDragOffsetY;
+
+      const duration = ccDraggingClip.endFrame - ccDraggingClip.startFrame;
+      const progress = duration > 0 ? (capcutCurrentFrame - ccDraggingClip.startFrame) / duration : 0;
+
+      if (progress < 0.5) {
+        ccDraggingClip.startX = targetX;
+        ccDraggingClip.startY = targetY;
+      } else {
+        ccDraggingClip.endX = targetX;
+        ccDraggingClip.endY = targetY;
+      }
+
       renderCapCutFrame(capcutCurrentFrame);
     });
 
     window.addEventListener('mouseup', () => { ccDraggingClip = null; });
     ccCanvas.addEventListener('contextmenu', (e) => { e.preventDefault(); });
 
-    // Sağ Tık Menü Fonksiyonları
+    /* CapCut Sağ Tık Menü Fonksiyonları */
+    function ccMenuChangeShape() {
+      if (ccSelectedClipForMenu) {
+        const newShape = prompt("Yeni şekil seçin (rect = Kare, circle = Daire, line = Çizgi, text = Metin):", ccSelectedClipForMenu.type);
+        if (newShape && ['rect', 'circle', 'line', 'text'].includes(newShape.toLowerCase())) {
+          ccSelectedClipForMenu.type = newShape.toLowerCase();
+          renderCapCutTimelineClips();
+          renderCapCutFrame(capcutCurrentFrame);
+        }
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
+
+    function ccMenuSetStartPosition() {
+      if (ccSelectedClipForMenu) {
+        const pos = getClipCurrentPos(ccSelectedClipForMenu, capcutCurrentFrame);
+        ccSelectedClipForMenu.startX = Math.round(pos.x);
+        ccSelectedClipForMenu.startY = Math.round(pos.y);
+        alert(`1. Pozisyon (Başlangıç) ayarlandı:\nX: ${ccSelectedClipForMenu.startX}, Y: ${ccSelectedClipForMenu.startY}`);
+        renderCapCutFrame(capcutCurrentFrame);
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
+
+    function ccMenuSetEndPosition() {
+      if (ccSelectedClipForMenu) {
+        const pos = getClipCurrentPos(ccSelectedClipForMenu, capcutCurrentFrame);
+        ccSelectedClipForMenu.endX = Math.round(pos.x);
+        ccSelectedClipForMenu.endY = Math.round(pos.y);
+        alert(`2. Pozisyon (Bitiş) ayarlandı:\nX: ${ccSelectedClipForMenu.endX}, Y: ${ccSelectedClipForMenu.endY}`);
+        renderCapCutFrame(capcutCurrentFrame);
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
+
     function ccMenuChangeColor() {
       if (ccSelectedClipForMenu) {
         const newColor = prompt("Yeni renk HEX kodu girin (örn: #ff0000, #3b82f6):", ccSelectedClipForMenu.color);
@@ -1775,7 +1862,7 @@
         const newText = prompt("Yeni metin veya başlık girin:", ccSelectedClipForMenu.textContent || '');
         if (newText !== null) {
           ccSelectedClipForMenu.textContent = newText;
-          if (ccSelectedClipForMenu.type !== 'text') ccSelectedClipForMenu.type = 'text'; // Metne dönüştür
+          if (ccSelectedClipForMenu.type !== 'text') ccSelectedClipForMenu.type = 'text';
           renderCapCutTimelineClips();
           renderCapCutFrame(capcutCurrentFrame);
         }
@@ -1864,6 +1951,8 @@
             endFrame: 90,
             startX: 250,
             startY: 175,
+            endX: 250,
+            endY: 175,
             sizeScale: 1
           });
           renderCapCutTimelineClips();
