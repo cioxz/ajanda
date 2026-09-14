@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gelişmiş Takvim & AI Animasyon Stüdyosu</title>
+  <title>Gelişmiş Takvim & Çoklu Stüdyo Platformu</title>
   <style>
     :root {
       --bg-color: #f8fafc;
@@ -436,7 +436,7 @@
       border-color: var(--primary);
     }
 
-    /* Animasyon Stüdyosu Modalı */
+    /* Stüdyolar Modalı */
     .anim-fullscreen-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -453,6 +453,28 @@
       padding: 16px 24px;
       border-bottom: 1px solid var(--border-color);
       background: #f8fafc;
+    }
+
+    .studio-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .studio-tab-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    .studio-tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
     }
 
     .anim-main-layout {
@@ -647,6 +669,42 @@
       pointer-events: auto;
     }
 
+    .studio-panel {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .studio-panel.active {
+      display: flex;
+    }
+
+    .minecraft-box {
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .mc-output {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 14px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      flex: 1;
+      border: 1px solid #334155;
+    }
+
     .anim-timeline-container {
       background: #f8fafc;
       border: 1px solid var(--border-color);
@@ -656,31 +714,13 @@
       flex-direction: column;
       gap: 8px;
     }
-
-    .anim-timeline-scrubber {
-      position: relative;
-      height: 24px;
-      background: #e2e8f0;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .anim-playhead {
-      position: absolute;
-      top: 0;
-      width: 8px;
-      height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
 
   <div class="top-action-bar">
     <button class="settings-btn" onclick="configureApiKey()">⚙️ API Anahtarı Ayarla</button>
-    <button class="open-anim-btn" onclick="openAnimStudio()">🎬 Animasyon Stüdyosu</button>
+    <button class="open-anim-btn" onclick="openAnimStudio()">🚀 Stüdyolar</button>
   </div>
 
   <div class="app-container">
@@ -708,21 +748,28 @@
     </div>
   </div>
 
-  <!-- Animasyon Stüdyosu Modalı -->
+  <!-- Çoklu Stüdyolar Modalı -->
   <div class="anim-fullscreen-overlay" id="animStudioModal">
     <div class="anim-fullscreen-header">
-      <h3 style="display:flex; align-items:center; gap:8px;">🎬 Animasyon Stüdyosu (Gemini Destekli)</h3>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <h3 id="studioMainTitle">🎨 Resim Stüdyosu</h3>
+        <div class="studio-tabs">
+          <button class="studio-tab-btn active" id="tabArt" onclick="switchStudio('art')">Resim Stüdyosu</button>
+          <button class="studio-tab-btn" id="tabMc" onclick="switchStudio('minecraft')">Minecraft Stüdyosu</button>
+        </div>
+      </div>
       <button class="delete-btn" onclick="closeAnimStudio()">✕ Kapat</button>
     </div>
 
     <div class="anim-main-layout">
       <!-- Sol Panel -->
       <div class="anim-sidebar-left">
-        <div>
-          <div class="sidebar-section-title">✨ Gerçek Gemini AI Asistanı</div>
+        <!-- Resim Stüdyosu Kontrolleri -->
+        <div id="sidebarArt" class="studio-sidebar-content">
+          <div class="sidebar-section-title">✨ Gemini AI Çizim Asistanı</div>
           <div class="ai-assistant-box">
             <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz, kule çiz..."></textarea>
-            <button class="ai-send-btn" onclick="handleGeminiAICommand()">🤖 Gemini'ye Sor / Çizdir</button>
+            <button class="ai-send-btn" onclick="handleGeminiAICommand()">🤖 Gemini ile Çizdir</button>
             <div class="ai-chips">
               <button class="ai-chip" onclick="quickAICoip('kedi çiz')">Kedi Çiz</button>
               <button class="ai-chip" onclick="quickAICoip('uçak çiz')">Uçak Çiz</button>
@@ -730,56 +777,77 @@
               <button class="ai-chip" onclick="quickAICoip('kule çiz')">Kule Çiz</button>
             </div>
           </div>
-        </div>
 
-        <div>
-          <div class="sidebar-section-title">Görsel İşlemleri</div>
-          <div class="layer-controls">
-            <button class="layer-action-btn" onclick="document.getElementById('animCharUploader').click()">➕ Yükle</button>
-            <button class="layer-action-btn danger" onclick="removeCharacter()">🗑️ Kaldır</button>
+          <div style="margin-top: 16px;">
+            <div class="sidebar-section-title">Görsel İşlemleri</div>
+            <div class="layer-controls">
+              <button class="layer-action-btn" onclick="document.getElementById('animCharUploader').click()">➕ Yükle</button>
+              <button class="layer-action-btn danger" onclick="removeCharacter()">🗑️ Kaldır</button>
+            </div>
+            <input type="file" id="animCharUploader" accept="image/*" style="display:none" onchange="loadAnimCharacter(event)">
           </div>
-          <input type="file" id="animCharUploader" accept="image/*" style="display:none" onchange="loadAnimCharacter(event)">
+        </div>
+
+        <!-- Minecraft Stüdyosu Kontrolleri -->
+        <div id="sidebarMc" class="studio-sidebar-content" style="display: none;">
+          <div class="sidebar-section-title">⛏️ Minecraft Asistanı</div>
+          <div class="ai-assistant-box">
+            <textarea class="ai-input" id="mcPromptInput" placeholder="Örn: Otomatik kapı skripti yaz, LuckPerms rank ayarla..."></textarea>
+            <button class="ai-send-btn" onclick="handleMinecraftAI()">✨ Gemini'ye Kod/Skript Ürettir</button>
+            <div class="ai-chips">
+              <button class="ai-chip" onclick="quickMcPrompt('Karşılama Skripti yaz')">Skript</button>
+              <button class="ai-chip" onclick="quickMcPrompt('WorldEdit komutları')">WorldEdit</button>
+              <button class="ai-chip" onclick="quickMcPrompt('Sunucu optimizasyon ipuçları')">Optimizasyon</button>
+            </div>
+          </div>
         </div>
 
         <div>
-          <div class="sidebar-section-title">Çizim Araçları</div>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="anim-tool-btn active" style="text-align:left;" id="toolPencil" onclick="setAnimTool('pencil')">✏️ Serbest Çizim</button>
-            <button class="anim-tool-btn" style="text-align:left;" id="toolEraser" onclick="setAnimTool('eraser')">🧹 Silgi</button>
-            <button class="anim-tool-btn" style="text-align:left;" onclick="clearAnimDrawing()">🗑️ Hepsini Temizle</button>
+          <div class="sidebar-section-title" style="margin-top: 16px;">Hızlı Durum</div>
+          <div id="aiResponseOutput" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+            Asistan hazır. İstediğiniz komutu seçip çalıştırabilirsiniz.
           </div>
         </div>
       </div>
 
       <!-- Sağ Ana Çalışma Alanı -->
       <div class="anim-workspace-container">
-        <div class="anim-top-toolbar">
-          <div class="anim-tools">
-            <button class="anim-tool-btn active" onclick="setAnimTool('pencil')">✏️ Çizim Kalemi</button>
-            <button class="anim-tool-btn" onclick="setAnimTool('eraser')">🧹 Silgi</button>
-          </div>
-          <div>
-            <span id="aiStatusText" style="margin-right: 12px; font-weight: bold; font-size: 0.85rem; color: var(--primary);">Gemini Hazır</span>
+        <!-- Resim Stüdyosu Paneli -->
+        <div id="panelArt" class="studio-panel active">
+          <div class="anim-top-toolbar">
+            <div class="anim-tools">
+              <button class="anim-tool-btn active" onclick="setAnimTool('pencil')">✏️ Çizim Kalemi</button>
+              <button class="anim-tool-btn" onclick="setAnimTool('eraser')">🧹 Silgi</button>
+            </div>
             <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
+          </div>
+
+          <div class="anim-workspace" id="animWorkspace">
+            <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
+              <div style="font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
+              <span style="font-size: 1.1rem; font-weight: 600;">Gemini'ye çizdirin ya da serbest çizim yapın</span><br>
+              <span style="font-size: 0.85rem;">Örn: "kedi çiz", "kule çiz"</span>
+            </div>
+            <canvas id="animCanvas"></canvas>
           </div>
         </div>
 
-        <div class="anim-workspace" id="animWorkspace">
-          <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
-            <div style="font-size: 2.5rem; margin-bottom: 8px;">✨</div>
-            <span style="font-size: 1.1rem; font-weight: 600;">Sol taraftan Gemini'ye çizim yaptırın ya da serbest çizin</span><br>
-            <span style="font-size: 0.85rem;">Örn: "kedi çiz", "uçak çiz", "kule çiz"</span>
+        <!-- Minecraft Stüdyosu Paneli -->
+        <div id="panelMc" class="studio-panel">
+          <div class="anim-top-toolbar">
+            <span style="font-weight: 600; font-size: 0.9rem;">Minecraft Sunucu & Skript Geliştirme Stüdyosu</span>
+            <button class="anim-tool-btn" onclick="document.getElementById('mcOutputBox').innerText = 'Çıktı temizlendi.'">Temizle</button>
           </div>
-          <canvas id="animCanvas"></canvas>
+          <div class="minecraft-box">
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Gemini Yanıtı / Kod Konsolu:</div>
+            <div class="mc-output" id="mcOutputBox">Minecraft ile ilgili skript, komut veya sunucu yönetimi isteklerinizi sol taraftan yazabilirsiniz...</div>
+          </div>
         </div>
 
         <div class="anim-timeline-container">
-          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);" id="aiResponseOutput">
-            <span>Gemini Asistan Hazır</span>
-            <span>İstediğiniz komutu yazarak etkileşime geçin</span>
-          </div>
-          <div class="anim-timeline-scrubber" id="timelineScrubber" style="cursor: default;">
-            <div class="anim-playhead" id="playhead" style="left: 0%; width: 100%; background: #e0e7ff; opacity: 0.5;"></div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+            <span>Aktif Stüdyo Modu</span>
+            <span id="activeStudioName">Resim Stüdyosu</span>
           </div>
         </div>
       </div>
@@ -1190,10 +1258,10 @@
       renderCalendar();
     }
 
-    // --- API ANAHTARI YÖNETİMİ (GÜVENLİ) ---
+    // --- API ANAHTARI YÖNETİMİ ---
     function configureApiKey() {
       const currentKey = localStorage.getItem('gemini_api_key') || '';
-      const newKey = prompt("Gemini API anahtarınızı girin (tarayıcınızda güvenle saklanır):", currentKey);
+      const newKey = prompt("Gemini API anahtarınızı girin:", currentKey);
       if (newKey !== null) {
         localStorage.setItem('gemini_api_key', newKey.trim());
         alert("API anahtarı kaydedildi!");
@@ -1203,7 +1271,7 @@
     function getApiKey() {
       let key = localStorage.getItem('gemini_api_key');
       if (!key) {
-        key = prompt("Animasyon stüdyosunu kullanmak için lütfen Gemini API anahtarınızı girin:");
+        key = prompt("Stüdyo özelliklerini kullanmak için lütfen Gemini API anahtarınızı girin:");
         if (key) {
           localStorage.setItem('gemini_api_key', key.trim());
         }
@@ -1211,7 +1279,50 @@
       return key;
     }
 
-    // --- ANIMASYON & GEMINI AI ÇİZİM STÜDYOSU ---
+    // --- ÇOKLU STÜDYOLAR YÖNETİMİ ---
+    function openAnimStudio() {
+      document.getElementById('animStudioModal').style.display = 'flex';
+      setTimeout(initAnimCanvasSize, 50);
+    }
+
+    function closeAnimStudio() {
+      document.getElementById('animStudioModal').style.display = 'none';
+    }
+
+    function switchStudio(type) {
+      const tabArt = document.getElementById('tabArt');
+      const tabMc = document.getElementById('tabMc');
+      const panelArt = document.getElementById('panelArt');
+      const panelMc = document.getElementById('panelMc');
+      const sidebarArt = document.getElementById('sidebarArt');
+      const sidebarMc = document.getElementById('sidebarMc');
+      const mainTitle = document.getElementById('studioMainTitle');
+      const activeStudioName = document.getElementById('activeStudioName');
+
+      tabArt.classList.remove('active');
+      tabMc.classList.remove('active');
+      panelArt.classList.remove('active');
+      panelMc.classList.remove('active');
+      sidebarArt.style.display = 'none';
+      sidebarMc.style.display = 'none';
+
+      if (type === 'art') {
+        tabArt.classList.add('active');
+        panelArt.classList.add('active');
+        sidebarArt.style.display = 'flex';
+        mainTitle.innerText = '🎨 Resim Stüdyosu';
+        activeStudioName.innerText = 'Resim Stüdyosu';
+        setTimeout(initAnimCanvasSize, 50);
+      } else if (type === 'minecraft') {
+        tabMc.classList.add('active');
+        panelMc.classList.add('active');
+        sidebarMc.style.display = 'flex';
+        mainTitle.innerText = '⛏️ Minecraft Stüdyosu';
+        activeStudioName.innerText = 'Minecraft Stüdyosu';
+      }
+    }
+
+    // --- RESİM / ÇİZİM STÜDYOSU (GEMINI DESTEKLİ) ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
@@ -1232,15 +1343,6 @@
           };
         }
       }
-    }
-
-    function openAnimStudio() {
-      document.getElementById('animStudioModal').style.display = 'flex';
-      setTimeout(initAnimCanvasSize, 50);
-    }
-
-    function closeAnimStudio() {
-      document.getElementById('animStudioModal').style.display = 'none';
     }
 
     window.addEventListener('resize', initAnimCanvasSize);
@@ -1281,7 +1383,7 @@
 
     function setAnimTool(tool) {
       animMode = tool;
-      document.querySelectorAll('.anim-workspace-container .anim-tool-btn, .anim-sidebar-left .anim-tool-btn').forEach(b => {
+      document.querySelectorAll('.anim-workspace-container .anim-tool-btn').forEach(b => {
         if (b.innerText.includes('Çizim') || b.innerText.includes('Silgi') || b.innerText.includes('Kalem')) {
           b.classList.remove('active');
         }
@@ -1318,19 +1420,18 @@
       clearAnimDrawing();
     }
 
-    // Gemini API Entegrasyonu (Güncel gemini-3.6-flash modeli ile)
     async function handleGeminiAICommand() {
       const prompt = document.getElementById('aiPromptInput').value.trim();
       if (!prompt) return;
 
       const apiKey = getApiKey();
       if (!apiKey) {
-        alert("Geçerli bir API anahtarı girmeden Gemini'yi kullanamazsınız.");
+        alert("API anahtarı gereklidir.");
         return;
       }
 
       const outputDiv = document.getElementById('aiResponseOutput');
-      outputDiv.innerHTML = `<span>Gemini tuvale çiziyor...</span>`;
+      outputDiv.innerHTML = `<span style="color:var(--primary);">Gemini çiziyor...</span>`;
       
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
@@ -1346,7 +1447,7 @@
         const data = await res.json();
         
         if (data.candidates && data.candidates[0].content) {
-          outputDiv.innerHTML = `<span style="color:var(--primary); font-weight:600;">Başarılı:</span> <span>"${prompt}" tuvale çizildi!</span>`;
+          outputDiv.innerHTML = `<span style="color:green; font-weight:600;">Başarılı:</span> "${prompt}" tuvale yansıtıldı!`;
           drawGeminiShape(prompt.toLowerCase());
         } else if (data.error) {
           outputDiv.innerHTML = `<span style="color:red;">Hata: ${data.error.message}</span>`;
@@ -1354,7 +1455,7 @@
           outputDiv.innerHTML = `<span style="color:red;">Yanıt alınamadı.</span>`;
         }
       } catch (error) {
-        outputDiv.innerHTML = `<span style="color:red;">Bağlantı hatası: ${error}</span>`;
+        outputDiv.innerHTML = `<span style="color:red;">Bağlantı hatası.</span>`;
       }
     }
 
@@ -1373,62 +1474,83 @@
       ctxAnim.lineJoin = 'round';
 
       if (prompt.includes('kedi')) {
-        // Detaylı ve sevimli Kedi Çizimi
         ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 25, 45, 0, Math.PI * 2); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 55); ctxAnim.lineTo(cx - 55, cy - 90); ctxAnim.lineTo(cx - 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy - 55); ctxAnim.lineTo(cx + 55, cy - 90); ctxAnim.lineTo(cx + 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = '#4f46e5'; ctxAnim.fill();
         ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = '#4f46e5'; ctxAnim.fill();
         ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 20, 4, 0, Math.PI * 2); ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 15); ctxAnim.lineTo(cx - 40, cy - 20); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 10); ctxAnim.lineTo(cx - 40, cy - 10); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy - 15); ctxAnim.lineTo(cx + 40, cy - 20); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy - 10); ctxAnim.lineTo(cx + 40, cy - 10); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy + 45, 40, 55, 0, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy + 70); ctxAnim.quadraticCurveTo(cx + 80, cy + 70, cx + 70, cy + 20); ctxAnim.stroke();
       } 
       else if (prompt.includes('uçak')) {
-        // Detaylı ve Şık Uçak Çizimi
         ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy, 90, 22, 0, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.arc(cx + 90, cy, 5, -Math.PI/2, Math.PI/2); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy - 20); ctxAnim.lineTo(cx + 25, cy - 110); ctxAnim.lineTo(cx + 45, cy - 20); ctxAnim.closePath(); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy + 20); ctxAnim.lineTo(cx + 25, cy + 110); ctxAnim.lineTo(cx + 45, cy + 20); ctxAnim.closePath(); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 70, cy - 10); ctxAnim.lineTo(cx - 90, cy - 45); ctxAnim.lineTo(cx - 60, cy - 10); ctxAnim.closePath(); ctxAnim.stroke();
-        for(let i = -40; i <= 40; i += 20) {
-          ctxAnim.beginPath(); ctxAnim.arc(cx + i, cy - 3, 3, 0, Math.PI * 2); ctxAnim.stroke();
-        }
       } 
-      else if (prompt.includes('insan') || prompt.includes('adam') || prompt.includes('kız')) {
-        // Karakter Tasarımı
+      else if (prompt.includes('insan') || prompt.includes('adam')) {
         ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 60, 22, 0, Math.PI * 2); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.rect(cx - 18, cy - 35, 36, 65); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx - 18, cy - 25); ctxAnim.lineTo(cx - 50, cy); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx + 18, cy - 25); ctxAnim.lineTo(cx + 50, cy); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy + 30); ctxAnim.lineTo(cx - 15, cy + 90); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy + 30); ctxAnim.lineTo(cx + 15, cy + 90); ctxAnim.stroke();
       } 
       else if (prompt.includes('kule')) {
-        // Detaylı Galata/Saat Kulesi Tarzı
         ctxAnim.beginPath(); ctxAnim.rect(cx - 25, cy - 30, 50, 110); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.rect(cx - 32, cy - 50, 64, 20); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx, cy - 100); ctxAnim.lineTo(cx + 35, cy - 50); ctxAnim.closePath(); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 10, 10, Math.PI, 0, false); ctxAnim.lineTo(cx + 10, cy + 15); ctxAnim.lineTo(cx - 10, cy + 15); ctxAnim.closePath(); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.rect(cx - 12, cy + 50, 24, 30); ctxAnim.stroke();
       }
       else {
-        // Estetik Yıldız / Çiçek Motifi
-        ctxAnim.beginPath();
-        for (let i = 0; i < 5; i++) {
-          ctxAnim.lineTo(cx + 50 * Math.cos((i * 4 * Math.PI) / 5), cy + 50 * Math.sin((i * 4 * Math.PI) / 5));
-        }
-        ctxAnim.closePath();
-        ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.rect(cx - 40, cy - 40, 80, 80); ctxAnim.stroke();
       }
     }
 
     function quickAICoip(text) {
       document.getElementById('aiPromptInput').value = text;
       handleGeminiAICommand();
+    }
+
+    // --- MINECRAFT STÜDYOSU (AI ENTEGRASYONLU) ---
+    async function handleMinecraftAI() {
+      const prompt = document.getElementById('mcPromptInput').value.trim();
+      if (!prompt) return;
+
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        alert("API anahtarı gereklidir.");
+        return;
+      }
+
+      const outputBox = document.getElementById('mcOutputBox');
+      outputBox.innerText = "Gemini Minecraft için kod/skript hazırlıyor...";
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `Minecraft sunucu geliştirme ve skript bağlamında şu isteği yanıtla: ${prompt}` }] }]
+          })
+        });
+
+        const data = await res.json();
+        
+        if (data.candidates && data.candidates[0].content) {
+          const textRes = data.candidates[0].content.parts[0].text;
+          outputBox.innerText = textRes;
+        } else if (data.error) {
+          outputBox.innerText = `Hata: ${data.error.message}`;
+        } else {
+          outputBox.innerText = "Yanıt alınamadı.";
+        }
+      } catch (error) {
+        outputBox.innerText = `Bağlantı hatası: ${error}`;
+      }
+    }
+
+    function quickMcPrompt(text) {
+      document.getElementById('mcPromptInput').value = text;
+      handleMinecraftAI();
     }
 
     updateHeaderTodayInfo();
