@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+[cite: 3]<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
@@ -1626,7 +1626,7 @@
         // Kedi Çizimi
         ctxAnim.beginPath();
         ctxAnim.arc(cx, cy, 40, 0, Math.PI * 2);
-        ctxAnim.moveTo(cx - 30, cy - 25); ctxAnim.lineTo(cx - 50, cy - 60); ctxAnim.lineTo(cx - 10, cy - 35);
+        ctxAnim.moveTo(cx - 30, dz = cy - 25); ctxAnim.lineTo(cx - 50, cy - 60); ctxAnim.lineTo(cx - 10, cy - 35);
         ctxAnim.moveTo(cx + 30, cy - 25); ctxAnim.lineTo(cx + 50, cy - 60); ctxAnim.lineTo(cx + 10, cy - 35);
         ctxAnim.stroke();
       } else {
@@ -1650,7 +1650,7 @@
       outputBox.innerText = "Gemini kod üretiyor...";
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: `Minecraft sunucu geliştirme ve skript bağlamında yanıtla: ${prompt}` }] }] })
@@ -1674,3 +1674,4 @@
   </script>
 </body>
 </html>
+```[cite: 3]
