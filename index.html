@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gelişmiş Takvim & Animasyon Stüdyosu</title>
+  <title>Gelişmiş Takvim & AI Animasyon Stüdyosu</title>
   <style>
     :root {
       --bg-color: #f8fafc;
@@ -41,6 +41,7 @@
       width: 100%;
       display: flex;
       justify-content: flex-end;
+      gap: 12px;
     }
 
     .open-anim-btn {
@@ -61,6 +62,16 @@
     .open-anim-btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .settings-btn {
+      background: #f1f5f9;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     .app-container {
@@ -184,7 +195,6 @@
       pointer-events: none;
     }
 
-    /* Sidebar / Notes */
     .sidebar-header {
       display: flex;
       justify-content: space-between;
@@ -257,7 +267,6 @@
       margin-top: 8px;
     }
 
-    /* Modals */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -368,7 +377,6 @@
       background: #e2e8f0;
     }
 
-    /* Not Çizim Alanı */
     .editor-wrapper {
       position: relative;
       width: 100%;
@@ -428,7 +436,7 @@
       border-color: var(--primary);
     }
 
-    /* Tam Ekran Animasyon Stüdyosu Modalı */
+    /* Animasyon Stüdyosu Modalı */
     .anim-fullscreen-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -671,6 +679,7 @@
 <body>
 
   <div class="top-action-bar">
+    <button class="settings-btn" onclick="configureApiKey()">⚙️ API Anahtarı Ayarla</button>
     <button class="open-anim-btn" onclick="openAnimStudio()">🎬 Animasyon Stüdyosu</button>
   </div>
 
@@ -699,10 +708,10 @@
     </div>
   </div>
 
-  <!-- Tam Ekran Animasyon Stüdyosu Modalı -->
+  <!-- Animasyon Stüdyosu Modalı -->
   <div class="anim-fullscreen-overlay" id="animStudioModal">
     <div class="anim-fullscreen-header">
-      <h3 style="display:flex; align-items:center; gap:8px;">🎬 Animasyon Stüdyosu</h3>
+      <h3 style="display:flex; align-items:center; gap:8px;">🎬 Animasyon Stüdyosu (Gemini Destekli)</h3>
       <button class="delete-btn" onclick="closeAnimStudio()">✕ Kapat</button>
     </div>
 
@@ -710,10 +719,10 @@
       <!-- Sol Panel -->
       <div class="anim-sidebar-left">
         <div>
-          <div class="sidebar-section-title">✨ AI Akıllı Çizim Asistanı</div>
+          <div class="sidebar-section-title">✨ Gerçek Gemini AI Asistanı</div>
           <div class="ai-assistant-box">
-            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz, insan çiz..."></textarea>
-            <button class="ai-send-btn" onclick="handleAICoordCommand()">🤖 Ne İstersen Çiz</button>
+            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz..."></textarea>
+            <button class="ai-send-btn" onclick="handleGeminiAICommand()">🤖 Gemini'ye Sor / Çizdir</button>
             <div class="ai-chips">
               <button class="ai-chip" onclick="quickAICoip('kedi çiz')">Kedi Çiz</button>
               <button class="ai-chip" onclick="quickAICoip('uçak çiz')">Uçak Çiz</button>
@@ -750,7 +759,7 @@
             <button class="anim-tool-btn" onclick="setAnimTool('eraser')">🧹 Silgi</button>
           </div>
           <div>
-            <span id="frameCounter" style="margin-right: 12px; font-weight: bold; font-size: 0.9rem; color: var(--text-muted);">Çizim Tuvali Aktif</span>
+            <span id="aiStatusText" style="margin-right: 12px; font-weight: bold; font-size: 0.85rem; color: var(--primary);">Gemini Hazır</span>
             <button class="anim-tool-btn" onclick="clearAnimDrawing()">Tuvali Temizle</button>
           </div>
         </div>
@@ -758,16 +767,16 @@
         <div class="anim-workspace" id="animWorkspace">
           <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
             <div style="font-size: 2.5rem; margin-bottom: 8px;">✨</div>
-            <span style="font-size: 1.1rem; font-weight: 600;">Sol taraftan AI asistanına bir şeyler çizdirin ya da serbest çizin</span><br>
-            <span style="font-size: 0.85rem;">Örn: "kedi çiz", "uçak çiz", "kalem çiz"</span>
+            <span style="font-size: 1.1rem; font-weight: 600;">Sol taraftan Gemini'ye çizim yaptırın ya da serbest çizin</span><br>
+            <span style="font-size: 0.85rem;">Örn: "kedi çiz", "uçak çiz"</span>
           </div>
           <canvas id="animCanvas"></canvas>
         </div>
 
         <div class="anim-timeline-container">
-          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-            <span>AI Çizim Paneli Hazır</span>
-            <span>İstediğiniz şekli metin kutusuna yazıp oluşturabilirsiniz</span>
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);" id="aiResponseOutput">
+            <span>Gemini Asistan Hazır</span>
+            <span>İstediğiniz komutu yazarak etkileşime geçin</span>
           </div>
           <div class="anim-timeline-scrubber" id="timelineScrubber" style="cursor: default;">
             <div class="anim-playhead" id="playhead" style="left: 0%; width: 100%; background: #e0e7ff; opacity: 0.5;"></div>
@@ -939,7 +948,6 @@
       }
     }
 
-    // Not Modalı Çizim Alanı Mantığı
     const canvas = document.getElementById('inlineCanvas');
     const ctx = canvas.getContext('2d');
     let painting = false;
@@ -1182,7 +1190,28 @@
       renderCalendar();
     }
 
-    // --- ANIMASYON & AI ÇİZİM STÜDYOSU ---
+    // --- API ANAHTARI YÖNETİMİ (GÜVENLİ) ---
+    function configureApiKey() {
+      const currentKey = localStorage.getItem('gemini_api_key') || '';
+      const newKey = prompt("Gemini API anahtarınızı girin (tarayıcınızda güvenle saklanır):", currentKey);
+      if (newKey !== null) {
+        localStorage.setItem('gemini_api_key', newKey.trim());
+        alert("API anahtarı kaydedildi!");
+      }
+    }
+
+    function getApiKey() {
+      let key = localStorage.getItem('gemini_api_key');
+      if (!key) {
+        key = prompt("Animasyon stüdyosunu kullanmak için lütfen Gemini API anahtarınızı girin:");
+        if (key) {
+          localStorage.setItem('gemini_api_key', key.trim());
+        }
+      }
+      return key;
+    }
+
+    // --- ANIMASYON & GEMINI AI ÇİZİM STÜDYOSU ---
     let animDrawing = false;
     let animMode = 'pencil';
     const animCanvasEl = document.getElementById('animCanvas');
@@ -1216,7 +1245,6 @@
 
     window.addEventListener('resize', initAnimCanvasSize);
 
-    // Serbest Çizim ve Silgi Fare Etkileşimleri
     animCanvasEl.addEventListener('mousedown', (e) => {
       animDrawing = true;
       const rect = animCanvasEl.getBoundingClientRect();
@@ -1290,11 +1318,49 @@
       clearAnimDrawing();
     }
 
-    // AI Gibi Çalışan Çizim Motoru (Kedi, Uçak, İnsan, Kalem vb.)
-    function handleAICoordCommand() {
-      const prompt = document.getElementById('aiPromptInput').value.toLowerCase().trim();
+    // Gemini API Entegrasyonu (Dinamik Anahtar ile)
+    async function handleGeminiAICommand() {
+      const prompt = document.getElementById('aiPromptInput').value.trim();
       if (!prompt) return;
 
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        alert("Geçerli bir API anahtarı girmeden Gemini'yi kullanamazsınız.");
+        return;
+      }
+
+      const outputDiv = document.getElementById('aiResponseOutput');
+      outputDiv.innerHTML = `<span>Gemini düşünüyor...</span>`;
+      
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const data = await res.json();
+        
+        if (data.candidates && data.candidates[0].content) {
+          const reply = data.candidates[0].content.parts[0].text;
+          outputDiv.innerHTML = `<span style="color:var(--primary); font-weight:600;">Gemini Cevabı:</span> <span>${reply}</span>`;
+          
+          drawGeminiShape(prompt.toLowerCase());
+        } else if (data.error) {
+          outputDiv.innerHTML = `<span style="color:red;">Hata: ${data.error.message}</span>`;
+        } else {
+          outputDiv.innerHTML = `<span style="color:red;">Gemini'den yanıt alınamadı.</span>`;
+        }
+      } catch (error) {
+        outputDiv.innerHTML = `<span style="color:red;">Bağlantı hatası: ${error}</span>`;
+      }
+    }
+
+    function drawGeminiShape(prompt) {
       initAnimCanvasSize();
       document.getElementById('uploadPlaceholder').style.display = 'none';
       
@@ -1302,63 +1368,40 @@
       const cy = animCanvasEl.height / 2;
 
       ctxAnim.globalCompositeOperation = 'source-over';
-      ctxAnim.strokeStyle = '#0f172a';
-      ctxAnim.fillStyle = '#0f172a';
+      ctxAnim.strokeStyle = '#4f46e5';
+      ctxAnim.fillStyle = '#4f46e5';
       ctxAnim.lineWidth = 3;
 
       if (prompt.includes('kedi')) {
-        // Kedi Çizimi
-        // Kafa
         ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 20, 40, 0, Math.PI * 2); ctxAnim.stroke();
-        // Kulaklar
         ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx - 50, cy - 80); ctxAnim.lineTo(cx - 15, cy - 55); ctxAnim.stroke();
         ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy - 50); ctxAnim.lineTo(cx + 50, cy - 80); ctxAnim.lineTo(cx + 15, cy - 55); ctxAnim.stroke();
-        // Gözler & Burun
         ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 30, 4, 0, Math.PI * 2); ctxAnim.fill();
         ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 30, 4, 0, Math.PI * 2); ctxAnim.fill();
         ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 15, 3, 0, Math.PI * 2); ctxAnim.fill();
-        // Bıyıklar
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 12); ctxAnim.lineTo(cx - 40, cy - 15); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy - 12); ctxAnim.lineTo(cx + 40, cy - 15); ctxAnim.stroke();
-        // Gövde
         ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy + 50, 35, 50, 0, 0, Math.PI * 2); ctxAnim.stroke();
       } 
       else if (prompt.includes('uçak')) {
-        // Uçak Çizimi
-        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy, 80, 20, 0, 0, Math.PI * 2); ctxAnim.stroke(); // Gövde
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 20); ctxAnim.lineTo(cx + 20, cy - 80); ctxAnim.lineTo(cx + 30, cy - 20); ctxAnim.stroke(); // Kanat üst
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy + 20); ctxAnim.lineTo(cx + 20, cy + 80); ctxAnim.lineTo(cx + 30, cy + 20); ctxAnim.stroke(); // Kanat alt
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 70, cy); ctxAnim.lineTo(cx - 95, cy - 30); ctxAnim.lineTo(cx - 75, cy); ctxAnim.stroke(); // Kuyruk
+        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy, 80, 20, 0, 0, Math.PI * 2); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 20); ctxAnim.lineTo(cx + 20, cy - 80); ctxAnim.lineTo(cx + 30, cy - 20); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy + 20); ctxAnim.lineTo(cx + 20, cy + 80); ctxAnim.lineTo(cx + 30, cy + 20); ctxAnim.stroke();
       } 
       else if (prompt.includes('insan') || prompt.includes('adam')) {
-        // İnsan Çizimi
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 50, 25, 0, Math.PI * 2); ctxAnim.stroke(); // Kafa
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy - 25); ctxAnim.lineTo(cx, cy + 40); ctxAnim.stroke(); // Gövde
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 30, cy); ctxAnim.lineTo(cx + 30, cy); ctxAnim.stroke(); // Kollar
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx - 20, cy + 90); ctxAnim.stroke(); // Sol Bacak
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx + 20, cy + 90); ctxAnim.stroke(); // Sağ Bacak
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 50, 25, 0, Math.PI * 2); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy - 25); ctxAnim.lineTo(cx, cy + 40); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 30, cy); ctxAnim.lineTo(cx + 30, cy); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx - 20, cy + 90); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx + 20, cy + 90); ctxAnim.stroke();
       } 
       else if (prompt.includes('kalem')) {
-        // Kalem Çizimi
-        ctxAnim.beginPath(); ctxAnim.rect(cx - 15, cy - 40, 30, 80); ctxAnim.stroke(); // Gövde
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy - 40); ctxAnim.lineTo(cx, cy - 75); ctxAnim.lineTo(cx + 15, cy - 40); ctxAnim.stroke(); // Uç kısmı
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 65, 3, 0, Math.PI * 2); ctxAnim.fill(); // Uç
-      } 
-      else {
-        // Varsayılan Geometrik/Yaratıcı Çizim
-        ctxAnim.beginPath();
-        ctxAnim.arc(cx, cy, 50, 0, Math.PI * 2);
-        ctxAnim.stroke();
-        ctxAnim.fillStyle = '#4f46e5';
-        ctxAnim.font = '14px sans-serif';
-        ctxAnim.textAlign = 'center';
-        ctxAnim.fillText(`"${prompt}" için çizim oluşturuldu!`, cx, cy + 70);
+        ctxAnim.beginPath(); ctxAnim.rect(cx - 15, cy - 40, 30, 80); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy - 40); ctxAnim.lineTo(cx, cy - 75); ctxAnim.lineTo(cx + 15, cy - 40); ctxAnim.stroke();
       }
     }
 
     function quickAICoip(text) {
       document.getElementById('aiPromptInput').value = text;
-      handleAICoordCommand();
+      handleGeminiAICommand();
     }
 
     updateHeaderTodayInfo();
