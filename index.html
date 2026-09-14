@@ -819,6 +819,10 @@
     .capcut-canvas {
       background: #181818;
       box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      cursor: grab;
+    }
+    .capcut-canvas:active {
+      cursor: grabbing;
     }
 
     .capcut-timeline-panel {
@@ -949,11 +953,14 @@
 
         <!-- CapCut Video / Animasyon Kontrolleri -->
         <div id="sidebarAnim" class="studio-sidebar-content" style="display: none;">
-          <div class="sidebar-section-title">🎬 Video Klip Öğeleri</div>
+          <div class="sidebar-section-title">🎬 Video Klip Araçları</div>
           <div class="ai-assistant-box">
             <button class="ai-send-btn" onclick="addVideoClip('rect', document.getElementById('capcutColorPicker').value)">➕ Kare Klip Ekle</button>
             <button class="ai-send-btn" onclick="addVideoClip('circle', document.getElementById('capcutColorPicker').value)">➕ Daire Klip Ekle</button>
             <button class="ai-send-btn" onclick="addVideoClip('text', document.getElementById('capcutColorPicker').value)">➕ Metin Klipi Ekle</button>
+            <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
+            <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">İpuçları:</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">• Tuvalde klip üstüne tıklayıp sürükleyerek **taşıyabilirsin**.<br>• Klip üstüne **sağ tıklayarak** büyütebilir veya silebilirsin.</div>
             <button class="btn-secondary" onclick="clearVideoClips()" style="margin-top:4px;">Tümünü Sıfırla</button>
           </div>
         </div>
@@ -1033,15 +1040,11 @@
           <div class="anim-top-toolbar">
             <div class="anim-tools">
               <button class="anim-tool-btn active">🎬 Video Araçları</button>
-              <button class="anim-tool-btn" oncontextmenu="openMenu(event, 'brush-menu'); return false;" onclick="toggleMenu(event, 'brush-menu')">Fırça ▾</button>
-              <button class="anim-tool-btn" oncontextmenu="openMenu(event, 'shape-menu'); return false;" onclick="toggleMenu(event, 'shape-menu')">Şekil ▾</button>
-              <button class="anim-tool-btn" oncontextmenu="openMenu(event, 'tools-menu'); return false;" onclick="toggleMenu(event, 'tools-menu')">Araçlar ▾</button>
               <button class="anim-tool-btn" onclick="document.getElementById('capcutImageLoader').click()">🖼️ Fotoğraf Ekle</button>
               <button class="anim-tool-btn" onclick="clearVideoClips()" style="color: #d9534f;">Tümünü Sıfırla</button>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
               <label style="font-size: 0.85rem; font-weight: 600;">Renk: <input type="color" id="capcutColorPicker" value="#3b82f6" style="border:none; width:28px; height:28px; vertical-align:middle; cursor:pointer; background:none;"></label>
-              <label style="font-size: 0.85rem; font-weight: 600;">Boyut: <input type="range" id="capcutBrushSize" min="1" max="50" value="25" style="vertical-align:middle;"></label>
             </div>
           </div>
           <input type="file" id="capcutImageLoader" accept="image/*" style="display: none;" />
@@ -1091,7 +1094,7 @@
     </div>
   </div>
 
-  <!-- Fırçalar Menüsü (Tık veya Sağ Tık) -->
+  <!-- Fırçalar Menüsü -->
   <div id="brush-menu" class="context-menu">
     <button onclick="setBrushType('normal')">Klasik Fırça</button>
     <button onclick="setBrushType('kaligrafi')">Kaligrafi Fırçası</button>
@@ -1101,7 +1104,7 @@
     <button onclick="setBrushType('suluboya')">Sulu Boya</button>
   </div>
 
-  <!-- Şekiller Menüsü (Tık veya Sağ Tık) -->
+  <!-- Şekiller Menüsü -->
   <div id="shape-menu" class="context-menu">
     <button onclick="setShape('line')">Çizgi</button>
     <button onclick="setShape('rect')">Dikdörtgen</button>
@@ -1117,11 +1120,18 @@
     <button onclick="setShape('heart')">Kalp</button>
   </div>
 
-  <!-- Araçlar Menüsü (Tık veya Sağ Tık) -->
+  <!-- Araçlar Menüsü -->
   <div id="tools-menu" class="context-menu">
     <button onclick="setTool('eyedropper')">Renk Seçici (Damlalık)</button>
     <button onclick="setTool('text')">Metin Aracı</button>
     <button onclick="setTool('magnifier')">Büyüteç</button>
+  </div>
+
+  <!-- CapCut Sağ Tık Düzenleme Menüsü -->
+  <div id="capcut-context-menu" class="context-menu">
+    <button onclick="ccMenuZoomIn()">🔍 Büyüt (Zoom +)</button>
+    <button onclick="ccMenuZoomOut()">🔍 Küçült (Zoom -)</button>
+    <button onclick="ccMenuDelete()" style="color:#ef4444;">🗑️ Klibi Sil</button>
   </div>
 
   <!-- Gün Düzenleme Modalı -->
@@ -1573,15 +1583,20 @@
       statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
     }
 
-    // CapCut-Stili Video Stüdyosu Mantığı
+    // CapCut-Stili Video Stüdyosu Mantığı (Sürükleme ve Sağ Tık Düzenleme Özellikli)
     let capcutClips = [
-      { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 50, startY: 175, endX: 550, endY: 175 },
-      { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 100, startY: 50, endX: 600, endY: 300 }
+      { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 150, startY: 175, sizeScale: 1 },
+      { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 400, startY: 150, sizeScale: 1 }
     ];
     let capcutCurrentFrame = 0;
     const capcutMaxFrames = 100;
     let capcutIsPlaying = false;
     let capcutAnimTimer = null;
+
+    let ccDraggingClip = null;
+    let ccDragOffsetX = 0;
+    let ccDragOffsetY = 0;
+    let ccSelectedClipForMenu = null;
 
     const ccCanvas = document.getElementById('capcutCanvas');
     const ccCtx = ccCanvas.getContext('2d');
@@ -1597,12 +1612,11 @@
         id: newId,
         type: type,
         color: color,
-        startFrame: 10,
+        startFrame: 0,
         endFrame: 90,
-        startX: Math.random() * 400 + 50,
-        startY: Math.random() * 200 + 50,
-        endX: Math.random() * 400 + 50,
-        endY: Math.random() * 200 + 50
+        startX: 200 + Math.random() * 100,
+        startY: 150 + Math.random() * 50,
+        sizeScale: 1
       });
       renderCapCutTimelineClips();
       renderCapCutFrame(capcutCurrentFrame);
@@ -1632,34 +1646,47 @@
       });
     }
 
+    function getClipBoundingBox(clip) {
+      const baseSize = 50 * (clip.sizeScale || 1);
+      return {
+        left: clip.startX - baseSize / 2,
+        top: clip.startY - baseSize / 2,
+        right: clip.startX + baseSize / 2,
+        bottom: clip.startY + baseSize / 2
+      };
+    }
+
     function renderCapCutFrame(f) {
       ccCtx.fillStyle = "#111111";
       ccCtx.fillRect(0, 0, ccCanvas.width, ccCanvas.height);
 
       capcutClips.forEach(clip => {
         if (f >= clip.startFrame && f <= clip.endFrame) {
-          const progress = (f - clip.startFrame) / (clip.endFrame - clip.startFrame);
-          const curX = clip.startX + (clip.endX - clip.startX) * progress;
-          const curY = clip.startY + (clip.endY - clip.startY) * progress;
+          const curX = clip.startX;
+          const curY = clip.startY;
+          const scale = clip.sizeScale || 1;
 
           ccCtx.fillStyle = clip.color;
           ccCtx.strokeStyle = "#fff";
           ccCtx.lineWidth = 2;
 
           if (clip.type === 'rect') {
-            ccCtx.fillRect(curX - 25, curY - 25, 50, 50);
-            ccCtx.strokeRect(curX - 25, curY - 25, 50, 50);
+            const size = 50 * scale;
+            ccCtx.fillRect(curX - size/2, curY - size/2, size, size);
+            ccCtx.strokeRect(curX - size/2, curY - size/2, size, size);
           } else if (clip.type === 'circle') {
+            const radius = 25 * scale;
             ccCtx.beginPath();
-            ccCtx.arc(curX, curY, 25, 0, Math.PI * 2);
+            ccCtx.arc(curX, curY, radius, 0, Math.PI * 2);
             ccCtx.fill();
             ccCtx.stroke();
           } else if (clip.type === 'text') {
-            ccCtx.font = "bold 20px sans-serif";
+            ccCtx.font = `bold ${Math.round(20 * scale)}px sans-serif`;
             ccCtx.fillStyle = clip.color;
-            ccCtx.fillText(`Animasyon #${clip.id}`, curX, curY);
+            ccCtx.fillText(`Animasyon #${clip.id}`, curX - 40, curY);
           } else if (clip.type === 'image' && clip.imgElement) {
-            ccCtx.drawImage(clip.imgElement, curX - 30, curY - 30, 60, 60);
+            const imgSize = 60 * scale;
+            ccCtx.drawImage(clip.imgElement, curX - imgSize/2, curY - imgSize/2, imgSize, imgSize);
           }
         }
       });
@@ -1667,6 +1694,83 @@
       document.getElementById('capcutTimecode').innerText = `Kare: ${f} / ${capcutMaxFrames}`;
       const playheadPct = (f / capcutMaxFrames) * 100;
       document.getElementById('capcutPlayhead').style.left = `${playheadPct}%`;
+    }
+
+    ccCanvas.addEventListener('mousedown', (e) => {
+      const rect = ccCanvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // Hangi klip tıklandı kontrol et
+      for (let i = capcutClips.length - 1; i >= 0; i--) {
+        const clip = capcutClips[i];
+        if (capcutCurrentFrame >= clip.startFrame && capcutCurrentFrame <= clip.endFrame) {
+          const box = getClipBoundingBox(clip);
+          if (mouseX >= box.left && mouseX <= box.right && mouseY >= box.top && mouseY <= box.bottom) {
+            if (e.button === 2) { // Sağ tık
+              e.preventDefault();
+              ccSelectedClipForMenu = clip;
+              const menu = document.getElementById('capcut-context-menu');
+              menu.style.display = 'block';
+              menu.style.left = `${e.clientX}px`;
+              menu.style.top = `${e.clientY}px`;
+              return;
+            } else if (e.button === 0) { // Sol tık sürükleme
+              ccDraggingClip = clip;
+              ccDragOffsetX = mouseX - clip.startX;
+              ccDragOffsetY = mouseY - clip.startY;
+              return;
+            }
+          }
+        }
+      }
+      if (e.button === 2) {
+        e.preventDefault();
+      }
+    });
+
+    ccCanvas.addEventListener('mousemove', (e) => {
+      if (!ccDraggingClip) return;
+      const rect = ccCanvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      ccDraggingClip.startX = mouseX - ccDragOffsetX;
+      ccDraggingClip.startY = mouseY - ccDragOffsetY;
+      renderCapCutFrame(capcutCurrentFrame);
+    });
+
+    window.addEventListener('mouseup', () => {
+      ccDraggingClip = null;
+    });
+
+    ccCanvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    function ccMenuZoomIn() {
+      if (ccSelectedClipForMenu) {
+        ccSelectedClipForMenu.sizeScale = (ccSelectedClipForMenu.sizeScale || 1) * 1.25;
+        renderCapCutFrame(capcutCurrentFrame);
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
+
+    function ccMenuZoomOut() {
+      if (ccSelectedClipForMenu) {
+        ccSelectedClipForMenu.sizeScale = Math.max(0.3, (ccSelectedClipForMenu.sizeScale || 1) / 1.25);
+        renderCapCutFrame(capcutCurrentFrame);
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
+    }
+
+    function ccMenuDelete() {
+      if (ccSelectedClipForMenu) {
+        capcutClips = capcutClips.filter(c => c.id !== ccSelectedClipForMenu.id);
+        renderCapCutTimelineClips();
+        renderCapCutFrame(capcutCurrentFrame);
+      }
+      document.getElementById('capcut-context-menu').style.display = 'none';
     }
 
     function toggleCapCutPlay() {
@@ -1712,10 +1816,9 @@
             color: '#10b981',
             startFrame: 0,
             endFrame: 90,
-            startX: 100,
-            startY: 100,
-            endX: 500,
-            endY: 200
+            startX: 250,
+            startY: 175,
+            sizeScale: 1
           });
           renderCapCutTimelineClips();
           renderCapCutFrame(capcutCurrentFrame);
@@ -1809,13 +1912,6 @@
       currentTool = 'shape';
       currentShape = shape;
       closeAllMenus();
-      // CapCut panelindeyken şekil menüsünden seçilirse direkt klip olarak da eklenebilir
-      if (document.getElementById('panelAnim').classList.contains('active')) {
-        let col = document.getElementById('capcutColorPicker').value;
-        if (shape === 'rect' || shape === 'roundRect') addVideoClip('rect', col);
-        else if (shape === 'circle') addVideoClip('circle', col);
-        else addVideoClip('text', col);
-      }
     }
 
     function setAnimTool(tool) {
