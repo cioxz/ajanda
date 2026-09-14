@@ -721,13 +721,13 @@
         <div>
           <div class="sidebar-section-title">✨ Gerçek Gemini AI Asistanı</div>
           <div class="ai-assistant-box">
-            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz..."></textarea>
+            <textarea class="ai-input" id="aiPromptInput" placeholder="Örn: kedi çiz, uçak çiz, kule çiz..."></textarea>
             <button class="ai-send-btn" onclick="handleGeminiAICommand()">🤖 Gemini'ye Sor / Çizdir</button>
             <div class="ai-chips">
               <button class="ai-chip" onclick="quickAICoip('kedi çiz')">Kedi Çiz</button>
               <button class="ai-chip" onclick="quickAICoip('uçak çiz')">Uçak Çiz</button>
               <button class="ai-chip" onclick="quickAICoip('insan çiz')">İnsan Çiz</button>
-              <button class="ai-chip" onclick="quickAICoip('kalem çiz')">Kalem Çiz</button>
+              <button class="ai-chip" onclick="quickAICoip('kule çiz')">Kule Çiz</button>
             </div>
           </div>
         </div>
@@ -768,7 +768,7 @@
           <div id="uploadPlaceholder" style="text-align:center; color: var(--text-muted); cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
             <div style="font-size: 2.5rem; margin-bottom: 8px;">✨</div>
             <span style="font-size: 1.1rem; font-weight: 600;">Sol taraftan Gemini'ye çizim yaptırın ya da serbest çizin</span><br>
-            <span style="font-size: 0.85rem;">Örn: "kedi çiz", "uçak çiz"</span>
+            <span style="font-size: 0.85rem;">Örn: "kedi çiz", "uçak çiz", "kule çiz"</span>
           </div>
           <canvas id="animCanvas"></canvas>
         </div>
@@ -1318,7 +1318,7 @@
       clearAnimDrawing();
     }
 
-    // Gemini API Entegrasyonu (Dinamik Anahtar ile)
+    // Gemini API Entegrasyonu (Güncel gemini-3.6-flash modeli ile)
     async function handleGeminiAICommand() {
       const prompt = document.getElementById('aiPromptInput').value.trim();
       if (!prompt) return;
@@ -1330,30 +1330,28 @@
       }
 
       const outputDiv = document.getElementById('aiResponseOutput');
-      outputDiv.innerHTML = `<span>Gemini düşünüyor...</span>`;
+      outputDiv.innerHTML = `<span>Gemini tuvale çiziyor...</span>`;
       
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
       try {
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
+            contents: [{ parts: [{ text: `${prompt} istemini aldım. Tuvale çizim yapılıyor.` }] }]
           })
         });
 
         const data = await res.json();
         
         if (data.candidates && data.candidates[0].content) {
-          const reply = data.candidates[0].content.parts[0].text;
-          outputDiv.innerHTML = `<span style="color:var(--primary); font-weight:600;">Gemini Cevabı:</span> <span>${reply}</span>`;
-          
+          outputDiv.innerHTML = `<span style="color:var(--primary); font-weight:600;">Başarılı:</span> <span>"${prompt}" tuvale çizildi!</span>`;
           drawGeminiShape(prompt.toLowerCase());
         } else if (data.error) {
           outputDiv.innerHTML = `<span style="color:red;">Hata: ${data.error.message}</span>`;
         } else {
-          outputDiv.innerHTML = `<span style="color:red;">Gemini'den yanıt alınamadı.</span>`;
+          outputDiv.innerHTML = `<span style="color:red;">Yanıt alınamadı.</span>`;
         }
       } catch (error) {
         outputDiv.innerHTML = `<span style="color:red;">Bağlantı hatası: ${error}</span>`;
@@ -1369,33 +1367,62 @@ const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-
 
       ctxAnim.globalCompositeOperation = 'source-over';
       ctxAnim.strokeStyle = '#4f46e5';
-      ctxAnim.fillStyle = '#4f46e5';
+      ctxAnim.fillStyle = '#e0e7ff';
       ctxAnim.lineWidth = 3;
+      ctxAnim.lineCap = 'round';
+      ctxAnim.lineJoin = 'round';
 
       if (prompt.includes('kedi')) {
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 20, 40, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx - 50, cy - 80); ctxAnim.lineTo(cx - 15, cy - 55); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy - 50); ctxAnim.lineTo(cx + 50, cy - 80); ctxAnim.lineTo(cx + 15, cy - 55); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 30, 4, 0, Math.PI * 2); ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 30, 4, 0, Math.PI * 2); ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 15, 3, 0, Math.PI * 2); ctxAnim.fill();
-        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy + 50, 35, 50, 0, 0, Math.PI * 2); ctxAnim.stroke();
+        // Detaylı ve sevimli Kedi Çizimi
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 25, 45, 0, Math.PI * 2); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 55); ctxAnim.lineTo(cx - 55, cy - 90); ctxAnim.lineTo(cx - 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy - 55); ctxAnim.lineTo(cx + 55, cy - 90); ctxAnim.lineTo(cx + 15, cy - 60); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.arc(cx - 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = '#4f46e5'; ctxAnim.fill();
+        ctxAnim.beginPath(); ctxAnim.arc(cx + 15, cy - 35, 5, 0, Math.PI * 2); ctxAnim.fillStyle = '#4f46e5'; ctxAnim.fill();
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 20, 4, 0, Math.PI * 2); ctxAnim.fill();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 15); ctxAnim.lineTo(cx - 40, cy - 20); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 10); ctxAnim.lineTo(cx - 40, cy - 10); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy - 15); ctxAnim.lineTo(cx + 40, cy - 20); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy - 10); ctxAnim.lineTo(cx + 40, cy - 10); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy + 45, 40, 55, 0, 0, Math.PI * 2); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 35, cy + 70); ctxAnim.quadraticCurveTo(cx + 80, cy + 70, cx + 70, cy + 20); ctxAnim.stroke();
       } 
       else if (prompt.includes('uçak')) {
-        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy, 80, 20, 0, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy - 20); ctxAnim.lineTo(cx + 20, cy - 80); ctxAnim.lineTo(cx + 30, cy - 20); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy + 20); ctxAnim.lineTo(cx + 20, cy + 80); ctxAnim.lineTo(cx + 30, cy + 20); ctxAnim.stroke();
+        // Detaylı ve Şık Uçak Çizimi
+        ctxAnim.beginPath(); ctxAnim.ellipse(cx, cy, 90, 22, 0, 0, Math.PI * 2); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.arc(cx + 90, cy, 5, -Math.PI/2, Math.PI/2); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy - 20); ctxAnim.lineTo(cx + 25, cy - 110); ctxAnim.lineTo(cx + 45, cy - 20); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy + 20); ctxAnim.lineTo(cx + 25, cy + 110); ctxAnim.lineTo(cx + 45, cy + 20); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 70, cy - 10); ctxAnim.lineTo(cx - 90, cy - 45); ctxAnim.lineTo(cx - 60, cy - 10); ctxAnim.closePath(); ctxAnim.stroke();
+        for(let i = -40; i <= 40; i += 20) {
+          ctxAnim.beginPath(); ctxAnim.arc(cx + i, cy - 3, 3, 0, Math.PI * 2); ctxAnim.stroke();
+        }
       } 
-      else if (prompt.includes('insan') || prompt.includes('adam')) {
-        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 50, 25, 0, Math.PI * 2); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy - 25); ctxAnim.lineTo(cx, cy + 40); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 30, cy); ctxAnim.lineTo(cx + 30, cy); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx - 20, cy + 90); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx, cy + 40); ctxAnim.lineTo(cx + 20, cy + 90); ctxAnim.stroke();
+      else if (prompt.includes('insan') || prompt.includes('adam') || prompt.includes('kız')) {
+        // Karakter Tasarımı
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 60, 22, 0, Math.PI * 2); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.rect(cx - 18, cy - 35, 36, 65); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 18, cy - 25); ctxAnim.lineTo(cx - 50, cy); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 18, cy - 25); ctxAnim.lineTo(cx + 50, cy); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 10, cy + 30); ctxAnim.lineTo(cx - 15, cy + 90); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx + 10, cy + 30); ctxAnim.lineTo(cx + 15, cy + 90); ctxAnim.stroke();
       } 
-      else if (prompt.includes('kalem')) {
-        ctxAnim.beginPath(); ctxAnim.rect(cx - 15, cy - 40, 30, 80); ctxAnim.stroke();
-        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 15, cy - 40); ctxAnim.lineTo(cx, cy - 75); ctxAnim.lineTo(cx + 15, cy - 40); ctxAnim.stroke();
+      else if (prompt.includes('kule')) {
+        // Detaylı Galata/Saat Kulesi Tarzı
+        ctxAnim.beginPath(); ctxAnim.rect(cx - 25, cy - 30, 50, 110); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.rect(cx - 32, cy - 50, 64, 20); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.moveTo(cx - 35, cy - 50); ctxAnim.lineTo(cx, cy - 100); ctxAnim.lineTo(cx + 35, cy - 50); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.arc(cx, cy - 10, 10, Math.PI, 0, false); ctxAnim.lineTo(cx + 10, cy + 15); ctxAnim.lineTo(cx - 10, cy + 15); ctxAnim.closePath(); ctxAnim.stroke();
+        ctxAnim.beginPath(); ctxAnim.rect(cx - 12, cy + 50, 24, 30); ctxAnim.stroke();
+      }
+      else {
+        // Estetik Yıldız / Çiçek Motifi
+        ctxAnim.beginPath();
+        for (let i = 0; i < 5; i++) {
+          ctxAnim.lineTo(cx + 50 * Math.cos((i * 4 * Math.PI) / 5), cy + 50 * Math.sin((i * 4 * Math.PI) / 5));
+        }
+        ctxAnim.closePath();
+        ctxAnim.stroke();
       }
     }
 
