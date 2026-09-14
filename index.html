@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gelişmiş Takvim & Not Uygulaması</title>
+  <title>Gelişmiş Takvim & Animasyon Stüdyosu</title>
   <style>
     :root {
       --bg-color: #f3f4f6;
@@ -30,14 +30,16 @@
       color: var(--text-main);
       padding: 20px;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
     }
 
     .app-container {
       display: grid;
       grid-template-columns: 1fr 340px;
       gap: 20px;
-      max-width: 1100px;
+      max-width: 1200px;
       width: 100%;
     }
 
@@ -349,6 +351,99 @@
       color: #fff;
       border-color: var(--primary);
     }
+
+    /* Animation Addon Section Styles */
+    .anim-addon-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #111827;
+      color: #f9fafb;
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 1200px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .anim-top-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .anim-tools {
+      display: flex;
+      gap: 8px;
+    }
+
+    .anim-tool-btn {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .anim-tool-btn:hover {
+      background: #374151;
+    }
+
+    .anim-tool-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .anim-workspace {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: #0b0f19;
+      border: 2px dashed #374151;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .anim-workspace canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+    }
+
+    .anim-timeline-container {
+      background: #1f2937;
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .anim-timeline-scrubber {
+      position: relative;
+      height: 24px;
+      background: #111827;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .anim-playhead {
+      position: absolute;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -377,6 +472,41 @@
         <button class="add-note-btn" onclick="openIosNoteModal()">+ Not</button>
       </div>
       <div class="notes-list" id="generalNotesList"></div>
+    </div>
+  </div>
+
+  <!-- Animasyon Stüdyosu Eklentisi -->
+  <div class="anim-addon-container">
+    <div class="anim-top-toolbar">
+      <div class="anim-tools">
+        <button class="anim-tool-btn active" onclick="setAnimTool('select')">↖ Seç</button>
+        <button class="anim-tool-btn" onclick="setAnimTool('tag')">◎ Etiket</button>
+        <button class="anim-tool-btn" onclick="setAnimTool('rotate')">⊕ Döndür</button>
+      </div>
+      <div>
+        <button class="anim-tool-btn" onclick="rewindAnimation()">⏮ Başa Sar</button>
+        <button class="anim-tool-btn" onclick="togglePlayAnimation()">▶ Oynat</button>
+        <span id="frameCounter" style="margin-left: 10px; font-weight: bold; font-size: 0.9rem;">F12 / 48</span>
+        <button class="anim-tool-btn" style="margin-left: 10px;" onclick="addKeyframe()">+ Keyframe</button>
+      </div>
+    </div>
+
+    <div class="anim-workspace" id="animWorkspace">
+      <div id="uploadPlaceholder" style="text-align:center; color: #9ca3af; cursor:pointer;" onclick="document.getElementById('animCharUploader').click()">
+        <div style="font-size: 2rem; margin-bottom: 6px;">➕</div>
+        Karakter Fotoğrafı Yükle<br><span style="font-size: 0.8rem;">PNG, JPG — Çizimler, görseller</span>
+      </div>
+      <input type="file" id="animCharUploader" accept="image/*" style="display:none" onchange="loadAnimCharacter(event)">
+      <canvas id="animCanvas"></canvas>
+    </div>
+
+    <div class="anim-timeline-container">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #9ca3af;">
+        <span>0</span><span>8</span><span>16</span><span>24</span><span>32</span><span>40</span><span>48</span>
+      </div>
+      <div class="anim-timeline-container-inner anim-timeline-scrubber" id="timelineScrubber" onclick="scrubTimeline(event)">
+        <div class="anim-playhead" id="playhead" style="left: 25%;"></div>
+      </div>
     </div>
   </div>
 
@@ -438,6 +568,7 @@
   </div>
 
   <script>
+    // --- Takvim & Not Mantığı ---
     let currentDate = new Date();
     const realToday = new Date();
     let selectedDateKey = '';
@@ -490,10 +621,8 @@
     function getHolidayName(year, month, day) {
       const fullKey = `${year}-${month}-${day}`;
       if (religiousHolidays[fullKey]) return religiousHolidays[fullKey];
-
       const fixedKey = `${month}-${day}`;
       if (fixedHolidays[fixedKey]) return fixedHolidays[fixedKey];
-
       return null;
     }
 
@@ -561,7 +690,7 @@
       }
     }
 
-    /* Canvas Drawing Logic */
+    // --- Not Çizim Canvas Mantığı ---
     const canvas = document.getElementById('inlineCanvas');
     const ctx = canvas.getContext('2d');
     let painting = false;
@@ -648,7 +777,7 @@
     canvas.addEventListener('touchend', endPosition);
     canvas.addEventListener('touchmove', draw);
 
-    /* General Notes Logic */
+    // --- Notlar Sidebar Mantığı ---
     function loadGeneralNotes() {
       const notesList = document.getElementById('generalNotesList');
       notesList.innerHTML = '';
@@ -816,10 +945,124 @@
     function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }
     function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }
 
+
+    // --- Animasyon Stüdyosu Eklenti Mantığı ---
+    let animCanvas = document.getElementById('animCanvas');
+    let animCtx = animCanvas.getContext('2d');
+    let currentFrame = 12;
+    let totalFrames = 48;
+    let characterImage = null;
+    let imgTransform = { x: 0, y: 0, scale: 1, rotation: 0 };
+    let keyframes = { 0: {rotation: 0}, 24: {rotation: 45}, 48: {rotation: 0} };
+
+    function initAnimCanvas() {
+      const workspace = document.getElementById('animWorkspace');
+      animCanvas.width = workspace.clientWidth;
+      animCanvas.height = workspace.clientHeight;
+      redrawAnimWorkspace();
+    }
+
+    function loadAnimCharacter(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          characterImage = new Image();
+          characterImage.onload = function() {
+            document.getElementById('uploadPlaceholder').style.display = 'none';
+            imgTransform.x = animCanvas.width / 2 - (characterImage.width / 4) / 2;
+            imgTransform.y = animCanvas.height / 2 - (characterImage.height / 4) / 2;
+            redrawAnimWorkspace();
+          };
+          characterImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function redrawAnimWorkspace() {
+      animCtx.clearRect(0, 0, animCanvas.width, animCanvas.height);
+      if (!characterImage) return;
+
+      animCtx.save();
+      const renderW = characterImage.width / 3;
+      const renderH = characterImage.height / 3;
+      animCtx.translate(imgTransform.x + renderW / 2, imgTransform.y + renderH / 2);
+      animCtx.rotate((imgTransform.rotation * Math.PI) / 180);
+      animCtx.drawImage(characterImage, -renderW / 2, -renderH / 2, renderW, renderH);
+      animCtx.restore();
+    }
+
+    function scrubTimeline(e) {
+      const scrubber = document.getElementById('timelineScrubber');
+      const rect = scrubber.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+      
+      currentFrame = Math.round(percentage * totalFrames);
+      document.getElementById('playhead').style.left = `${percentage * 100}%`;
+      document.getElementById('frameCounter').innerText = `F${currentFrame} / ${totalFrames}`;
+
+      // Zaman çizelgesine göre örnek rotasyon değişimi (interpolasyon)
+      if (currentFrame <= 24) {
+        imgTransform.rotation = (currentFrame / 24) * 45;
+      } else {
+        imgTransform.rotation = 45 - ((currentFrame - 24) / 24) * 45;
+      }
+      redrawAnimWorkspace();
+    }
+
+    function addKeyframe() {
+      keyframes[currentFrame] = { rotation: imgTransform.rotation };
+      alert(`Kare ${currentFrame} için Keyframe eklendi!`);
+    }
+
+    function rewindAnimation() {
+      currentFrame = 0;
+      document.getElementById('playhead').style.left = `0%`;
+      document.getElementById('frameCounter').innerText = `F0 / ${totalFrames}`;
+      imgTransform.rotation = 0;
+      redrawAnimWorkspace();
+    }
+
+    function togglePlayAnimation() {
+      let frameStep = setInterval(() => {
+        if (currentFrame >= totalFrames) {
+          clearInterval(frameStep);
+          return;
+        }
+        currentFrame++;
+        let percentage = (currentFrame / totalFrames) * 100;
+        document.getElementById('playhead').style.left = `${percentage}%`;
+        document.getElementById('frameCounter').innerText = `F${currentFrame} / ${totalFrames}`;
+        
+        if (currentFrame <= 24) {
+          imgTransform.rotation = (currentFrame / 24) * 45;
+        } else {
+          imgTransform.rotation = 45 - ((currentFrame - 24) / 24) * 45;
+        }
+        redrawAnimWorkspace();
+      }, 50);
+    }
+
+    function setAnimTool(toolName) {
+      // Araç butonlarının aktiflik durumunu güncelleme
+      const buttons = document.querySelectorAll('.anim-addon-container .anim-tool-btn');
+      buttons.forEach(btn => {
+        if(!btn.getAttribute('onclick')?.includes('play') && !btn.getAttribute('onclick')?.includes('rewind') && !btn.getAttribute('onclick')?.includes('Keyframe')) {
+          btn.classList.remove('active');
+        }
+      });
+      event.currentTarget.classList.add('active');
+    }
+
     // Uygulamayı Başlat
     updateHeaderTodayInfo();
     renderCalendar();
     loadGeneralNotes();
+    
+    window.addEventListener('resize', initAnimCanvas);
+    setTimeout(initAnimCanvas, 100);
   </script>
 </body>
 </html>
