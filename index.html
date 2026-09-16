@@ -662,7 +662,6 @@
     .context-menu div:hover, .context-menu button:hover {
       background-color: #ff0022;
     }
-    .context-menu hr { border: 0; border-top: 1px solid #444; margin: 4px 0; }
 
     .studio-panel {
       display: none;
@@ -756,33 +755,6 @@
       overflow: auto;
     }
 
-    .blueprint-grid {
-      display: grid;
-      gap: 1px;
-      background-color: #d5d0c7;
-      border: 2px solid var(--border-color);
-      padding: 1px;
-      border-radius: 6px;
-    }
-
-    .bp-cell {
-      width: 18px;
-      height: 18px;
-      background: #ffffff;
-    }
-
-    .bp-cell.active {
-      background: #3b82f6;
-    }
-
-    .bp-cell.axis {
-      background: #94a3b8;
-    }
-
-    .bp-cell.center {
-      background: #64748b;
-    }
-
     .bp-stats-text {
       font-size: 0.95rem;
       font-weight: 500;
@@ -792,135 +764,6 @@
       padding: 8px 16px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
-    }
-
-    /* Video & Animasyon Stüdyosu (CapCut + Zaman Çizelgesi Barı) */
-    .capcut-studio-wrapper {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      gap: 12px;
-      background: #1e1e1e;
-      border-radius: 16px;
-      border: 1px solid #333;
-      overflow: hidden;
-      color: #fff;
-    }
-
-    .capcut-preview-viewport {
-      flex: 1;
-      background: #121212;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      min-height: 220px;
-    }
-
-    .target-shape {
-      width: 50px;
-      height: 50px;
-      background-color: red;
-      border: 2px solid white;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      z-index: 5;
-    }
-
-    .capcut-canvas {
-      background: #181818;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      cursor: grab;
-    }
-    .capcut-canvas:active {
-      cursor: grabbing;
-    }
-
-    .capcut-timeline-panel {
-      height: 180px;
-      background: #181818;
-      border-top: 1px solid #333;
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-      gap: 8px;
-    }
-
-    .capcut-timeline-toolbar {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .timeline-container {
-      flex: 1;
-      height: 90px;
-      background-color: #1a1a1a;
-      border-radius: 8px;
-      position: relative;
-      padding: 10px;
-      box-sizing: border-box;
-      border: 1px solid #333;
-      overflow: hidden;
-    }
-
-    .timeline-bar {
-      position: absolute;
-      top: 25px;
-      left: 20px;
-      width: 400px;
-      height: 36px;
-      background-color: #ff0022;
-      border-radius: 6px;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding-left: 10px;
-      font-size: 13px;
-      font-weight: bold;
-      user-select: none;
-      cursor: grab;
-      z-index: 8;
-    }
-
-    .resize-handle {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 8px;
-      cursor: ew-resize;
-      background-color: rgba(255, 255, 255, 0.4);
-    }
-    .resize-handle:hover { background-color: rgba(255, 255, 255, 0.8); }
-    .resize-handle.left { left: 0; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
-    .resize-handle.right { right: 0; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
-
-    .capcut-playhead {
-      position: absolute;
-      top: 0; bottom: 0;
-      width: 2px;
-      background: #ef4444;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .capcut-clip-element {
-      position: absolute;
-      top: 5px;
-      height: 20px;
-      background: #3b82f6;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      padding: 0 6px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: #fff;
-      border: 1px solid #60a5fa;
     }
 
     .anim-timeline-container {
@@ -974,7 +817,7 @@
         <h3 id="studioMainTitle">🎨 Resim Stüdyosu</h3>
         <div class="studio-tabs">
           <button class="studio-tab-btn active" id="tabArt" onclick="switchStudio('art')">Resim Stüdyosu</button>
-          <button class="studio-tab-btn" id="tabAnim" onclick="switchStudio('anim')">🎬 Video & Animasyon Stüdyosu</button>
+          <button class="studio-tab-btn" id="tabSound" onclick="switchStudio('sound')">🔊 Ses Stüdyosu</button>
           <button class="studio-tab-btn" id="tabMc" onclick="switchStudio('minecraft')">Minecraft Stüdyosu</button>
           <button class="studio-tab-btn" id="tabBlueprint" onclick="switchStudio('blueprint')">📐 Daire Şeması</button>
         </div>
@@ -999,21 +842,18 @@
           </div>
         </div>
 
-        <!-- CapCut Video / Animasyon Kontrolleri -->
-        <div id="sidebarAnim" class="studio-sidebar-content" style="display: none;">
-          <div class="sidebar-section-title">🎬 Video & Klip Araçları</div>
+        <!-- Ses Stüdyosu Kontrolleri -->
+        <div id="sidebarSound" class="studio-sidebar-content" style="display: none;">
+          <div class="sidebar-section-title">🔊 Oyun Ses Efektleri</div>
           <div class="ai-assistant-box">
-            <button class="ai-send-btn" onclick="addVideoClip('rect', document.getElementById('capcutColorPicker').value)">➕ Kare Klip Ekle</button>
-            <button class="ai-send-btn" onclick="addVideoClip('circle', document.getElementById('capcutColorPicker').value)">➕ Daire Klip Ekle</button>
-            <button class="ai-send-btn" onclick="addVideoClip('line', document.getElementById('capcutColorPicker').value)">➕ Çizgi Klip Ekle</button>
-            <button class="ai-send-btn" onclick="addVideoClip('text', document.getElementById('capcutColorPicker').value, 'Yeni Metin')">➕ Metin Klipi Ekle</button>
-            <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
-            <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">İpuçları:</div>
-            <div style="font-size:0.75rem; color:var(--text-muted);">
-              • Zaman barını sürükleyebilir, uçlarındaki tutamaklardan uzatıp kısaltabilirsiniz.<br>
-              • Kırmızı şekle ve klip öğelerine **sağ tıklayarak** özel seçenekleri açabilirsiniz.
-            </div>
-            <button class="btn-secondary" onclick="clearVideoClips()" style="margin-top:4px;">Tümünü Sıfırla</button>
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Hazır Oyun Efektleri:</div>
+            <button class="ai-send-btn" onclick="playSoundFX('jump')">🦘 Zıplama (Jump)</button>
+            <button class="ai-send-btn" onclick="playSoundFX('laser')">🔫 Lazer / Ateş (Laser)</button>
+            <button class="ai-send-btn" onclick="playSoundFX('coin')">🪙 Altın Toplama (Coin)</button>
+            <button class="ai-send-btn" onclick="playSoundFX('explosion')">💥 Patlama (Explosion)</button>
+            <button class="ai-send-btn" onclick="playSoundFX('powerup')">⭐ Güç Alma (Powerup)</button>
+            <button class="ai-send-btn" onclick="playSoundFX('hit')">🛡️ Darbe / Hasar (Hit)</button>
+            <button class="ai-send-btn" onclick="playSoundFX('click')">🖱️ Buton Tıklama (Click)</button>
           </div>
         </div>
 
@@ -1086,46 +926,51 @@
           </div>
         </div>
 
-        <!-- CapCut Video & Animasyon Stüdyosu Paneli -->
-        <div id="panelAnim" class="studio-panel">
+        <!-- Ses Stüdyosu Paneli -->
+        <div id="panelSound" class="studio-panel">
           <div class="anim-top-toolbar">
-            <div class="anim-tools">
-              <button class="anim-tool-btn active">🎬 Video & Zaman Çizelgesi Araçları</button>
-              <button class="anim-tool-btn" onclick="document.getElementById('capcutImageLoader').click()">🖼️ Fotoğraf Ekle</button>
-              <button class="anim-tool-btn" onclick="clearVideoClips()" style="color: #d9534f;">Tümünü Sıfırla</button>
-            </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
-              <label style="font-size: 0.85rem; font-weight: 600;">Renk: <input type="color" id="capcutColorPicker" value="#3b82f6" style="border:none; width:28px; height:28px; vertical-align:middle; cursor:pointer; background:none;"></label>
-            </div>
+            <span style="font-weight: 600; font-size: 0.9rem;">🔊 Ses Efekti Sentezleyici & Jeneratörü</span>
+            <button class="anim-tool-btn" onclick="playCustomSound()">▶️ Efekti Dinle / Çal</button>
           </div>
-          <input type="file" id="capcutImageLoader" accept="image/*" style="display: none;" />
-
-          <div class="capcut-studio-wrapper">
-            <!-- Animasyon Tuval & Şekil Alanı -->
-            <div class="capcut-preview-viewport" id="viewport">
-              <div class="target-shape" id="shape"></div>
-              <canvas id="capcutCanvas" width="700" height="350" class="capcut-canvas"></canvas>
+          <div class="minecraft-box" style="gap:16px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+              <div class="blueprint-card-box">
+                <span style="font-size:0.85rem; font-weight:700;">Dalga Tipi (Waveform)</span>
+                <select id="sfxWaveform" style="padding:8px; border-radius:8px; border:1px solid var(--border-color); font-weight:600;">
+                  <option value="square" selected>Kare (Retro 8-Bit / Square)</option>
+                  <option value="sine">Sinüs (Yumuşak / Sine)</option>
+                  <option value="sawtooth">Testere (Keskin Lazer / Sawtooth)</option>
+                  <option value="triangle">Üçgen (Bas / Triangle)</option>
+                </select>
+              </div>
+              <div class="blueprint-card-box">
+                <span style="font-size:0.85rem; font-weight:700;">Başlangıç Frekansı (Hz)</span>
+                <input type="range" id="sfxFreq" min="100" max="2000" value="440" oninput="document.getElementById('freqVal').innerText = this.value + ' Hz'">
+                <span id="freqVal" style="font-size:0.8rem; text-align:right;">440 Hz</span>
+              </div>
+              <div class="blueprint-card-box">
+                <span style="font-size:0.85rem; font-weight:700;">Süre (Saniye)</span>
+                <input type="range" id="sfxDuration" min="0.05" max="2.0" step="0.05" value="0.3" oninput="document.getElementById('durVal').innerText = this.value + ' sn'">
+                <span id="durVal" style="font-size:0.8rem; text-align:right;">0.3 sn</span>
+              </div>
+              <div class="blueprint-card-box">
+                <span style="font-size:0.85rem; font-weight:700;">Frekans Kayması (Pitch Slide)</span>
+                <select id="sfxSlide" style="padding:8px; border-radius:8px; border:1px solid var(--border-color); font-weight:600;">
+                  <option value="none">Sabit Frekans</option>
+                  <option value="up">Yükselen (Zıplama / Up)</option>
+                  <option value="down" selected>Düşen (Lazer / Down)</option>
+                </select>
+              </div>
             </div>
-            
-            <!-- Zaman Çizelgesi Paneli -->
-            <div class="capcut-timeline-panel">
-              <div class="capcut-timeline-toolbar">
-                <button class="anim-tool-btn" onclick="toggleCapCutPlay()">▶ Oynat / Durdur</button>
-                <button class="anim-tool-btn" onclick="resetCapCutTimeline()">⏮ Başa Dön</button>
-                <span id="capcutTimecode" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Kare: 0 / 100</span>
-              </div>
-              
-              <div class="timeline-container" id="timelineTrack" onclick="scrubCapCutTimeline(event)">
-                <div class="capcut-playhead" id="capcutPlayhead"></div>
-                <div id="capcutClipsContainer"></div>
-                
-                <!-- Sürüklenebilir ve Boyutlandırılabilir Zaman Barı -->
-                <div class="timeline-bar" id="timelineBar">
-                  #1 rect
-                  <div class="resize-handle left" id="handleLeft"></div>
-                  <div class="resize-handle right" id="handleRight"></div>
-                </div>
-              </div>
+
+            <div style="font-weight:700; font-size:0.9rem; margin-top:8px;">🎮 Oyun İçi Ses Padleri (Tıkla ve Dinle)</div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
+              <button class="open-anim-btn" style="justify-content:center; background:#3b82f6;" onclick="playSoundFX('jump')">🦘 Zıpla</button>
+              <button class="open-anim-btn" style="justify-content:center; background:#ef4444;" onclick="playSoundFX('laser')">🔫 Lazer</button>
+              <button class="open-anim-btn" style="justify-content:center; background:#eab308;" onclick="playSoundFX('coin')">🪙 Coin</button>
+              <button class="open-anim-btn" style="justify-content:center; background:#dc2626;" onclick="playSoundFX('explosion')">💥 Patlama</button>
+              <button class="open-anim-btn" style="justify-content:center; background:#10b981;" onclick="playSoundFX('powerup')">⭐ Powerup</button>
+              <button class="open-anim-btn" style="justify-content:center; background:#8b5cf6;" onclick="playSoundFX('hit')">🛡️ Darbe</button>
             </div>
           </div>
         </div>
@@ -1188,31 +1033,6 @@
     <button onclick="setTool('eyedropper')">Renk Seçici (Damlalık)</button>
     <button onclick="setTool('text')">Metin Aracı</button>
     <button onclick="setTool('magnifier')">Büyüteç</button>
-  </div>
-
-  <!-- Kırmızı Şekil Sağ Tık Özel Menüsü -->
-  <div class="context-menu" id="contextMenu">
-    <div onclick="alert('Şekil rengi değiştirildi'); document.getElementById('shape').style.backgroundColor='#00ffcc';">Renk Değiştir</div>
-    <div onclick="alert('Animasyon süresi sıfırlandı'); document.getElementById('timelineBar').style.left='20px';">Süreyi Sıfırla</div>
-    <div onclick="alert('Şekil gizlendi'); document.getElementById('shape').style.display='none';">Sil</div>
-  </div>
-
-  <!-- CapCut Sağ Tık Düzenleme Menüsü -->
-  <div id="capcut-context-menu" class="context-menu">
-    <div style="padding: 4px 12px; font-size:11px; color:#aaa; font-weight:bold;">Klip Özelleştirme</div>
-    <hr>
-    <button onclick="ccMenuChangeShape()">📐 Şekli Değiştir / Düzenle</button>
-    <button onclick="ccMenuChangeColor()">🎨 Renk Değiştir</button>
-    <button onclick="ccMenuEditText()">✏️ Metni Düzenle</button>
-    <button onclick="ccMenuChangeDuration()">⏱️ Süreyi/Bitiş Kare Ayarla</button>
-    <hr>
-    <button onclick="ccMenuSetStartPosition()">📍 1. Pozisyonu Kaydet (Başlangıç)</button>
-    <button onclick="ccMenuSetEndPosition()">🚩 2. Pozisyonu Kaydet (Bitiş)</button>
-    <hr>
-    <button onclick="ccMenuZoomIn()">🔍 Büyüt (Zoom +)</button>
-    <button onclick="ccMenuZoomOut()">🔍 Küçült (Zoom -)</button>
-    <hr>
-    <button onclick="ccMenuDelete()" style="color:#ef4444;">🗑️ Klibi Sil</button>
   </div>
 
   <!-- Gün Düzenleme Modalı -->
@@ -1278,7 +1098,7 @@
     let selectedMonth = 1;
     let currentMode = 'write';
 
-    const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+    const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylul", "Ekim", "Kasım", "Aralık"];
     const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
 
     const fixedHolidays = {
@@ -1559,7 +1379,6 @@
       document.getElementById('animStudioModal').style.display = 'flex';
       setTimeout(() => {
         initAnimCanvasSize();
-        initCapCutStudio();
       }, 50);
     }
 
@@ -1569,15 +1388,17 @@
 
     function switchStudio(type) {
       document.getElementById('tabArt').classList.remove('active');
-      document.getElementById('tabAnim').classList.remove('active');
+      document.getElementById('tabSound').classList.remove('active');
       document.getElementById('tabMc').classList.remove('active');
       document.getElementById('tabBlueprint').classList.remove('active');
+      
       document.getElementById('panelArt').classList.remove('active');
-      document.getElementById('panelAnim').classList.remove('active');
+      document.getElementById('panelSound').classList.remove('active');
       document.getElementById('panelMc').classList.remove('active');
       document.getElementById('panelBlueprint').classList.remove('active');
+
       document.getElementById('sidebarArt').style.display = 'none';
-      document.getElementById('sidebarAnim').style.display = 'none';
+      document.getElementById('sidebarSound').style.display = 'none';
       document.getElementById('sidebarMc').style.display = 'none';
       document.getElementById('sidebarBlueprint').style.display = 'none';
 
@@ -1588,13 +1409,12 @@
         document.getElementById('studioMainTitle').innerText = '🎨 Resim Stüdyosu';
         document.getElementById('activeStudioName').innerText = 'Resim Stüdyosu';
         setTimeout(initAnimCanvasSize, 50);
-      } else if (type === 'anim') {
-        document.getElementById('tabAnim').classList.add('active');
-        document.getElementById('panelAnim').classList.add('active');
-        document.getElementById('sidebarAnim').style.display = 'flex';
-        document.getElementById('studioMainTitle').innerText = '🎬 Video & Animasyon Stüdyosu';
-        document.getElementById('activeStudioName').innerText = 'Video Stüdyosu';
-        initCapCutStudio();
+      } else if (type === 'sound') {
+        document.getElementById('tabSound').classList.add('active');
+        document.getElementById('panelSound').classList.add('active');
+        document.getElementById('sidebarSound').style.display = 'flex';
+        document.getElementById('studioMainTitle').innerText = '🔊 Ses Stüdyosu';
+        document.getElementById('activeStudioName').innerText = 'Ses Stüdyosu';
       } else if (type === 'minecraft') {
         document.getElementById('tabMc').classList.add('active');
         document.getElementById('panelMc').classList.add('active');
@@ -1611,464 +1431,124 @@
       }
     }
 
-    /* --- 2. SÜRÜKLENEBİLİR ZAMAN ÇİZELGESİ VE ANİMASYON DÜZENLEYİCİ MANTIĞI --- */
-    const timelineBar = document.getElementById('timelineBar');
-    const handleLeft = document.getElementById('handleLeft');
-    const handleRight = document.getElementById('handleRight');
-    const timelineTrack = document.getElementById('timelineTrack');
-    const shape = document.getElementById('shape');
-    const contextMenu = document.getElementById('contextMenu');
+    /* --- 2. SES STÜDYOSU (WEB AUDIO API SES EFEKTİ JENERATÖRÜ) --- */
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
 
-    let isTimelineDragging = false;
-    let isResizingLeft = false;
-    let isResizingRight = false;
-    let dragStartX, dragStartLeft, dragStartWidth;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new AudioCtx();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
 
-    // Barı Taşıma (Drag)
-    timelineBar.addEventListener('mousedown', (e) => {
-      if (e.target.classList.contains('resize-handle')) return;
-      isTimelineDragging = true;
-      timelineBar.style.cursor = 'grabbing';
-      dragStartX = e.clientX;
-      dragStartLeft = timelineBar.offsetLeft;
-    });
+    function playSoundFX(type) {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
-    // Sol Tutamak ile Kısaltma/Uzatma
-    handleLeft.addEventListener('mousedown', (e) => {
-      e.stopPropagation();
-      isResizingLeft = true;
-      dragStartX = e.clientX;
-      dragStartLeft = timelineBar.offsetLeft;
-      dragStartWidth = timelineBar.offsetWidth;
-    });
+      osc.connect(gain);
+      gain.connect(ctx.destination);
 
-    // Sağ Tutamak ile Kısaltma/Uzatma
-    handleRight.addEventListener('mousedown', (e) => {
-      e.stopPropagation();
-      isResizingRight = true;
-      dragStartX = e.clientX;
-      dragStartWidth = timelineBar.offsetWidth;
-    });
-
-    // Fare Hareket Ettiğinde Zaman Barı Güncellemesi
-    window.addEventListener('mousemove', (e) => {
-      const trackWidth = timelineTrack.offsetWidth;
-
-      if (isTimelineDragging) {
-        const dx = e.clientX - dragStartX;
-        let newLeft = dragStartLeft + dx;
-        
-        if (newLeft < 0) newLeft = 0;
-        if (newLeft + timelineBar.offsetWidth > trackWidth) {
-          newLeft = trackWidth - timelineBar.offsetWidth;
+      if (type === 'jump') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } else if (type === 'laser') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } else if (type === 'coin') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, now);
+        osc.frequency.setValueAtTime(1318.51, now + 0.08);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'explosion') {
+        const bufferSize = ctx.sampleRate * 0.3;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
         }
-        timelineBar.style.left = newLeft + 'px';
-      } 
-      else if (isResizingLeft) {
-        const dx = e.clientX - dragStartX;
-        let newWidth = dragStartWidth - dx;
-        let newLeft = dragStartLeft + dx;
-
-        if (newWidth > 30 && newLeft >= 0) {
-          timelineBar.style.width = newWidth + 'px';
-          timelineBar.style.left = newLeft + 'px';
-        }
-      } 
-      else if (isResizingRight) {
-        const dx = e.clientX - dragStartX;
-        let newWidth = dragStartWidth + dx;
-
-        if (newWidth > 30 && (timelineBar.offsetLeft + newWidth) <= trackWidth) {
-          timelineBar.style.width = newWidth + 'px';
-        }
-      }
-    });
-
-    // Fare Bırakıldığında
-    window.addEventListener('mouseup', () => {
-      isTimelineDragging = false;
-      isResizingLeft = false;
-      isResizingRight = false;
-      timelineBar.style.cursor = 'grab';
-    });
-
-    // Kırmızı Şeklin Üzerine Sağ Tıklama (Context Menu)
-    shape.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      contextMenu.style.display = 'block';
-      contextMenu.style.left = e.clientX + 'px';
-      contextMenu.style.top = e.clientY + 'px';
-    });
-
-    // Menü dışına tıklandığında menüyü kapat
-    window.addEventListener('click', () => {
-      contextMenu.style.display = 'none';
-    });
-
-    /* --- 3. VIDEO & ANİMASYON STÜDYOSU (CAPCUT UYUMLU) --- */
-    let capcutClips = [
-      { id: 1, type: 'rect', color: '#3b82f6', startFrame: 0, endFrame: 50, startX: 150, startY: 175, endX: 350, endY: 175, sizeScale: 1, textContent: 'Klip #1' },
-      { id: 2, type: 'circle', color: '#ef4444', startFrame: 25, endFrame: 80, startX: 400, startY: 150, endX: 400, endY: 280, sizeScale: 1, textContent: 'Klip #2' },
-      { id: 3, type: 'line', color: '#10b981', startFrame: 10, endFrame: 70, startX: 250, startY: 250, endX: 450, endY: 100, sizeScale: 1, textContent: 'Çizgi' }
-    ];
-    let capcutCurrentFrame = 0;
-    const capcutMaxFrames = 100;
-    let capcutIsPlaying = false;
-    let capcutAnimTimer = null;
-
-    let ccDraggingClip = null;
-    let ccDragOffsetX = 0;
-    let ccDragOffsetY = 0;
-    let ccSelectedClipForMenu = null;
-
-    const ccCanvas = document.getElementById('capcutCanvas');
-    const ccCtx = ccCanvas.getContext('2d');
-
-    function initCapCutStudio() {
-      renderCapCutTimelineClips();
-      renderCapCutFrame(capcutCurrentFrame);
-    }
-
-    function addVideoClip(type, color, customText = '') {
-      const newId = capcutClips.length + 1;
-      const rx = 200 + Math.random() * 100;
-      const ry = 150 + Math.random() * 50;
-      capcutClips.push({
-        id: newId,
-        type: type,
-        color: color,
-        startFrame: 0,
-        endFrame: 70,
-        startX: rx,
-        startY: ry,
-        endX: rx,
-        endY: ry,
-        sizeScale: 1,
-        textContent: customText || (type === 'text' ? 'Örnek Metin' : `Klip #${newId}`)
-      });
-      renderCapCutTimelineClips();
-      renderCapCutFrame(capcutCurrentFrame);
-    }
-
-    function clearVideoClips() {
-      capcutClips = [];
-      renderCapCutTimelineClips();
-      renderCapCutFrame(capcutCurrentFrame);
-    }
-
-    function renderCapCutTimelineClips() {
-      const container = document.getElementById('capcutClipsContainer');
-      container.innerHTML = '';
-
-      capcutClips.forEach(clip => {
-        const div = document.createElement('div');
-        div.classList.add('capcut-clip-element');
-        const leftPct = (clip.startFrame / capcutMaxFrames) * 100;
-        const widthPct = ((clip.endFrame - clip.startFrame) / capcutMaxFrames) * 100;
-        div.style.left = `${leftPct}%`;
-        div.style.width = `${widthPct}%`;
-        div.style.backgroundColor = clip.color;
-        div.innerText = `${clip.type === 'text' ? clip.textContent : '#' + clip.id + ' ' + clip.type}`;
-        container.appendChild(div);
-      });
-    }
-
-    function getClipCurrentPos(clip, f) {
-      const endX = clip.endX !== undefined ? clip.endX : clip.startX;
-      const endY = clip.endY !== undefined ? clip.endY : clip.startY;
-      const duration = clip.endFrame - clip.startFrame;
-
-      if (duration <= 0) return { x: clip.startX, y: clip.startY };
-
-      const progress = Math.max(0, Math.min(1, (f - clip.startFrame) / duration));
-      return {
-        x: clip.startX + (endX - clip.startX) * progress,
-        y: clip.startY + (endY - clip.startY) * progress
-      };
-    }
-
-    function getClipBoundingBox(clip, f) {
-      const pos = getClipCurrentPos(clip, f);
-      const baseSize = 60 * (clip.sizeScale || 1);
-      return {
-        left: pos.x - baseSize / 2,
-        top: pos.y - baseSize / 2,
-        right: pos.x + baseSize / 2,
-        bottom: pos.y + baseSize / 2
-      };
-    }
-
-    function renderCapCutFrame(f) {
-      ccCtx.fillStyle = "#111111";
-      ccCtx.fillRect(0, 0, ccCanvas.width, ccCanvas.height);
-
-      capcutClips.forEach(clip => {
-        if (f >= clip.startFrame && f <= clip.endFrame) {
-          const pos = getClipCurrentPos(clip, f);
-          const curX = pos.x;
-          const curY = pos.y;
-          const scale = clip.sizeScale || 1;
-
-          ccCtx.fillStyle = clip.color;
-          ccCtx.strokeStyle = clip.color;
-          ccCtx.lineWidth = 3 * scale;
-
-          if (clip.type === 'rect') {
-            const size = 50 * scale;
-            ccCtx.fillRect(curX - size/2, curY - size/2, size, size);
-            ccCtx.strokeStyle = "#fff";
-            ccCtx.strokeRect(curX - size/2, curY - size/2, size, size);
-          } else if (clip.type === 'circle') {
-            const radius = 25 * scale;
-            ccCtx.beginPath();
-            ccCtx.arc(curX, curY, radius, 0, Math.PI * 2);
-            ccCtx.fill();
-            ccCtx.strokeStyle = "#fff";
-            ccCtx.stroke();
-          } else if (clip.type === 'line') {
-            const len = 70 * scale;
-            ccCtx.beginPath();
-            ccCtx.moveTo(curX - len/2, curY);
-            ccCtx.lineTo(curX + len/2, curY);
-            ccCtx.stroke();
-          } else if (clip.type === 'text') {
-            ccCtx.font = `bold ${Math.round(22 * scale)}px sans-serif`;
-            ccCtx.fillStyle = clip.color;
-            ccCtx.fillText(clip.textContent || 'Metin', curX - 40, curY);
-          } else if (clip.type === 'image' && clip.imgElement) {
-            const imgSize = 60 * scale;
-            ccCtx.drawImage(clip.imgElement, curX - imgSize/2, curY - imgSize/2, imgSize, imgSize);
-          }
-
-          if (clip.endX !== undefined && (clip.startX !== clip.endX || clip.startY !== clip.endY)) {
-            ccCtx.beginPath();
-            ccCtx.setLineDash([4, 4]);
-            ccCtx.strokeStyle = "rgba(255, 255, 255, 0.4)";
-            ccCtx.lineWidth = 1;
-            ccCtx.moveTo(clip.startX, clip.startY);
-            ccCtx.lineTo(clip.endX, clip.endY);
-            ccCtx.stroke();
-            ccCtx.setLineDash([]);
-          }
-        }
-      });
-
-      document.getElementById('capcutTimecode').innerText = `Kare: ${f} / ${capcutMaxFrames}`;
-      const playheadPct = (f / capcutMaxFrames) * 100;
-      document.getElementById('capcutPlayhead').style.left = `${playheadPct}%`;
-    }
-
-    ccCanvas.addEventListener('mousedown', (e) => {
-      const rect = ccCanvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      for (let i = capcutClips.length - 1; i >= 0; i--) {
-        const clip = capcutClips[i];
-        if (capcutCurrentFrame >= clip.startFrame && capcutCurrentFrame <= clip.endFrame) {
-          const box = getClipBoundingBox(clip, capcutCurrentFrame);
-          if (mouseX >= box.left && mouseX <= box.right && mouseY >= box.top && mouseY <= box.bottom) {
-            if (e.button === 2) {
-              e.preventDefault();
-              ccSelectedClipForMenu = clip;
-              const menu = document.getElementById('capcut-context-menu');
-              menu.style.display = 'block';
-              menu.style.left = `${e.clientX}px`;
-              menu.style.top = `${e.clientY}px`;
-              return;
-            } else if (e.button === 0) {
-              ccDraggingClip = clip;
-              const pos = getClipCurrentPos(clip, capcutCurrentFrame);
-              ccDragOffsetX = mouseX - pos.x;
-              ccDragOffsetY = mouseY - pos.y;
-              return;
-            }
-          }
-        }
-      }
-      if (e.button === 2) e.preventDefault();
-    });
-
-    ccCanvas.addEventListener('mousemove', (e) => {
-      if (!ccDraggingClip) return;
-      const rect = ccCanvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      const targetX = mouseX - ccDragOffsetX;
-      const targetY = mouseY - ccDragOffsetY;
-
-      const duration = ccDraggingClip.endFrame - ccDraggingClip.startFrame;
-      const progress = duration > 0 ? (capcutCurrentFrame - ccDraggingClip.startFrame) / duration : 0;
-
-      if (progress < 0.5) {
-        ccDraggingClip.startX = targetX;
-        ccDraggingClip.startY = targetY;
-      } else {
-        ccDraggingClip.endX = targetX;
-        ccDraggingClip.endY = targetY;
-      }
-
-      renderCapCutFrame(capcutCurrentFrame);
-    });
-
-    window.addEventListener('mouseup', () => { ccDraggingClip = null; });
-    ccCanvas.addEventListener('contextmenu', (e) => { e.preventDefault(); });
-
-    function ccMenuChangeShape() {
-      if (ccSelectedClipForMenu) {
-        const newShape = prompt("Yeni şekil seçin (rect = Kare, circle = Daire, line = Çizgi, text = Metin):", ccSelectedClipForMenu.type);
-        if (newShape && ['rect', 'circle', 'line', 'text'].includes(newShape.toLowerCase())) {
-          ccSelectedClipForMenu.type = newShape.toLowerCase();
-          renderCapCutTimelineClips();
-          renderCapCutFrame(capcutCurrentFrame);
-        }
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuSetStartPosition() {
-      if (ccSelectedClipForMenu) {
-        const pos = getClipCurrentPos(ccSelectedClipForMenu, capcutCurrentFrame);
-        ccSelectedClipForMenu.startX = Math.round(pos.x);
-        ccSelectedClipForMenu.startY = Math.round(pos.y);
-        alert(`1. Pozisyon (Başlangıç) ayarlandı:\nX: ${ccSelectedClipForMenu.startX}, Y: ${ccSelectedClipForMenu.startY}`);
-        renderCapCutFrame(capcutCurrentFrame);
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuSetEndPosition() {
-      if (ccSelectedClipForMenu) {
-        const pos = getClipCurrentPos(ccSelectedClipForMenu, capcutCurrentFrame);
-        ccSelectedClipForMenu.endX = Math.round(pos.x);
-        ccSelectedClipForMenu.endY = Math.round(pos.y);
-        alert(`2. Pozisyon (Bitiş) ayarlandı:\nX: ${ccSelectedClipForMenu.endX}, Y: ${ccSelectedClipForMenu.endY}`);
-        renderCapCutFrame(capcutCurrentFrame);
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuChangeColor() {
-      if (ccSelectedClipForMenu) {
-        const newColor = prompt("Yeni renk HEX kodu girin (örn: #ff0000, #3b82f6):", ccSelectedClipForMenu.color);
-        if (newColor) {
-          ccSelectedClipForMenu.color = newColor;
-          renderCapCutTimelineClips();
-          renderCapCutFrame(capcutCurrentFrame);
-        }
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuEditText() {
-      if (ccSelectedClipForMenu) {
-        const newText = prompt("Yeni metin veya başlık girin:", ccSelectedClipForMenu.textContent || '');
-        if (newText !== null) {
-          ccSelectedClipForMenu.textContent = newText;
-          if (ccSelectedClipForMenu.type !== 'text') ccSelectedClipForMenu.type = 'text';
-          renderCapCutTimelineClips();
-          renderCapCutFrame(capcutCurrentFrame);
-        }
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuChangeDuration() {
-      if (ccSelectedClipForMenu) {
-        const newEnd = prompt(`Bitiş karesini girin (Başlangıç: ${ccSelectedClipForMenu.startFrame}, Max: ${capcutMaxFrames}):`, ccSelectedClipForMenu.endFrame);
-        if (newEnd !== null && !isNaN(newEnd)) {
-          ccSelectedClipForMenu.endFrame = Math.min(capcutMaxFrames, Math.max(ccSelectedClipForMenu.startFrame + 5, parseInt(newEnd)));
-          renderCapCutTimelineClips();
-          renderCapCutFrame(capcutCurrentFrame);
-        }
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuZoomIn() {
-      if (ccSelectedClipForMenu) {
-        ccSelectedClipForMenu.sizeScale = (ccSelectedClipForMenu.sizeScale || 1) * 1.25;
-        renderCapCutFrame(capcutCurrentFrame);
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuZoomOut() {
-      if (ccSelectedClipForMenu) {
-        ccSelectedClipForMenu.sizeScale = Math.max(0.3, (ccSelectedClipForMenu.sizeScale || 1) / 1.25);
-        renderCapCutFrame(capcutCurrentFrame);
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function ccMenuDelete() {
-      if (ccSelectedClipForMenu) {
-        capcutClips = capcutClips.filter(c => c.id !== ccSelectedClipForMenu.id);
-        renderCapCutTimelineClips();
-        renderCapCutFrame(capcutCurrentFrame);
-      }
-      document.getElementById('capcut-context-menu').style.display = 'none';
-    }
-
-    function toggleCapCutPlay() {
-      if (capcutIsPlaying) {
-        clearInterval(capcutAnimTimer);
-        capcutIsPlaying = false;
-      } else {
-        capcutIsPlaying = true;
-        capcutAnimTimer = setInterval(() => {
-          capcutCurrentFrame = (capcutCurrentFrame + 1) % (capcutMaxFrames + 1);
-          renderCapCutFrame(capcutCurrentFrame);
-        }, 1000 / 30);
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        noise.connect(gain);
+        noise.start(now);
+        noise.stop(now + 0.3);
+      } else if (type === 'powerup') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.linearRampToValueAtTime(900, now + 0.3);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'hit') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.linearRampToValueAtTime(40, now + 0.1);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
       }
     }
 
-    function resetCapCutTimeline() {
-      if (capcutIsPlaying) toggleCapCutPlay();
-      capcutCurrentFrame = 0;
-      renderCapCutFrame(capcutCurrentFrame);
-    }
+    function playCustomSound() {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
+      const waveform = document.getElementById('sfxWaveform').value;
+      const freq = parseFloat(document.getElementById('sfxFreq').value);
+      const duration = parseFloat(document.getElementById('sfxDuration').value);
+      const slide = document.getElementById('sfxSlide').value;
 
-    function scrubCapCutTimeline(e) {
-      if (e.target.closest('#timelineBar')) return;
-      const box = document.getElementById('timelineTrack');
-      const rect = box.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-      capcutCurrentFrame = Math.round(ratio * capcutMaxFrames);
-      renderCapCutFrame(capcutCurrentFrame);
-    }
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
-    const capcutImageLoader = document.getElementById('capcutImageLoader');
-    capcutImageLoader.addEventListener('change', (e) => {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const img = new Image();
-        img.onload = function () {
-          const newId = capcutClips.length + 1;
-          capcutClips.push({
-            id: newId,
-            type: 'image',
-            imgElement: img,
-            color: '#10b981',
-            startFrame: 0,
-            endFrame: 90,
-            startX: 250,
-            startY: 175,
-            endX: 250,
-            endY: 175,
-            sizeScale: 1
-          });
-          renderCapCutTimelineClips();
-          renderCapCutFrame(capcutCurrentFrame);
-        }
-        img.src = event.target.result;
+      osc.type = waveform;
+      osc.frequency.setValueAtTime(freq, now);
+
+      if (slide === 'up') {
+        osc.frequency.exponentialRampToValueAtTime(freq * 2.5, now + duration);
+      } else if (slide === 'down') {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq * 0.2), now + duration);
       }
-      if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
-    });
 
-    /* --- 4. RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + duration);
+    }
+
+    /* --- 3. RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
     let animDrawing = false;
     let currentTool = 'brush';
     let currentBrush = 'normal';
@@ -2095,7 +1575,6 @@
 
     window.addEventListener('resize', () => {
       initAnimCanvasSize();
-      renderCapCutTimelineClips();
     });
 
     function closeAllMenus() {
@@ -2387,98 +1866,58 @@
         ctxAnim.moveTo(cx, cy - 5); ctxAnim.lineTo(cx, cy + 15);
         ctxAnim.arc(cx, cy + 20, 15, 0, Math.PI);
         ctxAnim.stroke();
-      } else if (promptText.includes('kedi')) {
-        ctxAnim.beginPath();
-        ctxAnim.arc(cx, cy, 40, 0, Math.PI * 2);
-        ctxAnim.moveTo(cx - 30, cy - 25); ctxAnim.lineTo(cx - 50, cy - 60); ctxAnim.lineTo(cx - 10, cy - 35);
-        ctxAnim.moveTo(cx + 30, cy - 25); ctxAnim.lineTo(cx + 50, cy - 60); ctxAnim.lineTo(cx + 10, cy - 35);
-        ctxAnim.stroke();
-      } else {
-        ctxAnim.beginPath();
-        ctxAnim.rect(cx - 40, cy, 80, 80);
-        ctxAnim.moveTo(cx - 50, cy); ctxAnim.lineTo(cx, cy - 50); ctxAnim.lineTo(cx + 50, cy);
-        ctxAnim.stroke();
       }
     }
 
-    function quickAICoip(text) { document.getElementById('aiPromptInput').value = text; handleSmartSketchCommand(); }
-
-    /* --- 5. MINECRAFT ASİSTANI VE DERECE DAİRE ŞEMASI --- */
-    async function handleMinecraftAI() {
-      const promptText = document.getElementById('mcPromptInput').value.trim();
-      if (!promptText) return;
-      const apiKey = localStorage.getItem('gemini_api_key');
-      if (!apiKey) { alert("API anahtarı gerekli. Lütfen üstteki ayarlar düğmesinden API anahtarınızı girin."); return; }
-
-      const outputBox = document.getElementById('mcOutputBox');
-      outputBox.innerText = "Gemini yanıt üretiyor...";
-
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: `Minecraft sunucu geliştirme ve skript bağlamında yanıtla: ${promptText}` }] }] })
-        });
-        const data = await res.json();
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-          outputBox.innerText = data.candidates[0].content.parts[0].text;
-        } else {
-          outputBox.innerText = "Yanıt alınamadı veya bir hata oluştu: " + JSON.stringify(data);
-        }
-      } catch (err) {
-        outputBox.innerText = "Hata oluştu: " + err.message;
-      }
+    function quickAICoip(text) {
+      document.getElementById('aiPromptInput').value = text;
+      handleSmartSketchCommand();
     }
 
+    /* --- 4. MINECRAFT ASİSTANI MANTIĞI --- */
     function quickMcPrompt(text) {
       document.getElementById('mcPromptInput').value = text;
       handleMinecraftAI();
     }
 
-    function updateBlueprintParams() { generateBlueprint(); }
+    function handleMinecraftAI() {
+      const promptText = document.getElementById('mcPromptInput').value;
+      const output = document.getElementById('mcOutputBox');
+      output.innerText = "Yükleniyor...";
+      setTimeout(() => {
+        output.innerText = `# ${promptText} için Minecraft Kod Örneği:\non join:\n    send "&aSunucuya Hoş Geldin!" to player\n    give player 1 diamond`;
+      }, 500);
+    }
+
+    /* --- 5. MINECRAFT DAIRE / BLUEPRINT MANTIĞI --- */
+    function updateBlueprintParams() {
+      generateBlueprint();
+    }
 
     function generateBlueprint() {
-      let size = parseInt(document.getElementById('bpSizeInput').value);
-      let thickness = parseInt(document.getElementById('bpThickInput').value);
-
-      if (isNaN(size) || size < 3) size = 3;
-      if (isNaN(thickness) || thickness < 1) thickness = 1;
-
+      const d = parseInt(document.getElementById('bpSizeInput').value) || 15;
       const container = document.getElementById('blueprintGridContainer');
-      const statsText = document.getElementById('bpStatsText');
       container.innerHTML = '';
 
       const grid = document.createElement('div');
       grid.classList.add('blueprint-grid');
-      grid.style.gridTemplateColumns = `repeat(${size}, 18px)`;
+      grid.style.gridTemplateColumns = `repeat(${d}, 18px)`;
 
-      const center = (size - 1) / 2;
-      const outerRadius = size / 2;
-      const innerRadius = Math.max(0, outerRadius - thickness);
-      let activeBlocksCount = 0;
+      const r = d / 2;
+      let totalBlocks = 0;
 
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
+      for (let y = 0; y < d; y++) {
+        for (let x = 0; x < d; x++) {
           const cell = document.createElement('div');
           cell.classList.add('bp-cell');
 
-          const dx = x - center;
-          const dy = y - center;
+          const dx = (x + 0.5) - r;
+          const dy = (y + 0.5) - r;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          const isCenter = (Math.abs(dx) === 0 && Math.abs(dy) === 0);
-          const isAxis = (dx === 0 || dy === 0) && dist <= outerRadius;
-          const isEdge = dist <= outerRadius && dist >= innerRadius;
-
-          if (isCenter && size % 2 !== 0) {
-            cell.classList.add('center');
-            activeBlocksCount++;
-          } else if (isEdge) {
+          if (Math.abs(dist - r) < 0.5) {
             cell.classList.add('active');
-            activeBlocksCount++;
-          } else if (isAxis) {
-            cell.classList.add('axis');
-            activeBlocksCount++;
+            totalBlocks++;
           }
 
           grid.appendChild(cell);
@@ -2486,10 +1925,10 @@
       }
 
       container.appendChild(grid);
-      statsText.innerHTML = `Bu daireyi inşa etmek için <b>${activeBlocksCount}</b> blok gereklidir.`;
+      document.getElementById('bpStatsText').innerHTML = `Bu daireyi inşa etmek için <b>${totalBlocks}</b> blok gereklidir.`;
     }
 
-    // Uygulama Başlatma
+    // Sayfa Yüklendiğinde İlk Kurulumlar
     window.onload = () => {
       updateHeaderTodayInfo();
       renderCalendar();
