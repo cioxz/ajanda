@@ -330,6 +330,7 @@
       gap: 10px;
       margin: 14px 0;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .color-btn {
@@ -439,6 +440,7 @@
       gap: 8px;
       margin-bottom: 12px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .tool-btn {
@@ -982,6 +984,7 @@
           <div class="anim-top-toolbar">
             <div class="anim-tools">
               <button class="anim-tool-btn active" id="drawBtn" onclick="setAnimTool('brush')">✏️ Çiz</button>
+              <button class="anim-tool-btn" id="eraserBtn" onclick="setAnimTool('eraser')">🧹 Silgi</button>
               <button class="anim-tool-btn" id="brushBtn" oncontextmenu="openMenu(event, 'brush-menu'); return false;" onclick="toggleMenu(event, 'brush-menu')">Fırça ▾</button>
               <button class="anim-tool-btn" id="shapeBtn" oncontextmenu="openMenu(event, 'shape-menu'); return false;" onclick="toggleMenu(event, 'shape-menu')">Şekil ▾</button>
               <button class="anim-tool-btn" id="toolsBtn" oncontextmenu="openMenu(event, 'tools-menu'); return false;" onclick="toggleMenu(event, 'tools-menu')">Araçlar ▾</button>
@@ -1130,6 +1133,9 @@
         <div class="color-btn" style="background:#14532d;" onclick="selectColor('#14532d')"></div>
         <div class="color-btn" style="background:#1e3a8a;" onclick="selectColor('#1e3a8a')"></div>
         <div class="color-btn" style="background:#581c87;" onclick="selectColor('#581c87')"></div>
+        <label style="font-size: 0.8rem; font-weight: 600; display:flex; align-items:center; gap:4px; cursor:pointer;" title="Özel Renk Seç">
+          🎨 <input type="color" id="ajandaCustomColor" value="#5c564f" onchange="selectColor(this.value)" style="border:none; width:28px; height:28px; cursor:pointer; background:none;">
+        </label>
       </div>
 
       <textarea id="noteInput" placeholder="Bu güne özel not yazın..."></textarea>
@@ -1152,6 +1158,9 @@
       <div class="toolbar">
         <button class="tool-btn active" id="btnWriteMode" onclick="setMode('write')">✏️ Yazı</button>
         <button class="tool-btn" id="btnDrawMode" onclick="setMode('draw')">🎨 Çizim</button>
+        <label style="font-size:0.8rem; font-weight:600; display:flex; align-items:center; gap:4px; margin-left:8px;">
+          Renk: <input type="color" id="noteDrawColor" value="#2c2b2a" style="border:none; width:24px; height:24px; cursor:pointer; background:none;">
+        </label>
         <button class="tool-btn" onclick="clearInlineCanvas()" style="margin-left:auto;">Temizle</button>
       </div>
 
@@ -1333,9 +1342,10 @@
       const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
       const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
+      const drawColor = document.getElementById('noteDrawColor') ? document.getElementById('noteDrawColor').value : '#2c2b2a';
       ctx.globalCompositeOperation = 'source-over';
       ctx.lineWidth = 3;
-      ctx.strokeStyle = '#2c2b2a';
+      ctx.strokeStyle = drawColor;
       ctx.lineCap = 'round';
       ctx.lineTo(x, y);
       ctx.stroke();
@@ -1409,6 +1419,9 @@
       selectedColor = activeColor || '';
       document.getElementById('modalDate').innerText = `${day} ${monthNames[month - 1]}`;
       document.getElementById('noteInput').value = savedData.note || '';
+      if (document.getElementById('ajandaCustomColor') && activeColor) {
+        document.getElementById('ajandaCustomColor').value = activeColor;
+      }
       document.getElementById(id).style.display = 'flex';
     }
 
@@ -1422,6 +1435,9 @@
 
     function selectColor(color) {
       selectedColor = color;
+      if(document.getElementById('ajandaCustomColor') && color) {
+        document.getElementById('ajandaCustomColor').value = color;
+      }
     }
 
     function saveDayData() {
@@ -1511,7 +1527,7 @@
       }
     }
 
-    /* --- 2. GELİŞMİŞ SES STÜDYOSU & PAD YÖNETİMİ --- */
+    /* --- GELİŞMİŞ SES STÜDYOSU & PAD YÖNETİMİ & TIKLAMA SESİ --- */
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
@@ -1520,6 +1536,30 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
       return audioCtx;
     }
+
+    function playClickSound() {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(370, now);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } catch (e) {}
+    }
+
+    // Site Tıklama Sesi Dinleyicisi
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('button, .day, .pad-card, .tool-btn, .color-btn, .studio-tab-btn, .ai-chip, .nav-btn, .m4a-btn')) {
+        playClickSound();
+      }
+    });
 
     // Varsayılan Çoklu Ses Pad Verileri
     let soundPads = [
@@ -1534,7 +1574,8 @@
       { id: 9, name: '⚡ Zap', waveform: 'square', freq: 1200, duration: 0.1, slide: 'down', bg: '#06b6d4' },
       { id: 10, name: '🔔 Zil', waveform: 'sine', freq: 1500, duration: 0.5, slide: 'none', bg: '#ec4899' },
       { id: 11, name: '🔉 Düşük Bas', waveform: 'triangle', freq: 80, duration: 0.4, slide: 'down', bg: '#475569' },
-      { id: 12, name: '✨ Sihir', waveform: 'sine', freq: 880, duration: 0.35, slide: 'up', bg: '#a855f7' }
+      { id: 12, name: '✨ Sihir', waveform: 'sine', freq: 880, duration: 0.35, slide: 'up', bg: '#a855f7' },
+      { id: 13, name: '🎵 Pad #13', waveform: 'sine', freq: 370, duration: 0.1, slide: 'none', bg: '#6366f1' }
     ];
 
     let selectedPadId = 1;
@@ -1650,7 +1691,7 @@
       osc.stop(now + duration);
     }
 
-    /* --- 3. M4A FORMATINDA SES KAYDETME VE İNDİRME --- */
+    /* --- M4A FORMATINDA SES KAYDETME VE İNDİRME --- */
     function exportAudioToM4A(waveform, freq, duration, slide, filename = 'ses_efekti.m4a') {
       const ctx = getAudioContext();
       const dest = ctx.createMediaStreamDestination();
@@ -1685,7 +1726,7 @@
 
       mediaRecorder.start();
       playSynthesizedAudio(waveform, freq, duration, slide, dest);
-      playSynthesizedAudio(waveform, freq, duration, slide); // Kullanıcı da duysun
+      playSynthesizedAudio(waveform, freq, duration, slide);
 
       setTimeout(() => {
         if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
@@ -1710,7 +1751,7 @@
       exportAudioToM4A(waveform, freq, duration, slide, 'ozel_ses_efekti.m4a');
     }
 
-    /* --- 4. RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
+    /* --- RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
     let animDrawing = false;
     let currentTool = 'brush';
     let currentBrush = 'normal';
@@ -1784,18 +1825,23 @@
       currentTool = 'brush';
       currentBrush = type;
       closeAllMenus();
+      document.querySelectorAll('.anim-top-toolbar .anim-tool-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('drawBtn').classList.add('active');
     }
 
     function setShape(shape) {
       currentTool = 'shape';
       currentShape = shape;
       closeAllMenus();
+      document.querySelectorAll('.anim-top-toolbar .anim-tool-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('shapeBtn').classList.add('active');
     }
 
     function setAnimTool(tool) {
       currentTool = tool;
       document.querySelectorAll('.anim-top-toolbar .anim-tool-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('drawBtn').classList.add('active');
+      if (tool === 'brush') document.getElementById('drawBtn').classList.add('active');
+      if (tool === 'eraser') document.getElementById('eraserBtn').classList.add('active');
     }
 
     const imageLoader = document.getElementById('imageLoader');
@@ -1828,7 +1874,7 @@
 
       animDrawing = true;
       snapshot = ctxAnim.getImageData(0, 0, animCanvasEl.width, animCanvasEl.height);
-      if (currentTool === 'brush') {
+      if (currentTool === 'brush' || currentTool === 'eraser') {
         ctxAnim.beginPath();
         ctxAnim.moveTo(startX, startY);
       }
@@ -1843,7 +1889,14 @@
       const color = document.getElementById('animColorPicker').value;
       const size = document.getElementById('animBrushSize').value;
 
-      if (currentTool === 'brush') {
+      if (currentTool === 'eraser') {
+        ctxAnim.strokeStyle = "#ffffff";
+        ctxAnim.lineWidth = size * 3;
+        ctxAnim.lineCap = 'round';
+        ctxAnim.lineJoin = 'round';
+        ctxAnim.lineTo(mouseX, mouseY);
+        ctxAnim.stroke();
+      } else if (currentTool === 'brush') {
         ctxAnim.strokeStyle = color;
         ctxAnim.fillStyle = color;
         ctxAnim.lineWidth = size;
@@ -2036,7 +2089,7 @@
       handleSmartSketchCommand();
     }
 
-    /* --- 5. MINECRAFT ASİSTANI MANTIĞI --- */
+    /* --- MINECRAFT ASİSTANI MANTIĞI --- */
     function quickMcPrompt(text) {
       document.getElementById('mcPromptInput').value = text;
       handleMinecraftAI();
@@ -2051,7 +2104,7 @@
       }, 500);
     }
 
-    /* --- 6. MINECRAFT DAIRE / BLUEPRINT MANTIĞI --- */
+    /* --- MINECRAFT DAIRE / BLUEPRINT MANTIĞI --- */
     function updateBlueprintParams() {
       generateBlueprint();
     }
