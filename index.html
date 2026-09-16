@@ -776,6 +776,65 @@
       font-size: 0.8rem;
       color: var(--text-muted);
     }
+
+    /* Pad Özel Stilleri */
+    .pad-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+    .pad-card {
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .pad-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .pad-card.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .pad-btn {
+      width: 100%;
+      border: none;
+      color: white;
+      padding: 10px 6px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .pad-info {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .m4a-btn {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .m4a-btn:hover {
+      background: #047857;
+    }
   </style>
 </head>
 <body>
@@ -844,16 +903,35 @@
 
         <!-- Ses Stüdyosu Kontrolleri -->
         <div id="sidebarSound" class="studio-sidebar-content" style="display: none;">
-          <div class="sidebar-section-title">🔊 Oyun Ses Efektleri</div>
+          <div class="sidebar-section-title">🎛️ Seçili Pad Ayarlarını Düzenle</div>
           <div class="ai-assistant-box">
-            <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Hazır Oyun Efektleri:</div>
-            <button class="ai-send-btn" onclick="playSoundFX('jump')">🦘 Zıplama (Jump)</button>
-            <button class="ai-send-btn" onclick="playSoundFX('laser')">🔫 Lazer / Ateş (Laser)</button>
-            <button class="ai-send-btn" onclick="playSoundFX('coin')">🪙 Altın Toplama (Coin)</button>
-            <button class="ai-send-btn" onclick="playSoundFX('explosion')">💥 Patlama (Explosion)</button>
-            <button class="ai-send-btn" onclick="playSoundFX('powerup')">⭐ Güç Alma (Powerup)</button>
-            <button class="ai-send-btn" onclick="playSoundFX('hit')">🛡️ Darbe / Hasar (Hit)</button>
-            <button class="ai-send-btn" onclick="playSoundFX('click')">🖱️ Buton Tıklama (Click)</button>
+            <div style="font-size:0.85rem; font-weight:700; color:#2563eb;" id="selectedPadTitle">Pad #1 Ayarları</div>
+            
+            <label style="font-size:0.8rem; font-weight:600;">Pad İsmi:</label>
+            <input type="text" id="padEditName" style="padding:6px; border-radius:6px; border:1px solid var(--border-color);" onchange="updateSelectedPad()">
+
+            <label style="font-size:0.8rem; font-weight:600;">Frekans / Pitch (Hz): <span id="padFreqVal">440 Hz</span></label>
+            <input type="range" id="padEditFreq" min="50" max="3000" step="10" value="440" oninput="document.getElementById('padFreqVal').innerText=this.value+' Hz'; updateSelectedPad();">
+
+            <label style="font-size:0.8rem; font-weight:600;">Süre (Saniye): <span id="padDurVal">0.3 sn</span></label>
+            <input type="range" id="padEditDur" min="0.05" max="3.0" step="0.05" value="0.3" oninput="document.getElementById('padDurVal').innerText=this.value+' sn'; updateSelectedPad();">
+
+            <label style="font-size:0.8rem; font-weight:600;">Dalga Tipi:</label>
+            <select id="padEditWave" style="padding:6px; border-radius:6px; border:1px solid var(--border-color);" onchange="updateSelectedPad()">
+              <option value="square">Kare (Retro 8-Bit)</option>
+              <option value="sine">Sinüs (Yumuşak)</option>
+              <option value="sawtooth">Testere (Lazer)</option>
+              <option value="triangle">Üçgen (Bas)</option>
+            </select>
+
+            <label style="font-size:0.8rem; font-weight:600;">Frekans Kayması (Slide):</label>
+            <select id="padEditSlide" style="padding:6px; border-radius:6px; border:1px solid var(--border-color);" onchange="updateSelectedPad()">
+              <option value="none">Sabit Frekans</option>
+              <option value="up">Yükselen (Zıplama)</option>
+              <option value="down">Düşen (Lazer)</option>
+            </select>
+
+            <button class="ai-send-btn" style="background:#059669; margin-top:8px;" onclick="exportSelectedPadM4A()">📥 Seçili Pad'i M4A İndir</button>
           </div>
         </div>
 
@@ -929,49 +1007,50 @@
         <!-- Ses Stüdyosu Paneli -->
         <div id="panelSound" class="studio-panel">
           <div class="anim-top-toolbar">
-            <span style="font-weight: 600; font-size: 0.9rem;">🔊 Ses Efekti Sentezleyici & Jeneratörü</span>
-            <button class="anim-tool-btn" onclick="playCustomSound()">▶️ Efekti Dinle / Çal</button>
+            <span style="font-weight: 600; font-size: 0.9rem;">🔊 Ses Efekti Sentezleyici & Çoklu Ses Padleri</span>
+            <div style="display:flex; gap:8px;">
+              <button class="anim-tool-btn" onclick="playCustomSound()">▶️ Özel Efekti Dinle</button>
+              <button class="anim-tool-btn" style="background:#059669; color:white;" onclick="exportCustomSoundM4A()">💾 M4A İndir</button>
+            </div>
           </div>
           <div class="minecraft-box" style="gap:16px;">
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
               <div class="blueprint-card-box">
-                <span style="font-size:0.85rem; font-weight:700;">Dalga Tipi (Waveform)</span>
-                <select id="sfxWaveform" style="padding:8px; border-radius:8px; border:1px solid var(--border-color); font-weight:600;">
-                  <option value="square" selected>Kare (Retro 8-Bit / Square)</option>
-                  <option value="sine">Sinüs (Yumuşak / Sine)</option>
-                  <option value="sawtooth">Testere (Keskin Lazer / Sawtooth)</option>
-                  <option value="triangle">Üçgen (Bas / Triangle)</option>
+                <span style="font-size:0.85rem; font-weight:700;">Dalga Tipi</span>
+                <select id="sfxWaveform" style="padding:6px; border-radius:8px; border:1px solid var(--border-color); font-weight:600;">
+                  <option value="square" selected>Kare (8-Bit)</option>
+                  <option value="sine">Sinüs (Yumuşak)</option>
+                  <option value="sawtooth">Testere (Lazer)</option>
+                  <option value="triangle">Üçgen (Bas)</option>
                 </select>
               </div>
               <div class="blueprint-card-box">
-                <span style="font-size:0.85rem; font-weight:700;">Başlangıç Frekansı (Hz)</span>
-                <input type="range" id="sfxFreq" min="100" max="2000" value="440" oninput="document.getElementById('freqVal').innerText = this.value + ' Hz'">
+                <span style="font-size:0.85rem; font-weight:700;">Başlangıç Hz</span>
+                <input type="range" id="sfxFreq" min="100" max="2500" value="440" oninput="document.getElementById('freqVal').innerText = this.value + ' Hz'">
                 <span id="freqVal" style="font-size:0.8rem; text-align:right;">440 Hz</span>
               </div>
               <div class="blueprint-card-box">
-                <span style="font-size:0.85rem; font-weight:700;">Süre (Saniye)</span>
-                <input type="range" id="sfxDuration" min="0.05" max="2.0" step="0.05" value="0.3" oninput="document.getElementById('durVal').innerText = this.value + ' sn'">
+                <span style="font-size:0.85rem; font-weight:700;">Süre</span>
+                <input type="range" id="sfxDuration" min="0.05" max="3.0" step="0.05" value="0.3" oninput="document.getElementById('durVal').innerText = this.value + ' sn'">
                 <span id="durVal" style="font-size:0.8rem; text-align:right;">0.3 sn</span>
               </div>
               <div class="blueprint-card-box">
-                <span style="font-size:0.85rem; font-weight:700;">Frekans Kayması (Pitch Slide)</span>
-                <select id="sfxSlide" style="padding:8px; border-radius:8px; border:1px solid var(--border-color); font-weight:600;">
-                  <option value="none">Sabit Frekans</option>
-                  <option value="up">Yükselen (Zıplama / Up)</option>
-                  <option value="down" selected>Düşen (Lazer / Down)</option>
+                <span style="font-size:0.85rem; font-weight:700;">Pitch Slide</span>
+                <select id="sfxSlide" style="padding:6px; border-radius:8px; border:1px solid var(--border-color); font-weight:600;">
+                  <option value="none">Sabit</option>
+                  <option value="up">Yükselen</option>
+                  <option value="down" selected>Düşen</option>
                 </select>
               </div>
             </div>
 
-            <div style="font-weight:700; font-size:0.9rem; margin-top:8px;">🎮 Oyun İçi Ses Padleri (Tıkla ve Dinle)</div>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
-              <button class="open-anim-btn" style="justify-content:center; background:#3b82f6;" onclick="playSoundFX('jump')">🦘 Zıpla</button>
-              <button class="open-anim-btn" style="justify-content:center; background:#ef4444;" onclick="playSoundFX('laser')">🔫 Lazer</button>
-              <button class="open-anim-btn" style="justify-content:center; background:#eab308;" onclick="playSoundFX('coin')">🪙 Coin</button>
-              <button class="open-anim-btn" style="justify-content:center; background:#dc2626;" onclick="playSoundFX('explosion')">💥 Patlama</button>
-              <button class="open-anim-btn" style="justify-content:center; background:#10b981;" onclick="playSoundFX('powerup')">⭐ Powerup</button>
-              <button class="open-anim-btn" style="justify-content:center; background:#8b5cf6;" onclick="playSoundFX('hit')">🛡️ Darbe</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+              <div style="font-weight:700; font-size:0.95rem;">🎮 Ses Padleri (Tıkla Çal - Seç ve Sol Panelden Editle)</div>
+              <button class="add-note-btn" onclick="addNewPad()">+ Yeni Pad Ekle</button>
             </div>
+
+            <!-- Ses Padleri Grid Alanı -->
+            <div class="pad-grid" id="padGridContainer"></div>
           </div>
         </div>
 
@@ -1098,7 +1177,7 @@
     let selectedMonth = 1;
     let currentMode = 'write';
 
-    const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylul", "Ekim", "Kasım", "Aralık"];
+    const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
     const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
 
     const fixedHolidays = {
@@ -1413,8 +1492,9 @@
         document.getElementById('tabSound').classList.add('active');
         document.getElementById('panelSound').classList.add('active');
         document.getElementById('sidebarSound').style.display = 'flex';
-        document.getElementById('studioMainTitle').innerText = '🔊 Ses Stüdyosu';
+        document.getElementById('studioMainTitle').innerText = '🔊 Ses Stüdyosu & Pad Editörü';
         document.getElementById('activeStudioName').innerText = 'Ses Stüdyosu';
+        renderSoundPads();
       } else if (type === 'minecraft') {
         document.getElementById('tabMc').classList.add('active');
         document.getElementById('panelMc').classList.add('active');
@@ -1431,101 +1511,118 @@
       }
     }
 
-    /* --- 2. SES STÜDYOSU (WEB AUDIO API SES EFEKTİ JENERATÖRÜ) --- */
+    /* --- 2. GELİŞMİŞ SES STÜDYOSU & PAD YÖNETİMİ --- */
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
     function getAudioContext() {
-      if (!audioCtx) {
-        audioCtx = new AudioCtx();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       return audioCtx;
     }
 
-    function playSoundFX(type) {
-      const ctx = getAudioContext();
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    // Varsayılan Çoklu Ses Pad Verileri
+    let soundPads = [
+      { id: 1, name: '🦘 Zıplama', waveform: 'square', freq: 150, duration: 0.15, slide: 'up', bg: '#3b82f6' },
+      { id: 2, name: '🔫 Lazer', waveform: 'sawtooth', freq: 800, duration: 0.15, slide: 'down', bg: '#ef4444' },
+      { id: 3, name: '🪙 Altın', waveform: 'sine', freq: 987, duration: 0.3, slide: 'none', bg: '#eab308' },
+      { id: 4, name: '💥 Patlama', waveform: 'sawtooth', freq: 100, duration: 0.35, slide: 'down', bg: '#dc2626' },
+      { id: 5, name: '⭐ Powerup', waveform: 'triangle', freq: 300, duration: 0.3, slide: 'up', bg: '#10b981' },
+      { id: 6, name: '🛡️ Darbe', waveform: 'sawtooth', freq: 120, duration: 0.1, slide: 'down', bg: '#8b5cf6' },
+      { id: 7, name: '🖱️ Tıklama', waveform: 'sine', freq: 600, duration: 0.05, slide: 'none', bg: '#64748b' },
+      { id: 8, name: '🚨 Siren', waveform: 'sawtooth', freq: 440, duration: 0.4, slide: 'up', bg: '#f97316' },
+      { id: 9, name: '⚡ Zap', waveform: 'square', freq: 1200, duration: 0.1, slide: 'down', bg: '#06b6d4' },
+      { id: 10, name: '🔔 Zil', waveform: 'sine', freq: 1500, duration: 0.5, slide: 'none', bg: '#ec4899' },
+      { id: 11, name: '🔉 Düşük Bas', waveform: 'triangle', freq: 80, duration: 0.4, slide: 'down', bg: '#475569' },
+      { id: 12, name: '✨ Sihir', waveform: 'sine', freq: 880, duration: 0.35, slide: 'up', bg: '#a855f7' }
+    ];
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+    let selectedPadId = 1;
 
-      if (type === 'jump') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now);
-        osc.stop(now + 0.15);
-      } else if (type === 'laser') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(800, now);
-        osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now);
-        osc.stop(now + 0.15);
-      } else if (type === 'coin') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(987.77, now);
-        osc.frequency.setValueAtTime(1318.51, now + 0.08);
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-      } else if (type === 'explosion') {
-        const bufferSize = ctx.sampleRate * 0.3;
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
-        const noise = ctx.createBufferSource();
-        noise.buffer = buffer;
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        noise.connect(gain);
-        noise.start(now);
-        noise.stop(now + 0.3);
-      } else if (type === 'powerup') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.linearRampToValueAtTime(900, now + 0.3);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-      } else if (type === 'hit') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(120, now);
-        osc.frequency.linearRampToValueAtTime(40, now + 0.1);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now);
-        osc.stop(now + 0.1);
-      } else if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, now);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-        osc.start(now);
-        osc.stop(now + 0.05);
-      }
+    function renderSoundPads() {
+      const container = document.getElementById('padGridContainer');
+      container.innerHTML = '';
+
+      soundPads.forEach((pad) => {
+        const isSelected = pad.id === selectedPadId;
+        const card = document.createElement('div');
+        card.className = `pad-card ${isSelected ? 'selected' : ''}`;
+        card.onclick = () => selectPad(pad.id);
+
+        card.innerHTML = `
+          <button class="pad-btn" style="background:${pad.bg};" onclick="event.stopPropagation(); triggerPadSound(${pad.id}); selectPad(${pad.id});">${pad.name}</button>
+          <div class="pad-info">${pad.freq} Hz | ${pad.duration}s</div>
+          <button class="m4a-btn" onclick="event.stopPropagation(); exportPadM4A(${pad.id});">📥 M4A</button>
+        `;
+        container.appendChild(card);
+      });
+
+      loadSelectedPadToSidebar();
+    }
+
+    function selectPad(id) {
+      selectedPadId = id;
+      renderSoundPads();
+    }
+
+    function loadSelectedPadToSidebar() {
+      const pad = soundPads.find(p => p.id === selectedPadId);
+      if (!pad) return;
+
+      document.getElementById('selectedPadTitle').innerText = `Pad #${pad.id} (${pad.name}) Ayarları`;
+      document.getElementById('padEditName').value = pad.name;
+      document.getElementById('padEditFreq').value = pad.freq;
+      document.getElementById('padFreqVal').innerText = pad.freq + ' Hz';
+      document.getElementById('padEditDur').value = pad.duration;
+      document.getElementById('padDurVal').innerText = pad.duration + ' sn';
+      document.getElementById('padEditWave').value = pad.waveform;
+      document.getElementById('padEditSlide').value = pad.slide;
+    }
+
+    function updateSelectedPad() {
+      const pad = soundPads.find(p => p.id === selectedPadId);
+      if (!pad) return;
+
+      pad.name = document.getElementById('padEditName').value || `Pad #${pad.id}`;
+      pad.freq = parseFloat(document.getElementById('padEditFreq').value);
+      pad.duration = parseFloat(document.getElementById('padEditDur').value);
+      pad.waveform = document.getElementById('padEditWave').value;
+      pad.slide = document.getElementById('padEditSlide').value;
+
+      renderSoundPads();
+    }
+
+    function addNewPad() {
+      const newId = soundPads.length > 0 ? Math.max(...soundPads.map(p => p.id)) + 1 : 1;
+      soundPads.push({
+        id: newId,
+        name: `🎵 Pad #${newId}`,
+        waveform: 'square',
+        freq: 500,
+        duration: 0.2,
+        slide: 'none',
+        bg: '#4a4743'
+      });
+      selectPad(newId);
+    }
+
+    function triggerPadSound(id) {
+      const pad = soundPads.find(p => p.id === id);
+      if (!pad) return;
+      playSynthesizedAudio(pad.waveform, pad.freq, pad.duration, pad.slide);
     }
 
     function playCustomSound() {
-      const ctx = getAudioContext();
-      const now = ctx.currentTime;
       const waveform = document.getElementById('sfxWaveform').value;
       const freq = parseFloat(document.getElementById('sfxFreq').value);
       const duration = parseFloat(document.getElementById('sfxDuration').value);
       const slide = document.getElementById('sfxSlide').value;
+      playSynthesizedAudio(waveform, freq, duration, slide);
+    }
 
+    function playSynthesizedAudio(waveform, freq, duration, slide, destinationNode = null) {
+      const ctx = getAudioContext();
+      const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -1535,20 +1632,85 @@
       if (slide === 'up') {
         osc.frequency.exponentialRampToValueAtTime(freq * 2.5, now + duration);
       } else if (slide === 'down') {
-        osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq * 0.2), now + duration);
+        osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq * 0.15), now + duration);
       }
 
       gain.gain.setValueAtTime(0.3, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      
+      if (destinationNode) {
+        gain.connect(destinationNode);
+      } else {
+        gain.connect(ctx.destination);
+      }
 
       osc.start(now);
       osc.stop(now + duration);
     }
 
-    /* --- 3. RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
+    /* --- 3. M4A FORMATINDA SES KAYDETME VE İNDİRME --- */
+    function exportAudioToM4A(waveform, freq, duration, slide, filename = 'ses_efekti.m4a') {
+      const ctx = getAudioContext();
+      const dest = ctx.createMediaStreamDestination();
+
+      let mimeType = 'audio/mp4';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        if (MediaRecorder.isTypeSupported('audio/aac')) mimeType = 'audio/aac';
+        else if (MediaRecorder.isTypeSupported('audio/webm')) mimeType = 'audio/webm';
+      }
+
+      let mediaRecorder;
+      try {
+        mediaRecorder = new MediaRecorder(dest.stream, { mimeType: mimeType });
+      } catch (e) {
+        mediaRecorder = new MediaRecorder(dest.stream);
+      }
+
+      const chunks = [];
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: mimeType || 'audio/mp4' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename.endsWith('.m4a') ? filename : filename + '.m4a';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      mediaRecorder.start();
+      playSynthesizedAudio(waveform, freq, duration, slide, dest);
+      playSynthesizedAudio(waveform, freq, duration, slide); // Kullanıcı da duysun
+
+      setTimeout(() => {
+        if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      }, (duration + 0.15) * 1000);
+    }
+
+    function exportPadM4A(id) {
+      const pad = soundPads.find(p => p.id === id);
+      if (!pad) return;
+      exportAudioToM4A(pad.waveform, pad.freq, pad.duration, pad.slide, `${pad.name.replace(/[^a-zA-Z0-9]/g, '_')}.m4a`);
+    }
+
+    function exportSelectedPadM4A() {
+      exportPadM4A(selectedPadId);
+    }
+
+    function exportCustomSoundM4A() {
+      const waveform = document.getElementById('sfxWaveform').value;
+      const freq = parseFloat(document.getElementById('sfxFreq').value);
+      const duration = parseFloat(document.getElementById('sfxDuration').value);
+      const slide = document.getElementById('sfxSlide').value;
+      exportAudioToM4A(waveform, freq, duration, slide, 'ozel_ses_efekti.m4a');
+    }
+
+    /* --- 4. RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
     let animDrawing = false;
     let currentTool = 'brush';
     let currentBrush = 'normal';
@@ -1874,7 +2036,7 @@
       handleSmartSketchCommand();
     }
 
-    /* --- 4. MINECRAFT ASİSTANI MANTIĞI --- */
+    /* --- 5. MINECRAFT ASİSTANI MANTIĞI --- */
     function quickMcPrompt(text) {
       document.getElementById('mcPromptInput').value = text;
       handleMinecraftAI();
@@ -1889,7 +2051,7 @@
       }, 500);
     }
 
-    /* --- 5. MINECRAFT DAIRE / BLUEPRINT MANTIĞI --- */
+    /* --- 6. MINECRAFT DAIRE / BLUEPRINT MANTIĞI --- */
     function updateBlueprintParams() {
       generateBlueprint();
     }
