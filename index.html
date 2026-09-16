@@ -520,6 +520,13 @@
       overflow-y: auto;
     }
 
+    .studio-sidebar-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
     .sidebar-section-title {
       font-size: 0.85rem;
       font-weight: 700;
@@ -637,7 +644,6 @@
       border-color: var(--primary);
     }
 
-    /* Sağ Tıklama Menüleri */
     .context-menu {
       display: none;
       position: absolute;
@@ -757,6 +763,29 @@
       overflow: auto;
     }
 
+    /* Daire Şeması Grid Stilleri */
+    .blueprint-grid {
+      display: grid;
+      gap: 2px;
+      background: #d5d0c7;
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .bp-cell {
+      width: 18px;
+      height: 18px;
+      background-color: #ffffff;
+      border-radius: 2px;
+      transition: background-color 0.1s;
+    }
+
+    .bp-cell.active {
+      background-color: #2563eb;
+      box-shadow: 0 0 4px rgba(37, 99, 235, 0.4);
+    }
+
     .bp-stats-text {
       font-size: 0.95rem;
       font-weight: 500;
@@ -779,12 +808,12 @@
       color: var(--text-muted);
     }
 
-    /* Pad Özel Stilleri */
     .pad-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 12px;
     }
+
     .pad-card {
       background: #ffffff;
       border: 2px solid var(--border-color);
@@ -798,14 +827,17 @@
       transition: all 0.15s ease;
       position: relative;
     }
+
     .pad-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
+
     .pad-card.selected {
       border-color: #2563eb;
       background: #eff6ff;
     }
+
     .pad-btn {
       width: 100%;
       border: none;
@@ -818,11 +850,13 @@
       text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
+
     .pad-info {
       font-size: 0.75rem;
       color: var(--text-muted);
       text-align: center;
     }
+
     .m4a-btn {
       background: #059669;
       color: white;
@@ -834,6 +868,7 @@
       cursor: pointer;
       transition: background 0.2s;
     }
+
     .m4a-btn:hover {
       background: #047857;
     }
@@ -952,8 +987,8 @@
 
         <!-- Daire / Blueprint Kontrolleri -->
         <div id="sidebarBlueprint" class="studio-sidebar-content" style="display: none;">
-          <div style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Circle Generator</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
+          <div style="font-size: 1rem; font-weight: 700; margin-bottom: 2px;">Circle Generator</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
             Minecraft daire şemanızı özelleştirin.
           </div>
 
@@ -1052,7 +1087,6 @@
               <button class="add-note-btn" onclick="addNewPad()">+ Yeni Pad Ekle</button>
             </div>
 
-            <!-- Ses Padleri Grid Alanı -->
             <div class="pad-grid" id="padGridContainer"></div>
           </div>
         </div>
@@ -1177,7 +1211,6 @@
   </div>
 
   <script>
-    /* --- 1. TAKVİM VE GENEL NOT SİSTEMİ --- */
     let currentDate = new Date();
     const realToday = new Date();
     let selectedDateKey = '';
@@ -1527,7 +1560,6 @@
       }
     }
 
-    /* --- GELİŞMİŞ SES STÜDYOSU & PAD YÖNETİMİ & TIKLAMA SESİ --- */
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
@@ -1554,14 +1586,12 @@
       } catch (e) {}
     }
 
-    // Site Tıklama Sesi Dinleyicisi
     document.addEventListener('click', (e) => {
       if (e.target.closest('button, .day, .pad-card, .tool-btn, .color-btn, .studio-tab-btn, .ai-chip, .nav-btn, .m4a-btn')) {
         playClickSound();
       }
     });
 
-    // Varsayılan Çoklu Ses Pad Verileri
     let soundPads = [
       { id: 1, name: '🦘 Zıplama', waveform: 'square', freq: 150, duration: 0.15, slide: 'up', bg: '#3b82f6' },
       { id: 2, name: '🔫 Lazer', waveform: 'sawtooth', freq: 800, duration: 0.15, slide: 'down', bg: '#ef4444' },
@@ -1691,7 +1721,6 @@
       osc.stop(now + duration);
     }
 
-    /* --- M4A FORMATINDA SES KAYDETME VE İNDİRME --- */
     function exportAudioToM4A(waveform, freq, duration, slide, filename = 'ses_efekti.m4a') {
       const ctx = getAudioContext();
       const dest = ctx.createMediaStreamDestination();
@@ -1751,7 +1780,6 @@
       exportAudioToM4A(waveform, freq, duration, slide, 'ozel_ses_efekti.m4a');
     }
 
-    /* --- RESİM STÜDYOSU VE SERBEST ÇİZİM --- */
     let animDrawing = false;
     let currentTool = 'brush';
     let currentBrush = 'normal';
@@ -2089,7 +2117,6 @@
       handleSmartSketchCommand();
     }
 
-    /* --- MINECRAFT ASİSTANI MANTIĞI --- */
     function quickMcPrompt(text) {
       document.getElementById('mcPromptInput').value = text;
       handleMinecraftAI();
@@ -2104,13 +2131,13 @@
       }, 500);
     }
 
-    /* --- MINECRAFT DAIRE / BLUEPRINT MANTIĞI --- */
     function updateBlueprintParams() {
       generateBlueprint();
     }
 
     function generateBlueprint() {
       const d = parseInt(document.getElementById('bpSizeInput').value) || 15;
+      const thick = parseInt(document.getElementById('bpThickInput').value) || 1;
       const container = document.getElementById('blueprintGridContainer');
       container.innerHTML = '';
 
@@ -2119,6 +2146,7 @@
       grid.style.gridTemplateColumns = `repeat(${d}, 18px)`;
 
       const r = d / 2;
+      const innerR = Math.max(0, r - thick);
       let totalBlocks = 0;
 
       for (let y = 0; y < d; y++) {
@@ -2130,7 +2158,7 @@
           const dy = (y + 0.5) - r;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (Math.abs(dist - r) < 0.5) {
+          if (dist <= r && dist >= innerR) {
             cell.classList.add('active');
             totalBlocks++;
           }
@@ -2143,7 +2171,6 @@
       document.getElementById('bpStatsText').innerHTML = `Bu daireyi inşa etmek için <b>${totalBlocks}</b> blok gereklidir.`;
     }
 
-    // Sayfa Yüklendiğinde İlk Kurulumlar
     window.onload = () => {
       updateHeaderTodayInfo();
       renderCalendar();
