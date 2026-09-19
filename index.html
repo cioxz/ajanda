@@ -49,6 +49,80 @@
       display: flex;
       justify-content: flex-end;
       gap: 12px;
+      position: relative;
+    }
+
+    /* Uygulamalar Menü Stilleri */
+    .apps-dropdown-container {
+      position: relative;
+    }
+
+    .apps-btn {
+      background: #d5d0c7;
+      color: var(--text-main);
+      border: 1px solid #b8b0a4;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .apps-btn:hover {
+      background: #c4beb3;
+    }
+
+    .apps-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      min-width: 200px;
+      padding: 8px;
+      z-index: 1000;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    .apps-menu.show {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      transition: background 0.15s;
+    }
+
+    .app-item:hover {
+      background: #f4f2ee;
+    }
+
+    .app-item span.icon {
+      font-size: 1.2rem;
+      width: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .open-anim-btn {
@@ -881,6 +955,25 @@
 <body>
 
   <div class="top-action-bar">
+    <!-- Uygulamalar Butonu ve Menüsü -->
+    <div class="apps-dropdown-container">
+      <button class="apps-btn" onclick="toggleAppsMenu(event)">📱 Uygulamalar ▾</button>
+      <div class="apps-menu" id="appsDropdownMenu">
+        <a href="whatsapp://" onclick="openAppWithFallback(event, 'whatsapp://', 'https://web.whatsapp.com')" class="app-item">
+          <span class="icon">💬</span> WhatsApp
+        </a>
+        <a href="discord://" onclick="openAppWithFallback(event, 'discord://', 'https://discord.com/app')" class="app-item">
+          <span class="icon">👾</span> Discord
+        </a>
+        <a href="https://www.youtube.com" target="_blank" class="app-item">
+          <span class="icon">▶️</span> YouTube
+        </a>
+        <a href="https://music.youtube.com" target="_blank" class="app-item">
+          <span class="icon">🎵</span> YouTube Music
+        </a>
+      </div>
+    </div>
+
     <button class="settings-btn" onclick="configureApiKey()">⚙️ API Anahtarı Ayarla</button>
     <button class="open-anim-btn" onclick="openAnimStudio()">🚀 Stüdyolar</button>
   </div>
@@ -1137,7 +1230,7 @@
     <button onclick="setShape('line')">Çizgi</button>
     <button onclick="setShape('rect')">Dikdörtgen</button>
     <button onclick="setShape('roundRect')">Yuvarlak Dikdörtgen</button>
-    <button onclick="setShape('circle')">Çember / Daire</button>
+    <button onclick="setShape('circle')">Çamber / Daire</button>
     <button onclick="setShape('triangle')">Üçgen</button>
     <button onclick="setShape('rightTriangle')">Dik Üçgen</button>
     <button onclick="setShape('diamond')">Eşkenar Dörtgen</button>
@@ -1245,6 +1338,33 @@
       "2026-5-29": "Kurban Bayramı 3. Gün",
       "2026-5-30": "Kurban Bayramı 4. Gün"
     };
+
+    // Uygulamalar Menüsü Kontrol Fonksiyonları
+    function toggleAppsMenu(event) {
+      event.stopPropagation();
+      const menu = document.getElementById('appsDropdownMenu');
+      menu.classList.toggle('show');
+    }
+
+    function openAppWithFallback(event, appScheme, webUrl) {
+      event.preventDefault();
+      const start = Date.now();
+      window.location.href = appScheme;
+
+      setTimeout(() => {
+        if (Date.now() - start < 2000) {
+          window.open(webUrl, '_blank');
+        }
+      }, 1200);
+    }
+
+    // Menü dışına tıklanınca açılır menüyü kapatma
+    window.addEventListener('click', (e) => {
+      const appsMenu = document.getElementById('appsDropdownMenu');
+      if (appsMenu && !e.target.closest('.apps-dropdown-container')) {
+        appsMenu.classList.remove('show');
+      }
+    });
 
     function getHolidayName(year, month, day) {
       const fullKey = `${year}-${month}-${day}`;
@@ -1591,7 +1711,7 @@
     }
 
     document.addEventListener('click', (e) => {
-      if (e.target.closest('button, .day, .pad-card, .tool-btn, .color-btn, .studio-tab-btn, .ai-chip, .nav-btn, .m4a-btn')) {
+      if (e.target.closest('button, .day, .pad-card, .tool-btn, .color-btn, .studio-tab-btn, .ai-chip, .nav-btn, .m4a-btn, .app-item')) {
         playClickSound();
       }
     });
